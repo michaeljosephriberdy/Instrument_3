@@ -1,0 +1,70 @@
+#pragma once
+
+#include <atomic>
+#include <cstdint>
+#include <map>
+#include <memory>
+
+#include <sys/types.h>
+
+#include "actions.h"
+#include "layout_manager.h"
+
+class InstrumentState;
+class KeyboardManager;
+class BreathController;
+class MidiEngine;
+class VialController;
+class ConfigManager;
+struct KeyEvent;
+
+// Phase 3: layouts/config load from JSON; upper-keyboard actions drive
+// InstrumentState; bottom boards use absolute-cents Note actions.
+class Engine
+{
+public:
+    Engine();
+    ~Engine();
+
+    bool initialize();
+    void run();
+    void shutdown();
+    void requestStop();
+
+private:
+    struct ActiveKey
+    {
+        int note;
+        int channel;
+    };
+
+    bool launchZyn();
+    void handleKeyEvent(const KeyEvent& event);
+    void handleAction(const Action& action, int keyboard_index, int keycode, bool pressed);
+
+    // Convert absolute layout cents + octave + transpose → MIDI note + bend cents.
+    // Returns MIDI note in [0,127]; residual_cents is the pitch-bend amount
+    // in cents relative to that note (−50..+50 typically).
+    void centsToMidi(int absolute_cents, int& midi_note, int& residual_cents) const;
+
+    void allNotesOff();
+
+private:
+    std::atomic<bool> running_;
+    pid_t zyn_pid_ = -1;
+
+    std::unique_ptr<InstrumentState> state_;
+    std::unique_ptr<KeyboardManager> keyboard_;
+    std::unique_ptr<BreathController> breath_;
+    std::unique_ptr<MidiEngine> midi_;
+    std::unique_ptr<VialController> vial_;
+    std::unique_ptr<ConfigManager> config_;
+    std::unique_ptr<LayoutManager> layouts_;
+
+    int mix_step_ = 5;
+    int transpose_step_ = 1;
+    int drum_channel_ = 9;
+
+    std::map<uint32_t, ActiveKey> active_keys_;
+    std::map<uint32_t, int> note_ref_counts_;
+};

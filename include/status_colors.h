@@ -1,0 +1,19 @@
+#pragma once
+
+#include "vial_controller.h"
+
+// Named colors for the plan's Section 5 RGB status system. Hue is on
+// VialRGB's 0-255 scale. Brightness is deliberately not maxed out
+// (200/255) so status colors read as clearly distinct from a full-
+// brightness "look at me" performance color later -- tune freely,
+// this was a judgment call, not a spec value from the design doc.
+namespace StatusColors
+{
+    constexpr VialController::Color Blue    {170, 255, 200};
+    constexpr VialController::Color White   {0,   0,   200};
+    constexpr VialController::Color Green   {85,  255, 200};
+    constexpr VialController::Color Yellow  {42,  255, 200};
+    constexpr VialController::Color Magenta {212, 255, 200};
+    constexpr VialController::Color Cyan    {127, 255, 200};
+    constexpr VialController::Color Red     {0,   255, 200};
+}

@@ -1,0 +1,47 @@
+# =============================================================================
+# Phase 3 CMake changes — merge into the project CMakeLists.txt
+# =============================================================================
+
+# After find_package(Threads REQUIRED), add:
+
+include(FetchContent)
+FetchContent_Declare(
+    json
+    GIT_REPOSITORY https://github.com/nlohmann/json.git
+    GIT_TAG        v3.11.3
+    GIT_SHALLOW    TRUE
+)
+FetchContent_MakeAvailable(json)
+
+# Replace the add_executable block with:
+
+add_executable(microtonal_instrument
+
+    src/main.cpp
+    src/engine.cpp
+    src/logger.cpp
+    src/instrument_state.cpp
+    src/keyboard_manager.cpp
+    src/keyboard_discovery.cpp
+    src/keyboard_assignment.cpp
+    src/breath_controller.cpp
+    src/midi_engine.cpp
+    src/vial_controller.cpp
+    src/startup_manager.cpp
+    src/usb_topology.cpp
+
+    # Phase 3
+    src/config_manager.cpp
+    src/layout_manager.cpp
+)
+
+target_link_libraries(microtonal_instrument
+    ${ALSA_LIBRARIES}
+    ${HIDAPI_LIBRARIES}
+    Threads::Threads
+    nlohmann_json::nlohmann_json
+)
+
+# Optional helper that writes default layout JSON files from the built-in V1 grids:
+# add_executable(write_default_layouts tools/write_default_layouts.cpp src/layout_manager.cpp src/logger.cpp)
+# target_link_libraries(write_default_layouts nlohmann_json::nlohmann_json)
