@@ -1,367 +1,366 @@
 {
   "name": "bottom_right",
   "inverted": false,
-  "layout_version": "v1.1-4loop-rails",
   "keys": [
     {
       "row": 0,
       "col": 0,
       "action": "note",
-      "cents": -40
+      "cents": -50
     },
     {
       "row": 0,
+      "col": 1,
+      "action": "note",
+      "cents": 50
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "action": "note",
+      "cents": 150
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "action": "note",
+      "cents": 250
+    },
+    {
+      "row": 0,
+      "col": 4,
+      "action": "note",
+      "cents": 350
+    },
+    {
+      "row": 0,
+      "col": 5,
+      "action": "note",
+      "cents": 450
+    },
+    {
+      "row": 0,
+      "col": 6,
+      "action": "note",
+      "cents": 550
+    },
+    {
+      "row": 0,
+      "col": 7,
+      "action": "note",
+      "cents": 650
+    },
+    {
+      "row": 0,
+      "col": 8,
+      "action": "note",
+      "cents": 750
+    },
+    {
+      "row": 0,
+      "col": 9,
+      "action": "note",
+      "cents": 850
+    },
+    {
+      "row": 0,
+      "col": 10,
+      "action": "note",
+      "cents": 950
+    },
+    {
+      "row": 0,
+      "col": 11,
+      "action": "note",
+      "cents": 1050
+    },
+    {
+      "row": 0,
+      "col": 12,
+      "action": "note",
+      "cents": 1150
+    },
+    {
+      "row": 0,
+      "col": 13,
+      "action": "note",
+      "cents": 1250
+    },
+    {
+      "row": 0,
+      "col": 14,
+      "action": "note",
+      "cents": 1350
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "action": "note",
+      "cents": -40
+    },
+    {
+      "row": 1,
       "col": 1,
       "action": "note",
       "cents": 60
     },
     {
-      "row": 0,
+      "row": 1,
       "col": 2,
       "action": "note",
       "cents": 160
     },
     {
-      "row": 0,
+      "row": 1,
       "col": 3,
       "action": "note",
       "cents": 260
     },
     {
-      "row": 0,
+      "row": 1,
       "col": 4,
       "action": "note",
       "cents": 360
     },
     {
-      "row": 0,
+      "row": 1,
       "col": 5,
       "action": "note",
       "cents": 460
     },
     {
-      "row": 0,
+      "row": 1,
       "col": 6,
       "action": "note",
       "cents": 560
     },
     {
-      "row": 0,
+      "row": 1,
       "col": 7,
       "action": "note",
       "cents": 660
     },
     {
-      "row": 0,
+      "row": 1,
       "col": 8,
       "action": "note",
       "cents": 760
     },
     {
-      "row": 0,
+      "row": 1,
       "col": 9,
       "action": "note",
       "cents": 860
     },
     {
-      "row": 0,
+      "row": 1,
       "col": 10,
       "action": "note",
       "cents": 960
     },
     {
-      "row": 0,
+      "row": 1,
       "col": 11,
       "action": "note",
       "cents": 1060
     },
     {
-      "row": 0,
+      "row": 1,
       "col": 12,
       "action": "note",
       "cents": 1160
     },
     {
-      "row": 0,
+      "row": 1,
       "col": 13,
       "action": "note",
       "cents": 1260
     },
     {
-      "row": 0,
+      "row": 1,
       "col": 14,
       "action": "note",
       "cents": 1360
     },
     {
-      "row": 1,
+      "row": 2,
       "col": 0,
       "action": "note",
       "cents": -30
     },
     {
-      "row": 1,
+      "row": 2,
       "col": 1,
       "action": "note",
       "cents": 70
     },
     {
-      "row": 1,
+      "row": 2,
       "col": 2,
       "action": "note",
       "cents": 170
     },
     {
-      "row": 1,
+      "row": 2,
       "col": 3,
       "action": "note",
       "cents": 270
     },
     {
-      "row": 1,
+      "row": 2,
       "col": 4,
       "action": "note",
       "cents": 370
     },
     {
-      "row": 1,
+      "row": 2,
       "col": 5,
       "action": "note",
       "cents": 470
     },
     {
-      "row": 1,
+      "row": 2,
       "col": 6,
       "action": "note",
       "cents": 570
     },
     {
-      "row": 1,
+      "row": 2,
       "col": 7,
       "action": "note",
       "cents": 670
     },
     {
-      "row": 1,
+      "row": 2,
       "col": 8,
       "action": "note",
       "cents": 770
     },
     {
-      "row": 1,
+      "row": 2,
       "col": 9,
       "action": "note",
       "cents": 870
     },
     {
-      "row": 1,
+      "row": 2,
       "col": 10,
       "action": "note",
       "cents": 970
     },
     {
-      "row": 1,
+      "row": 2,
       "col": 11,
       "action": "note",
       "cents": 1070
     },
     {
-      "row": 1,
+      "row": 2,
       "col": 12,
       "action": "note",
       "cents": 1170
     },
     {
-      "row": 1,
+      "row": 2,
       "col": 13,
       "action": "note",
       "cents": 1270
     },
     {
-      "row": 1,
+      "row": 2,
       "col": 14,
       "action": "note",
       "cents": 1370
     },
     {
-      "row": 2,
+      "row": 3,
       "col": 0,
       "action": "note",
       "cents": -20
     },
     {
-      "row": 2,
+      "row": 3,
       "col": 1,
       "action": "note",
       "cents": 80
     },
     {
-      "row": 2,
+      "row": 3,
       "col": 2,
       "action": "note",
       "cents": 180
     },
     {
-      "row": 2,
+      "row": 3,
       "col": 3,
       "action": "note",
       "cents": 280
     },
     {
-      "row": 2,
+      "row": 3,
       "col": 4,
       "action": "note",
       "cents": 380
     },
     {
-      "row": 2,
+      "row": 3,
       "col": 5,
       "action": "note",
       "cents": 480
     },
     {
-      "row": 2,
+      "row": 3,
       "col": 6,
       "action": "note",
       "cents": 580
     },
     {
-      "row": 2,
+      "row": 3,
       "col": 7,
       "action": "note",
       "cents": 680
     },
     {
-      "row": 2,
+      "row": 3,
       "col": 8,
       "action": "note",
       "cents": 780
     },
     {
-      "row": 2,
+      "row": 3,
       "col": 9,
       "action": "note",
       "cents": 880
     },
     {
-      "row": 2,
+      "row": 3,
       "col": 10,
       "action": "note",
       "cents": 980
     },
     {
-      "row": 2,
+      "row": 3,
       "col": 11,
       "action": "note",
       "cents": 1080
     },
     {
-      "row": 2,
+      "row": 3,
       "col": 12,
       "action": "note",
       "cents": 1180
     },
     {
-      "row": 2,
+      "row": 3,
       "col": 13,
       "action": "note",
       "cents": 1280
     },
     {
-      "row": 2,
+      "row": 3,
       "col": 14,
       "action": "note",
       "cents": 1380
-    },
-    {
-      "row": 3,
-      "col": 0,
-      "action": "note",
-      "cents": -10
-    },
-    {
-      "row": 3,
-      "col": 1,
-      "action": "note",
-      "cents": 90
-    },
-    {
-      "row": 3,
-      "col": 2,
-      "action": "note",
-      "cents": 190
-    },
-    {
-      "row": 3,
-      "col": 3,
-      "action": "note",
-      "cents": 290
-    },
-    {
-      "row": 3,
-      "col": 4,
-      "action": "note",
-      "cents": 390
-    },
-    {
-      "row": 3,
-      "col": 5,
-      "action": "note",
-      "cents": 490
-    },
-    {
-      "row": 3,
-      "col": 6,
-      "action": "note",
-      "cents": 590
-    },
-    {
-      "row": 3,
-      "col": 7,
-      "action": "note",
-      "cents": 690
-    },
-    {
-      "row": 3,
-      "col": 8,
-      "action": "note",
-      "cents": 790
-    },
-    {
-      "row": 3,
-      "col": 9,
-      "action": "note",
-      "cents": 890
-    },
-    {
-      "row": 3,
-      "col": 10,
-      "action": "note",
-      "cents": 990
-    },
-    {
-      "row": 3,
-      "col": 11,
-      "action": "note",
-      "cents": 1090
-    },
-    {
-      "row": 3,
-      "col": 12,
-      "action": "note",
-      "cents": 1190
-    },
-    {
-      "row": 3,
-      "col": 13,
-      "action": "note",
-      "cents": 1290
-    },
-    {
-      "row": 3,
-      "col": 14,
-      "action": "note",
-      "cents": 1390
     },
     {
       "row": 4,

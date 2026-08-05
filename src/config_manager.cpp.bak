@@ -19,7 +19,7 @@ bool ConfigManager::createDefaultConfiguration()
     config_.audio.zyn_instrument = "config/mkb.xmz";
     config_.audio.default_volume = 127;
     config_.audio.default_transpose = 0;
-    config_.audio.drum_channel = 10;
+    config_.audio.drum_channel = 9;
 
     config_.controls.breath_volume_cc = 7;
     config_.controls.nod_controller_cc = 1;

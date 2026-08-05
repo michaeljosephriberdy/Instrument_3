@@ -88,17 +88,11 @@ public:
 
     // --- Looper OSC commands (Phase 4.3; stubs log until SL is up) ---
     void looperRecord();
- void looperOverdub();
- void looperPlay();
- void looperStop();
- void looperUndo();
- void looperClear();
- // --- Per-loop control (4 independent loops, track index 0..3) ---
- void looperRecordTrack(int track);
- void looperMuteTrack(int track);
- void looperClearTrack(int track);
- // Mutes all loops only -- never the live Zyn output.
- void looperMuteAll();
+    void looperOverdub();
+    void looperPlay();
+    void looperStop();
+    void looperUndo();
+    void looperClear();
     struct MicInfo
     {
         bool present = false;
@@ -141,9 +135,7 @@ private:
     int last_master_  = 127;
     int last_dry_     = 100;
     int last_vocoder_ = 100;
-    int last_drums_ = 100;
- // Shared target for Overdub/Undo; armed by Record on that loop track.
- int armed_loop_ = 0;
+    int last_drums_   = 100;
 
 
     bool launchZyn();

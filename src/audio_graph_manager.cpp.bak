@@ -259,7 +259,7 @@ bool AudioGraphManager::launchSooperLooper()
 
     if (pid == 0)
     {
-        // Headless: -p OSC port, -l 4 four independent loops, -c 2 stereo channels.
+        // Headless: -p OSC port, -l 1 one loop, -c 2 stereo channels.
         // Do not pass -j (JACK name) in a way that breaks PipeWire.
         std::string port = std::to_string(cfg_.sooperlooper_osc_port);
         std::string pwjack = which("pw-jack");
@@ -268,15 +268,15 @@ bool AudioGraphManager::launchSooperLooper()
             execlp("pw-jack", "pw-jack",
                    bin.c_str(),
                    "-p", port.c_str(),
- "-l", "4",
- "-c", "2",
- static_cast<char*>(nullptr));
- }
- execlp(bin.c_str(), bin.c_str(),
- "-p", port.c_str(),
- "-l", "4",
- "-c", "2",
- static_cast<char*>(nullptr));
+                   "-l", "1",
+                   "-c", "2",
+                   static_cast<char*>(nullptr));
+        }
+        execlp(bin.c_str(), bin.c_str(),
+               "-p", port.c_str(),
+               "-l", "1",
+               "-c", "2",
+               static_cast<char*>(nullptr));
         _exit(127);
     }
 
@@ -611,76 +611,55 @@ std::string AudioGraphManager::statusSummary() const
     return ss.str();
 }
 
-// --- Looper OSC ---------------------------------------------------------
-// SooperLooper runs with 4 independent loops (-l 4). Per-loop control
-// uses /sl/<track>/hit (track 0..3); the "armed" loop (default 0,
-// re-armed by Record on that track) is the target for the shared
-// Overdub/Undo controls. Mute All addresses SooperLooper's broadcast
-// loop index (-1) so it only silences the loops -- never live Zyn.
-// Prefer `oscsend` if present; otherwise log (see sendLooperOsc()).
+// --- Looper OSC (Phase 4.3 stubs) -------------------------------------------
+// SooperLooper OSC path examples (will be used when SL is confirmed running):
+//   /sl/0/hit record
+//   /sl/0/hit overdub
+//   /sl/0/hit pause   (or trigger)
+//   /sl/0/hit undo
+//   /sl/0/hit undo_all  (clear-ish)
+// Prefer `oscsend` if present; otherwise log.
+
 namespace
 {
- std::string loopHitPath(int track)
- {
-     return "/sl/" + std::to_string(track) + "/hit";
- }
+    void tryOsc(int port, const std::string& path, const std::string& arg = {})
+    {
+        std::string oscsend = which("oscsend");
+        if (oscsend.empty())
+        {
+            Logger::info("Looper OSC " + path +
+                         " (oscsend not installed — install liblo-tools)");
+            return;
+        }
+        std::ostringstream cmd;
+        cmd << oscsend << " localhost " << port << " " << path;
+        if (!arg.empty())
+            cmd << " " << arg;
+        cmd << " 2>/dev/null";
+        int rc = std::system(cmd.str().c_str());
+        if (rc != 0)
+            Logger::warning("oscsend failed for " + path);
+        else
+            Logger::info("Looper OSC sent: " + path +
+                         (arg.empty() ? "" : " " + arg));
+    }
 }
-void AudioGraphManager::looperRecordTrack(int track)
+
+void AudioGraphManager::looperRecord()
 {
-    if (track < 0 || track > 3)
-        return;
     if (!processAlive(sl_pid_))
     {
         if (!launchSooperLooper())
         {
-            Logger::info("Looper Record track " + std::to_string(track) +
-                         " (SooperLooper unavailable)");
+            Logger::info("Looper Record (SooperLooper unavailable)");
             return;
         }
         connectLooperGraph();
     }
-    armed_loop_ = track; // Record arms this track for shared Overdub/Undo.
-    sendLooperOsc(loopHitPath(track), "s", "record");
+    sendLooperOsc("/sl/0/hit", "s", "record");
 }
-void AudioGraphManager::looperMuteTrack(int track)
-{
-    if (track < 0 || track > 3)
-        return;
-    if (!processAlive(sl_pid_))
-    {
-        Logger::info("Looper Mute track " + std::to_string(track) +
-                     " (SooperLooper not running)");
-        return;
-    }
-    sendLooperOsc(loopHitPath(track), "s", "mute");
-}
-void AudioGraphManager::looperClearTrack(int track)
-{
-    if (track < 0 || track > 3)
-        return;
-    if (!processAlive(sl_pid_))
-    {
-        Logger::info("Looper Clear track " + std::to_string(track) +
-                     " (SooperLooper not running)");
-        return;
-    }
-    // undo_all clears the loop content on common setups.
-    sendLooperOsc(loopHitPath(track), "s", "undo_all");
-}
-void AudioGraphManager::looperMuteAll()
-{
-    if (!processAlive(sl_pid_))
-    {
-        Logger::info("Looper Mute All (SooperLooper not running)");
-        return;
-    }
-    // Loop index -1 is SooperLooper's broadcast address -- every loop,
-    // and only the loops (live Zyn output is a separate, unaffected
-    // graph path).
-    sendLooperOsc("/sl/-1/hit", "s", "mute");
-}
-void AudioGraphManager::looperRecord() { looperRecordTrack(0); }
-void AudioGraphManager::looperClear() { looperClearTrack(0); }
+
+
 void AudioGraphManager::looperOverdub()
 {
     if (!processAlive(sl_pid_))
@@ -688,8 +667,10 @@ void AudioGraphManager::looperOverdub()
         Logger::info("Looper Overdub (SooperLooper not running)");
         return;
     }
-    sendLooperOsc(loopHitPath(armed_loop_), "s", "overdub");
+    sendLooperOsc("/sl/0/hit", "s", "overdub");
 }
+
+
 void AudioGraphManager::looperPlay()
 {
     if (!processAlive(sl_pid_))
@@ -698,8 +679,10 @@ void AudioGraphManager::looperPlay()
         return;
     }
     // 'trigger' starts playback from the beginning; 'pause' toggles.
-    sendLooperOsc(loopHitPath(armed_loop_), "s", "trigger");
+    sendLooperOsc("/sl/0/hit", "s", "trigger");
 }
+
+
 void AudioGraphManager::looperStop()
 {
     if (!processAlive(sl_pid_))
@@ -708,8 +691,10 @@ void AudioGraphManager::looperStop()
         return;
     }
     // Pause if playing; mute as a hard silence fallback.
-    sendLooperOsc(loopHitPath(armed_loop_), "s", "pause");
+    sendLooperOsc("/sl/0/hit", "s", "pause");
 }
+
+
 void AudioGraphManager::looperUndo()
 {
     if (!processAlive(sl_pid_))
@@ -717,7 +702,19 @@ void AudioGraphManager::looperUndo()
         Logger::info("Looper Undo (SooperLooper not running)");
         return;
     }
-    sendLooperOsc(loopHitPath(armed_loop_), "s", "undo");
+    sendLooperOsc("/sl/0/hit", "s", "undo");
+}
+
+
+void AudioGraphManager::looperClear()
+{
+    if (!processAlive(sl_pid_))
+    {
+        Logger::info("Looper Clear (SooperLooper not running)");
+        return;
+    }
+    // undo_all clears the loop content on common setups.
+    sendLooperOsc("/sl/0/hit", "s", "undo_all");
 }
 
 
@@ -870,9 +867,7 @@ void AudioGraphManager::connectLooperGraph()
 {
     if (!processAlive(sl_pid_))
         return;
-    // With -l 4, SooperLooper still exposes one common stereo in/out bus
-    // that sums all 4 loops -- per-loop OSC control does not require
-    // per-loop PipeWire ports, so the link topology below is unchanged.
+
     // Discover SL ports. Names vary slightly by version / pw-jack.
     auto sl_in  = findPortsMatching(
         {"sooperlooper", "SooperLooper", "common_in", "loop0_in"}, true);
@@ -957,14 +952,9 @@ void AudioGraphManager::applyMixerLevels(int master, int dry, int vocoder, int d
     last_vocoder_ = vocoder;
     last_drums_   = drums;
 
-    float m = master / 127.0f;
-    float d = dry / 127.0f;
+    float m = master  / 127.0f;
+    float d = dry     / 127.0f;
     float v = vocoder / 127.0f;
-    // Dry/voice node gain is a fraction of the master ceiling.
-    float dry_final = d * m;
-    // Vocoder gain is a fraction of the dry/voice level (relative to
-    // voice), not an independent absolute -- it rides on dry_final.
-    float vocoder_final = v * dry_final;
 
     Logger::info(
         "Mixer apply master=" + std::to_string(master) +
@@ -985,13 +975,8 @@ void AudioGraphManager::applyMixerLevels(int master, int dry, int vocoder, int d
         setNodeVolume("analog-stereo", m);
     }
 
-    setNodeVolume("InstrumentVocoder", vocoder_final);
+    setNodeVolume("InstrumentVocoder", v);
     if (!cfg_.mic_name_hint.empty())
-        setNodeVolume(cfg_.mic_name_hint, dry_final);
-    // NOTE: 'drums' is intentionally not applied to any PipeWire node
-    // here -- drum loudness is a MIDI-velocity path, not an audio-graph
-    // gain: Engine::handleAction's ActionType::Drum case scales note-on
-    // velocity by (drumMix/127) * (masterVolume/127) directly. Breath
-    // and vocoder gain never touch that path.
+        setNodeVolume(cfg_.mic_name_hint, d);
 }
 

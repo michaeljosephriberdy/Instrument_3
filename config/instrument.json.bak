@@ -4,7 +4,7 @@
     "zyn_instrument": "config/mkb.xmz",
     "default_volume": 127,
     "default_transpose": 0,
-    "drum_channel": 10
+    "drum_channel": 9
   },
   "controls": {
     "breath_volume_cc": 7,

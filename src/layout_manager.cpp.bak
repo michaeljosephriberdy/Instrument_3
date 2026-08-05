@@ -27,18 +27,11 @@ namespace
     }
 
     Action make(ActionType t)
- {
- Action a;
- a.type = t;
- return a;
- }
- Action makeLoop(ActionType t, int track)
- {
- Action a;
- a.type = t;
- a.loop_track = track;
- return a;
- }
+    {
+        Action a;
+        a.type = t;
+        return a;
+    }
 
     // GM-ish drum map used on the top-board percussion row.
     // Columns 0..8 left-style pads; 9..14 continue / mirror.
@@ -168,7 +161,7 @@ void LayoutManager::buildPhysicalLayoutV1(KeyboardLayout& bl,
     bl.inverted = false;
     {
         // rail offsets for rows 0..4
-        const int left_rail[5] = {20, 30, 40, 50, 0};
+        const int left_rail[5] = {10, 20, 30, 40, 0};
         for (int r = 0; r < ID75_ROWS; ++r)
         {
             for (int c = 0; c < ID75_COLS; ++c)
@@ -183,7 +176,7 @@ void LayoutManager::buildPhysicalLayoutV1(KeyboardLayout& bl,
     br.name = "bottom_right";
     br.inverted = false;
     {
-        const int right_rail[5] = {-40, -30, -20, -10, 0};
+        const int right_rail[5] = {-50, -40, -30, -20, 0};
         for (int r = 0; r < ID75_ROWS; ++r)
         {
             for (int c = 0; c < ID75_COLS; ++c)
@@ -194,75 +187,80 @@ void LayoutManager::buildPhysicalLayoutV1(KeyboardLayout& bl,
         }
     }
 
-    // ----- Top Left (command surface + rail-0 notes) -----
- // Row mapping (Physical Layout V1 labels):
- // row 0 — Note rail, +10, same horizontal rule as BottomLeft
- // row 1 — Percussion (15 pads, GM-ish map)
- // row 2 — Loop controls (per-loop Rec/Mute/Clear + shared Overdub/MuteAll/Undo)
- // row 3 — Transpose / Octave / Panic / Mode 1-2-3
- // row 4 — Mixer (MasterVol / VocoderMix / DrumMix / DryMix)
- tl.name = "top_left";
- tl.inverted = true; // top boards mounted upside-down
- for (auto& a : tl.actions)
- a = Action{};
- // Row 0: Note rail, +10 (same horizontal rule as BottomLeft).
- for (int c = 0; c < ID75_COLS; ++c)
- {
- int cents = (ID75_COLS - 1 - c) * 100 + 10;
- tl.actions[index(0, c)] = makeNote(cents);
- }
- // Row 1: Percussion — all 15 pads.
- for (int c = 0; c < ID75_COLS; ++c)
- tl.actions[index(1, c)] = makeDrum(DRUM_NOTES[c]);
- // Row 2: Loop controls.
- // cols 0-2 = Loop0 Rec/Mute/Clear, 3-5 = Loop1, 6-8 = Loop2, 9-11 = Loop3,
- // col 12 = Overdub (armed loop), 13 = Mute All, 14 = Undo (armed loop).
- for (int track = 0; track < 4; ++track)
- {
- int base = track * 3;
- tl.actions[index(2, base + 0)] = makeLoop(ActionType::LoopRecord, track);
- tl.actions[index(2, base + 1)] = makeLoop(ActionType::LoopMute, track);
- tl.actions[index(2, base + 2)] = makeLoop(ActionType::LoopClear, track);
- }
- tl.actions[index(2, 12)] = make(ActionType::LoopOverdub);
- tl.actions[index(2, 13)] = make(ActionType::LoopMuteAll);
- tl.actions[index(2, 14)] = make(ActionType::LoopUndo);
- // Row 3: Transpose / Octave / Panic / Mode 1-2-3.
- {
- const ActionType sys_row[15] = {
- ActionType::TransposeUp, ActionType::TransposeDown,
- ActionType::OctaveUp, ActionType::OctaveDown,
- ActionType::Panic,
- ActionType::ModeInstrument, ActionType::ModeVocoder, ActionType::ModeVocoderDry,
- ActionType::None, ActionType::None, ActionType::None,
- ActionType::None, ActionType::None, ActionType::None, ActionType::None
- };
- for (int c = 0; c < ID75_COLS; ++c)
- tl.actions[index(3, c)] = make(sys_row[c]);
- }
- // Row 4: Mixer.
- {
- const ActionType mix_row[15] = {
- ActionType::MasterVolUp, ActionType::MasterVolDown,
- ActionType::VocoderMixUp, ActionType::VocoderMixDown,
- ActionType::DrumMixUp, ActionType::DrumMixDown,
- ActionType::DryMixUp, ActionType::DryMixDown,
- ActionType::None, ActionType::None, ActionType::None,
- ActionType::None, ActionType::None, ActionType::None, ActionType::None
- };
- for (int c = 0; c < ID75_COLS; ++c)
- tl.actions[index(4, c)] = make(mix_row[c]);
- }
- // ----- Top Right (mirror of Top Left, except row 0 notes) -----
- tr = tl;
- tr.name = "top_right";
- tr.inverted = true;
- // Row 0: Note rail, -50 (same horizontal rule as BottomRight).
- for (int c = 0; c < ID75_COLS; ++c)
- {
- int cents = c * 100 - 50;
- tr.actions[index(0, c)] = makeNote(cents);
- }
+    // ----- Top Left (command surface) -----
+    // Row mapping (Physical Layout V1 labels):
+    //   row 0 — Loop controls
+    //   row 1 — Mode 1/2/3 + extras
+    //   row 2 — Mixer (master / vocoder / percussion)
+    //   row 3 — Percussion pads
+    //   row 4 — System (panic, transpose, empty for now)
+    tl.name = "top_left";
+    tl.inverted = true;  // top boards mounted upside-down
+    for (auto& a : tl.actions)
+        a = Action{};
+
+    // Row 0: Loop
+    {
+        const ActionType loop_row[15] = {
+            ActionType::LoopRecord, ActionType::LoopPlay, ActionType::LoopStop,
+            ActionType::LoopOverdub, ActionType::LoopUndo, ActionType::LoopClear,
+            ActionType::None, ActionType::None, ActionType::None,
+            ActionType::None, ActionType::None, ActionType::None,
+            ActionType::None, ActionType::None, ActionType::None
+        };
+        for (int c = 0; c < ID75_COLS; ++c)
+            tl.actions[index(0, c)] = make(loop_row[c]);
+    }
+
+    // Row 1: Modes
+    {
+        const ActionType mode_row[15] = {
+            ActionType::ModeInstrument, ActionType::ModeVocoder, ActionType::ModeVocoderDry,
+            ActionType::None, ActionType::None, ActionType::None,
+            ActionType::None, ActionType::None, ActionType::None,
+            ActionType::None, ActionType::None, ActionType::None,
+            ActionType::None, ActionType::None, ActionType::None
+        };
+        for (int c = 0; c < ID75_COLS; ++c)
+            tl.actions[index(1, c)] = make(mode_row[c]);
+    }
+
+    // Row 2: Mixer
+    {
+        const ActionType mix_row[15] = {
+            ActionType::MasterVolUp, ActionType::MasterVolDown,
+            ActionType::VocoderMixUp, ActionType::VocoderMixDown,
+            ActionType::DrumMixUp, ActionType::DrumMixDown,
+            ActionType::DryMixUp, ActionType::DryMixDown,
+            ActionType::None, ActionType::None, ActionType::None,
+            ActionType::None, ActionType::None, ActionType::None, ActionType::None
+        };
+        for (int c = 0; c < ID75_COLS; ++c)
+            tl.actions[index(2, c)] = make(mix_row[c]);
+    }
+
+    // Row 3: Percussion
+    for (int c = 0; c < ID75_COLS; ++c)
+        tl.actions[index(3, c)] = makeDrum(DRUM_NOTES[c]);
+
+    // Row 4: System
+    {
+        const ActionType sys_row[15] = {
+            ActionType::Panic,
+            ActionType::TransposeUp, ActionType::TransposeDown,
+            ActionType::OctaveUp, ActionType::OctaveDown,
+            ActionType::None, ActionType::None, ActionType::None,
+            ActionType::None, ActionType::None, ActionType::None,
+            ActionType::None, ActionType::None, ActionType::None, ActionType::None
+        };
+        for (int c = 0; c < ID75_COLS; ++c)
+            tl.actions[index(4, c)] = make(sys_row[c]);
+    }
+
+    // ----- Top Right (mirror of top left per sheet) -----
+    tr = tl;
+    tr.name = "top_right";
+    tr.inverted = true;
 }
 
 // -----------------------------------------------------------------------------
@@ -313,7 +311,6 @@ bool LayoutManager::loadLayout(const std::string& filename, KeyboardLayout& layo
         a.cents = k.value("cents", 0);
         a.semitone = k.value("semitone", 0);
         a.drum_note = k.value("drum_note", 0);
- a.loop_track = k.value("loop_track", 0);
         layout.actions[index(row, col)] = a;
     }
 
@@ -343,11 +340,9 @@ bool LayoutManager::saveLayout(const std::string& filename, const KeyboardLayout
             if (a.type == ActionType::Note)
                 k["cents"] = a.cents;
             if (a.type == ActionType::Drum)
- k["drum_note"] = a.drum_note;
- if (a.loop_track != 0)
- k["loop_track"] = a.loop_track;
- if (a.semitone != 0)
- k["semitone"] = a.semitone;
+                k["drum_note"] = a.drum_note;
+            if (a.semitone != 0)
+                k["semitone"] = a.semitone;
             j["keys"].push_back(k);
         }
     }

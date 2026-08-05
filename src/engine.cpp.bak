@@ -132,7 +132,6 @@ bool Engine::initialize()
         mix_step_ = cfg.controls.mix_step;
         transpose_step_ = cfg.controls.transpose_step;
         drum_channel_ = cfg.audio.drum_channel;
-        breath_volume_cc_ = cfg.controls.breath_volume_cc;
         state_->setTranspose(cfg.audio.default_transpose);
         state_->setMasterVolume(cfg.audio.default_volume);
     }
@@ -205,9 +204,7 @@ bool Engine::initialize()
         }
     }
 
-    // Master volume is a stored ceiling only -- it is not pushed to
-    // MIDI directly. Actual instrument loudness is breath pressure
-    // scaled by this ceiling, each tick, in Engine::run().
+    midi_->setVolume(state_ ? state_->masterVolume() : 127);
     running_ = true;
     Logger::info("Engine initialization complete");
     return true;
@@ -230,24 +227,13 @@ void Engine::run()
             breath_->update();
 
             int breath_value = breath_->breathValue();
-                int breath_pressure = (breath_value < 12) ? 0 : breath_value;
-                state_->setBreath(breath_pressure);
-                // Instrument/synth volume = breath_pressure * (masterVolume/127),
-                // sent as CC7 on every channel EXCEPT the drum channel. Breath
-                // never affects drums, the dry/mic node, or the vocoder node --
-                // those are scaled elsewhere (Drum note-on velocity, and
-                // AudioGraphManager::applyMixerLevels for the audio graph).
-                int scaled_volume = (breath_pressure * state_->masterVolume()) / 127;
-                if (scaled_volume != last_sent_volume)
-                {
-                    for (int ch = 0; ch < 16; ++ch)
-                    {
-                        if (ch == drum_channel_)
-                            continue;
-                        midi_->sendControlChange(ch, breath_volume_cc_, scaled_volume);
-                    }
-                    last_sent_volume = scaled_volume;
-                }
+            int volume = (breath_value < 12) ? 0 : breath_value;
+
+            if (volume != last_sent_volume)
+            {
+                midi_->setVolume(volume);
+                last_sent_volume = volume;
+            }
 
             state_->setOctave(computeOctaveFromNod(breath_->nodValue()));
         }
@@ -409,12 +395,7 @@ void Engine::handleAction(const Action& action, int keyboard_index, int keycode,
         case ActionType::Drum:
         {
             int channel = drum_channel_;
-                int note = action.drum_note;
-                // Drum velocity = 100 * (drumMix/127) * (masterVolume/127).
-                // Never modulated by breath or vocoder gain.
-                int velocity = (100 * state_->drumMix() * state_->masterVolume()) / (127 * 127);
-                if (velocity < 1) velocity = 1;
-                if (velocity > 127) velocity = 127;
+            int note = action.drum_note;
 
             uint32_t key_id =
                 (static_cast<uint32_t>(keyboard_index) << 16) |
@@ -428,7 +409,7 @@ void Engine::handleAction(const Action& action, int keyboard_index, int keycode,
             {
                 if (active_keys_.count(key_id))
                     return;
-                midi_->sendNoteOn(channel, note, velocity, 0);
+                midi_->sendNoteOn(channel, note, 100, 0);
                 active_keys_[key_id] = {note, channel};
                 note_ref_counts_[note_id]++;
             }
@@ -470,23 +451,23 @@ void Engine::handleAction(const Action& action, int keyboard_index, int keycode,
 
         case ActionType::VolumeUp:
             state_->adjustMasterVolume(mix_step_);
-            if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
+            midi_->setVolume(state_->masterVolume());
             Logger::info("Master volume " + std::to_string(state_->masterVolume()));
             return;
         case ActionType::VolumeDown:
             state_->adjustMasterVolume(-mix_step_);
-            if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
+            midi_->setVolume(state_->masterVolume());
             Logger::info("Master volume " + std::to_string(state_->masterVolume()));
             return;
 
         case ActionType::MasterVolUp:
             state_->adjustMasterVolume(mix_step_);
-            if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
+            midi_->setVolume(state_->masterVolume());
             Logger::info("Master volume " + std::to_string(state_->masterVolume()));
             return;
         case ActionType::MasterVolDown:
             state_->adjustMasterVolume(-mix_step_);
-            if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
+            midi_->setVolume(state_->masterVolume());
             Logger::info("Master volume " + std::to_string(state_->masterVolume()));
             return;
 
@@ -544,26 +525,22 @@ void Engine::handleAction(const Action& action, int keyboard_index, int keycode,
             return;
 
         case ActionType::LoopRecord:
-            case ActionType::LoopMute:
-            case ActionType::LoopClear:
-            case ActionType::LoopPlay:
-            case ActionType::LoopStop:
-            case ActionType::LoopOverdub:
-            case ActionType::LoopUndo:
-            case ActionType::LoopMuteAll:
-                switch (action.type)
-                {
-                case ActionType::LoopRecord: if (audio_) audio_->looperRecordTrack(action.loop_track); break;
-                case ActionType::LoopMute: if (audio_) audio_->looperMuteTrack(action.loop_track); break;
-                case ActionType::LoopClear: if (audio_) audio_->looperClearTrack(action.loop_track); break;
-                case ActionType::LoopPlay: if (audio_) audio_->looperPlay(); break;
-                case ActionType::LoopStop: if (audio_) audio_->looperStop(); break;
+        case ActionType::LoopPlay:
+        case ActionType::LoopStop:
+        case ActionType::LoopOverdub:
+        case ActionType::LoopUndo:
+        case ActionType::LoopClear:
+            switch (action.type)
+            {
+                case ActionType::LoopRecord:  if (audio_) audio_->looperRecord();  break;
+                case ActionType::LoopPlay:    if (audio_) audio_->looperPlay();    break;
+                case ActionType::LoopStop:    if (audio_) audio_->looperStop();    break;
                 case ActionType::LoopOverdub: if (audio_) audio_->looperOverdub(); break;
-                case ActionType::LoopUndo: if (audio_) audio_->looperUndo(); break;
-                case ActionType::LoopMuteAll: if (audio_) audio_->looperMuteAll(); break;
+                case ActionType::LoopUndo:    if (audio_) audio_->looperUndo();    break;
+                case ActionType::LoopClear:   if (audio_) audio_->looperClear();   break;
                 default: break;
-                }
-                return;
+            }
+            return;
 
         case ActionType::ReverbToggle:
         case ActionType::DelayToggle:

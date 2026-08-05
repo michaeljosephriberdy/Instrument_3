@@ -61,12 +61,11 @@ enum class ActionType : uint8_t
     LoopStop,
     LoopOverdub,
     LoopUndo,
- LoopClear,
- LoopMute, // per-loop mute (Physical Layout V1 loop row)
- LoopMuteAll, // mutes all loops only -- never live Zyn
- //-----------------------
- // Effects
- //-----------------------
+    LoopClear,
+
+    //-----------------------
+    // Effects
+    //-----------------------
     ReverbToggle,
     DelayToggle,
     ChorusToggle,
@@ -94,11 +93,8 @@ struct Action
 
     // Drum: MIDI note number on the drum channel (e.g. 36 = bass drum).
     int drum_note = 0;
- // Loop track index (0..3) for per-loop actions (LoopRecord/LoopMute/
- // LoopClear). Unused (0) for the shared-armed actions (LoopOverdub/
- // LoopUndo) and for LoopMuteAll.
- int loop_track = 0;
- // True on key press, false on key release.
+
+    // True on key press, false on key release.
     // Continuous controls (transpose, mix, mode) typically act on press only.
     bool pressed = true;
 };
@@ -134,9 +130,7 @@ inline const char* actionTypeToString(ActionType t)
         case ActionType::LoopStop:       return "loop_stop";
         case ActionType::LoopOverdub:    return "loop_overdub";
         case ActionType::LoopUndo:       return "loop_undo";
-        case ActionType::LoopClear: return "loop_clear";
- case ActionType::LoopMute: return "loop_mute";
- case ActionType::LoopMuteAll: return "loop_mute_all";
+        case ActionType::LoopClear:      return "loop_clear";
         case ActionType::ReverbToggle:   return "reverb_toggle";
         case ActionType::DelayToggle:    return "delay_toggle";
         case ActionType::ChorusToggle:   return "chorus_toggle";
@@ -175,9 +169,7 @@ inline ActionType stringToActionType(const std::string& s)
     if (s == "loop_stop")       return ActionType::LoopStop;
     if (s == "loop_overdub")    return ActionType::LoopOverdub;
     if (s == "loop_undo")       return ActionType::LoopUndo;
-    if (s == "loop_clear") return ActionType::LoopClear;
- if (s == "loop_mute") return ActionType::LoopMute;
- if (s == "loop_mute_all") return ActionType::LoopMuteAll;
+    if (s == "loop_clear")      return ActionType::LoopClear;
     if (s == "reverb_toggle")   return ActionType::ReverbToggle;
     if (s == "delay_toggle")    return ActionType::DelayToggle;
     if (s == "chorus_toggle")   return ActionType::ChorusToggle;

@@ -1,0 +1,206 @@
+{
+  "name": "top_right",
+  "inverted": true,
+  "keys": [
+    {
+      "row": 0,
+      "col": 0,
+      "action": "loop_record"
+    },
+    {
+      "row": 0,
+      "col": 1,
+      "action": "loop_play"
+    },
+    {
+      "row": 0,
+      "col": 2,
+      "action": "loop_stop"
+    },
+    {
+      "row": 0,
+      "col": 3,
+      "action": "loop_overdub"
+    },
+    {
+      "row": 0,
+      "col": 4,
+      "action": "loop_undo"
+    },
+    {
+      "row": 0,
+      "col": 5,
+      "action": "loop_clear"
+    },
+    {
+      "row": 1,
+      "col": 0,
+      "action": "mode_instrument"
+    },
+    {
+      "row": 1,
+      "col": 1,
+      "action": "mode_vocoder"
+    },
+    {
+      "row": 1,
+      "col": 2,
+      "action": "mode_vocoder_dry"
+    },
+    {
+      "row": 2,
+      "col": 0,
+      "action": "master_vol_up"
+    },
+    {
+      "row": 2,
+      "col": 1,
+      "action": "master_vol_down"
+    },
+    {
+      "row": 2,
+      "col": 2,
+      "action": "vocoder_mix_up"
+    },
+    {
+      "row": 2,
+      "col": 3,
+      "action": "vocoder_mix_down"
+    },
+    {
+      "row": 2,
+      "col": 4,
+      "action": "drum_mix_up"
+    },
+    {
+      "row": 2,
+      "col": 5,
+      "action": "drum_mix_down"
+    },
+    {
+      "row": 2,
+      "col": 6,
+      "action": "dry_mix_up"
+    },
+    {
+      "row": 2,
+      "col": 7,
+      "action": "dry_mix_down"
+    },
+    {
+      "row": 3,
+      "col": 0,
+      "action": "drum",
+      "drum_note": 36
+    },
+    {
+      "row": 3,
+      "col": 1,
+      "action": "drum",
+      "drum_note": 38
+    },
+    {
+      "row": 3,
+      "col": 2,
+      "action": "drum",
+      "drum_note": 46
+    },
+    {
+      "row": 3,
+      "col": 3,
+      "action": "drum",
+      "drum_note": 42
+    },
+    {
+      "row": 3,
+      "col": 4,
+      "action": "drum",
+      "drum_note": 51
+    },
+    {
+      "row": 3,
+      "col": 5,
+      "action": "drum",
+      "drum_note": 49
+    },
+    {
+      "row": 3,
+      "col": 6,
+      "action": "drum",
+      "drum_note": 45
+    },
+    {
+      "row": 3,
+      "col": 7,
+      "action": "drum",
+      "drum_note": 47
+    },
+    {
+      "row": 3,
+      "col": 8,
+      "action": "drum",
+      "drum_note": 50
+    },
+    {
+      "row": 3,
+      "col": 9,
+      "action": "drum",
+      "drum_note": 36
+    },
+    {
+      "row": 3,
+      "col": 10,
+      "action": "drum",
+      "drum_note": 38
+    },
+    {
+      "row": 3,
+      "col": 11,
+      "action": "drum",
+      "drum_note": 46
+    },
+    {
+      "row": 3,
+      "col": 12,
+      "action": "drum",
+      "drum_note": 42
+    },
+    {
+      "row": 3,
+      "col": 13,
+      "action": "drum",
+      "drum_note": 51
+    },
+    {
+      "row": 3,
+      "col": 14,
+      "action": "drum",
+      "drum_note": 49
+    },
+    {
+      "row": 4,
+      "col": 0,
+      "action": "panic"
+    },
+    {
+      "row": 4,
+      "col": 1,
+      "action": "transpose_up"
+    },
+    {
+      "row": 4,
+      "col": 2,
+      "action": "transpose_down"
+    },
+    {
+      "row": 4,
+      "col": 3,
+      "action": "octave_up"
+    },
+    {
+      "row": 4,
+      "col": 4,
+      "action": "octave_down"
+    }
+  ]
+}
