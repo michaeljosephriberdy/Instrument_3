@@ -45,6 +45,10 @@ private:
     int client_id_;
 
     int port_id_;
+int local_port_; // ALSA port WE create on our own client, so
+// subscribeToController() has a real destination to
+// subscribe to (root cause of the silent subscribe
+// failure -- see fix_breath_controller.sh).
 
 
 

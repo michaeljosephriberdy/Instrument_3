@@ -1,0 +1,59 @@
+bool VialController::getKeycode(
+    int device_index,
+    uint8_t layer,
+    uint8_t row,
+    uint8_t column,
+    uint16_t& keycode
+)
+{
+    if (
+        device_index < 0 ||
+        device_index >= deviceCount()
+    )
+    {
+        return false;
+    }
+    std::vector<uint8_t> response;
+    if (
+        !sendCommand(
+            devices_[device_index].handle,
+            {
+                COMMAND_KEYMAP_GET,
+                layer,
+                row,
+                column
+            },
+            response
+        )
+    )
+    {
+        return false;
+    }
+    if (response.size() < 6)
+        return false;
+    keycode =
+        (static_cast<uint16_t>(response[4]) << 8) |
+        response[5];
+    return true;
+}
+bool VialController::programAndVerifyLayout(
+    int device_index,
+    const std::array<uint16_t, 75>& keycodes
+)
+{
+    for (uint8_t row = 0; row < ID75_FIRMWARE_ROWS; ++row)
+    {
+        for (uint8_t col = 0; col < ID75_FIRMWARE_COLS; ++col)
+        {
+            uint16_t target = keycodes[row * ID75_FIRMWARE_COLS + col];
+            if (!configureKeyboardLayout(device_index, 0, row, col, target))
+                return false;
+            uint16_t readback = 0;
+            if (!getKeycode(device_index, 0, row, col, readback))
+                return false;
+            if (readback != target)
+                return false;
+        }
+    }
+    return true;
+}

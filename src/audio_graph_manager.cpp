@@ -1,4 +1,6 @@
 #include "audio_graph_manager.h"
+#include <cmath>
+#include <atomic>
 #include "logger.h"
 
 #include <chrono>
@@ -135,15 +137,35 @@ bool AudioGraphManager::pwLink(const std::string& src, const std::string& dst)
     if (src.empty() || dst.empty())
         return false;
 
-    std::string cmd = "pw-link " + src + " " + dst + " 2>/dev/null";
-    int rc = std::system(cmd.c_str());
-    if (rc == 0)
+    // Port names can contain spaces (e.g. the ALSA-MIDI bridge names
+    // ports like "Midi-Bridge:Instrument_3MIDI Output"). Quote both
+    // so the shell doesn't split them into extra argv entries -- an
+    // unquoted space here silently turned one port name into two
+    // arguments, which is why previously-"correct" names still failed.
+    std::string cmd = "pw-link '" + src + "' '" + dst + "' 2>&1";
+    FILE* f = popen(cmd.c_str(), "r");
+    if (!f)
+    {
+        Logger::warning("pw-link: failed to launch subprocess for " +
+            src + " → " + dst);
+        return false;
+    }
+    std::string output;
+    char buf[512];
+    while (fgets(buf, sizeof(buf), f))
+        output += buf;
+    int status = pclose(f);
+    while (!output.empty() &&
+           (output.back() == '\n' || output.back() == '\r'))
+        output.pop_back();
+    if (status == 0)
     {
         owned_links_.push_back({src, dst});
         Logger::info("pw-link: " + src + " → " + dst);
         return true;
     }
-    Logger::warning("pw-link failed: " + src + " → " + dst);
+    Logger::warning("pw-link failed: " + src + " → " + dst +
+        (output.empty() ? "" : (" -- " + output)));
     return false;
 }
 
@@ -181,6 +203,70 @@ AudioGraphManager::findPorts(const std::string& substring, bool inputs) const
     return result;
 }
 
+std::string AudioGraphManager::findEngineMidiPort() const
+{
+    // MidiEngine registers ALSA client "Instrument_3", port "MIDI Output".
+    // PipeWire's Midi-Bridge exposes that under a system-dependent name.
+    // On current Ubuntu/PipeWire the diagnostic shows:
+    //   Midi-Bridge:Instrument_3MIDI Output (capture)
+    // Ask PipeWire what is actually present right now.
+    auto outs = findPortsMatching({"Instrument_3"}, false);
+
+    std::vector<std::string> midi_like;
+    for (const auto& p : outs) {
+        std::string low = p;
+        for (char& c : low)
+            c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+        if (low.find("midi") != std::string::npos)
+            midi_like.push_back(p);
+    }
+
+    auto pick = [](const std::vector<std::string>& list) -> std::string {
+        // Prefer the Midi-Bridge-qualified form when several candidates exist.
+        for (const auto& p : list)
+            if (p.find("Midi-Bridge") != std::string::npos)
+                return p;
+        if (!list.empty())
+            return list.front();
+        return {};
+    };
+
+    std::string chosen = pick(midi_like);
+    if (chosen.empty())
+        chosen = pick(outs);
+
+    if (!chosen.empty()) {
+        Logger::info("findEngineMidiPort: discovered '" + chosen + "'");
+        return chosen;
+    }
+
+    // Explicit fallbacks known to appear on this class of systems.
+    // Order: full (capture) form first, then colon form, then bare.
+    static const char* kFallbacks[] = {
+        "Midi-Bridge:Instrument_3MIDI Output (capture)",
+        "Midi-Bridge:Instrument_3:MIDI Output (capture)",
+        "Midi-Bridge:Instrument_3:MIDI Output",
+        "Midi-Bridge:Instrument_3MIDI Output",
+        "Instrument_3:MIDI Output",
+        nullptr
+    };
+    for (const char** f = kFallbacks; *f; ++f) {
+        // Re-check visibility via a lightweight port scan.
+        auto hit = findPortsMatching({*f}, false);
+        if (!hit.empty()) {
+            Logger::info(std::string("findEngineMidiPort: fallback matched '") + *f + "'");
+            return *f;
+        }
+    }
+
+    Logger::warning(
+        "findEngineMidiPort: no PipeWire port matching 'Instrument_3' "
+        "found yet -- falling back to configured engine_midi_name ('" +
+        cfg_.engine_midi_name + "')");
+    return cfg_.engine_midi_name;
+}
+
+
 bool AudioGraphManager::micPresent() const
 {
     return queryMic().present;
@@ -217,12 +303,18 @@ bool AudioGraphManager::launchZyn()
                    bin.c_str(),
                    "-U",  // no GUI when possible
                    "-l", cfg_.zyn_instrument.c_str(),
-                   static_cast<char*>(nullptr));
+            "-I", "jack",
+            "-O", "jack",
+            "-a",
+            static_cast<char*>(nullptr));
         }
         execlp(bin.c_str(), bin.c_str(),
                "-U",
                "-l", cfg_.zyn_instrument.c_str(),
-               static_cast<char*>(nullptr));
+            "-I", "jack",
+            "-O", "jack",
+            "-a",
+            static_cast<char*>(nullptr));
         _exit(127);
     }
 
@@ -231,7 +323,28 @@ bool AudioGraphManager::launchZyn()
                  " instrument=" + cfg_.zyn_instrument);
 
     // Give it a moment to register PipeWire ports.
-    std::this_thread::sleep_for(std::chrono::milliseconds(800));
+    // Poll for Zyn's actual PipeWire ports instead of trusting a flat
+    // delay -- launchSooperLooper()/launchVocoder() already do this;
+    // launchZyn() didn't, which let buildMode1() race ahead of a
+    // still-registering process on slower boots.
+    bool zyn_ports_ready = false;
+    for (int i = 0; i < 25; ++i) // up to ~5s @ 200ms
+    {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        auto outs = findPortsMatching({cfg_.zyn_client_name}, false);
+        auto ins = findPortsMatching({cfg_.zyn_client_name}, true);
+        if (!outs.empty() && !ins.empty())
+        {
+            zyn_ports_ready = true;
+            break;
+        }
+    }
+    if (!zyn_ports_ready)
+    {
+        Logger::warning("Zyn launched (pid=" + std::to_string(pid) +
+            ") but its ports were not visible to PipeWire after ~5s -- "
+            "links may fail");
+    }
     return true;
 }
 
@@ -418,8 +531,30 @@ bool AudioGraphManager::buildMode1()
     pwLink(zyn_r, play_r);
 
     // Engine MIDI → Zyn
-    pwLink(cfg_.engine_midi_name, cfg_.zyn_client_name + ":midi_input");
-
+    {
+        std::string midi_src = findEngineMidiPort();
+        Logger::info("Engine MIDI port resolved to: '" + midi_src + "'");
+        if (!pwLink(midi_src, cfg_.zyn_client_name + ":midi_input")) {
+            // Discovery raced a port that had not registered yet, or the
+            // bridge naming on this system is neither form we detected --
+            // try the common variants explicitly before giving up.
+            static const char* kTry[] = {
+                "Midi-Bridge:Instrument_3MIDI Output (capture)",
+                "Midi-Bridge:Instrument_3:MIDI Output (capture)",
+                "Midi-Bridge:Instrument_3:MIDI Output",
+                "Midi-Bridge:Instrument_3MIDI Output",
+                "Instrument_3:MIDI Output",
+                nullptr
+            };
+            for (const char** t = kTry; *t; ++t) {
+                if (pwLink(*t, cfg_.zyn_client_name + ":midi_input"))
+                    break;
+            }
+        }
+    }
+        // Wire SooperLooper in parallel with the main synth path so Record
+    // actually captures Zyn (drums/notes) and loop playback is audible.
+    connectLooperGraph();
     Logger::info("Graph: Mode 1 (SynthOnly) built");
     applyMixerLevels(last_master_, last_dry_, last_vocoder_, last_drums_);
     return true;
@@ -528,8 +663,27 @@ bool AudioGraphManager::buildMode2()
             pwLink(zyn_r, play_r);
     }
 
-    pwLink(cfg_.engine_midi_name, cfg_.zyn_client_name + ":midi_input");
-
+    {
+        std::string midi_src = findEngineMidiPort();
+        Logger::info("Engine MIDI port resolved to: '" + midi_src + "'");
+        if (!pwLink(midi_src, cfg_.zyn_client_name + ":midi_input")) {
+            // Discovery raced a port that had not registered yet, or the
+            // bridge naming on this system is neither form we detected --
+            // try the common variants explicitly before giving up.
+            static const char* kTry[] = {
+                "Midi-Bridge:Instrument_3MIDI Output (capture)",
+                "Midi-Bridge:Instrument_3:MIDI Output (capture)",
+                "Midi-Bridge:Instrument_3:MIDI Output",
+                "Midi-Bridge:Instrument_3MIDI Output",
+                "Instrument_3:MIDI Output",
+                nullptr
+            };
+            for (const char** t = kTry; *t; ++t) {
+                if (pwLink(*t, cfg_.zyn_client_name + ":midi_input"))
+                    break;
+            }
+        }
+    }
     if (!linked_vocoder)
         Logger::info("Graph: Mode 2 degraded (no Calf graph yet)");
 
@@ -625,71 +779,126 @@ namespace
      return "/sl/" + std::to_string(track) + "/hit";
  }
 }
+
+
+
+
 void AudioGraphManager::looperRecordTrack(int track)
 {
     if (track < 0 || track > 3)
         return;
-    if (!processAlive(sl_pid_))
-    {
-        if (!launchSooperLooper())
-        {
-            Logger::info("Looper Record track " + std::to_string(track) +
-                         " (SooperLooper unavailable)");
+    if (!processAlive(sl_pid_)) {
+        if (!launchSooperLooper()) {
+            Logger::info("Looper Record (SooperLooper unavailable)");
             return;
         }
-        connectLooperGraph();
     }
-    armed_loop_ = track; // Record arms this track for shared Overdub/Undo.
-    sendLooperOsc(loopHitPath(track), "s", "record");
+    connectLooperGraph();
+
+    // Single-loop model: only track 0 holds audio. Tracks 1..3 are overdub.
+    if (track == 0) {
+        armed_loop_ = 0;
+        cycle_master_ = 0;
+        sendLooperOsc(loopHitPath(0), "s", "record");
+        Logger::info("Looper: BASE record toggle on loop 0");
+        return;
+    }
+
+    // Secondary "record" keys -> overdub onto the base loop.
+    armed_loop_ = 0;
+    cycle_master_ = 0;
+    sendLooperOsc(loopHitPath(0), "s", "overdub");
+    Logger::info("Looper: OVERDUB toggle on loop 0 (from track " +
+                 std::to_string(track) + " key)");
 }
+
+
+
+
+
+
+
+
+
 void AudioGraphManager::looperMuteTrack(int track)
 {
     if (track < 0 || track > 3)
         return;
-    if (!processAlive(sl_pid_))
-    {
-        Logger::info("Looper Mute track " + std::to_string(track) +
-                     " (SooperLooper not running)");
+    if (!processAlive(sl_pid_)) {
+        Logger::info("Looper Mute (SooperLooper not running)");
         return;
     }
-    sendLooperOsc(loopHitPath(track), "s", "mute");
+    // One audible loop only.
+    (void)track;
+    sendLooperOsc(loopHitPath(0), "s", "mute");
+    Logger::info("Looper: mute toggle on loop 0");
 }
+
+
+
 void AudioGraphManager::looperClearTrack(int track)
 {
     if (track < 0 || track > 3)
         return;
-    if (!processAlive(sl_pid_))
-    {
-        Logger::info("Looper Clear track " + std::to_string(track) +
-                     " (SooperLooper not running)");
+    if (!processAlive(sl_pid_)) {
+        Logger::info("Looper Clear (SooperLooper not running)");
         return;
     }
-    // undo_all clears the loop content on common setups.
-    sendLooperOsc(loopHitPath(track), "s", "undo_all");
+
+    if (track == 0) {
+        // Wipe the whole base loop (all overdub layers go with it).
+        sendLooperOsc(loopHitPath(0), "s", "undo_all");
+        // Some SL builds use "clear" instead of / in addition to undo_all.
+        sendLooperOsc(loopHitPath(0), "s", "clear");
+        cycle_master_ = -1;
+        armed_loop_ = 0;
+        for (int t = 0; t < 4; ++t) {
+            loop_active_[t] = false;
+            loop_recording_[t] = false;
+        }
+        master_cycle_sec_ = 0.0;
+        master_epoch_sec_ = 0.0;
+        Logger::info("Looper: CLEAR base loop 0 (all layers)");
+        return;
+    }
+
+    // Secondary clear keys -> undo last overdub layer on loop 0.
+    sendLooperOsc(loopHitPath(0), "s", "undo");
+    Logger::info("Looper: UNDO last overdub on loop 0 (from track " +
+                 std::to_string(track) + " key)");
 }
+
+
+
 void AudioGraphManager::looperMuteAll()
 {
-    if (!processAlive(sl_pid_))
-    {
-        Logger::info("Looper Mute All (SooperLooper not running)");
+    if (!processAlive(sl_pid_)) {
+        Logger::info("Looper MuteAll (SooperLooper not running)");
         return;
     }
-    // Loop index -1 is SooperLooper's broadcast address -- every loop,
-    // and only the loops (live Zyn output is a separate, unaffected
-    // graph path).
-    sendLooperOsc("/sl/-1/hit", "s", "mute");
+    sendLooperOsc(loopHitPath(0), "s", "mute");
+    Logger::info("Looper: mute toggle on loop 0 (MuteAll)");
 }
+
+
 void AudioGraphManager::looperRecord() { looperRecordTrack(0); }
-void AudioGraphManager::looperClear() { looperClearTrack(0); }
+void AudioGraphManager::looperClear() { looperClearTrack(0); 
+    noteAllLoopsCleared();
+}
+
 void AudioGraphManager::looperOverdub()
 {
-    if (!processAlive(sl_pid_))
-    {
+    if (!processAlive(sl_pid_)) {
         Logger::info("Looper Overdub (SooperLooper not running)");
         return;
     }
-    sendLooperOsc(loopHitPath(armed_loop_), "s", "overdub");
+    connectLooperGraph();
+    armed_loop_ = 0;
+    sendLooperOsc(loopHitPath(0), "s", "overdub");
+    Logger::info("Looper: OVERDUB toggle on loop 0");
 }
+
+
 void AudioGraphManager::looperPlay()
 {
     if (!processAlive(sl_pid_))
@@ -710,15 +919,18 @@ void AudioGraphManager::looperStop()
     // Pause if playing; mute as a hard silence fallback.
     sendLooperOsc(loopHitPath(armed_loop_), "s", "pause");
 }
+
 void AudioGraphManager::looperUndo()
 {
-    if (!processAlive(sl_pid_))
-    {
+    if (!processAlive(sl_pid_)) {
         Logger::info("Looper Undo (SooperLooper not running)");
         return;
     }
-    sendLooperOsc(loopHitPath(armed_loop_), "s", "undo");
+    sendLooperOsc(loopHitPath(0), "s", "undo");
+    Logger::info("Looper: UNDO on loop 0");
 }
+
+
 
 
 // =============================================================================
@@ -834,6 +1046,134 @@ AudioGraphManager::MicInfo AudioGraphManager::queryMic() const
 // (Definition may already exist; we replace the body below.)
 
 
+
+bool AudioGraphManager::sendLooperOscSet(int track,
+                                         const std::string& prop,
+                                         float value) const
+{
+    // SooperLooper: /sl/<n>/set  sf  <control-name> <float>
+    // (NOT ssf -- that was causing every set to fail.)
+    if (track < -1 || track > 3)
+        return false;
+    std::string oscsend_bin = which("oscsend");
+    if (oscsend_bin.empty()) {
+        Logger::warning("oscsend not found -- install liblo-tools for looper sync");
+        return false;
+    }
+    std::ostringstream cmd;
+    cmd << oscsend_bin << " localhost " << cfg_.sooperlooper_osc_port
+        << " /sl/" << track << "/set sf " << prop << " " << value
+        << " 2>/dev/null";
+    int rc = std::system(cmd.str().c_str());
+    if (rc != 0) {
+        Logger::warning("Looper OSC set failed: /sl/" + std::to_string(track) +
+                        "/set " + prop + "=" + std::to_string(value));
+        return false;
+    }
+    Logger::info("Looper OSC set: /sl/" + std::to_string(track) +
+                 "/set " + prop + "=" + std::to_string(value));
+    return true;
+}
+
+
+
+
+
+
+void AudioGraphManager::realignActiveLoops()
+{
+    // no-op in overdub-only mode
+}
+
+
+
+
+
+
+
+
+
+
+
+
+void AudioGraphManager::applyLooperSyncTopology()
+{
+    // Overdub-only model: single loop, no multi-track sync topology.
+    Logger::info("Looper sync: overdub-only mode (single loop 0)");
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void AudioGraphManager::noteLoopRecordArmed(int track)
+{
+    (void)track;
+    armed_loop_ = 0;
+    cycle_master_ = 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+void AudioGraphManager::noteLoopCleared(int track)
+{
+    (void)track;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+void AudioGraphManager::noteAllLoopsCleared()
+{
+    cycle_master_ = -1;
+    for (int t = 0; t < 4; ++t) {
+        loop_active_[t] = false;
+        loop_recording_[t] = false;
+    }
+    master_cycle_sec_ = 0.0;
+    master_epoch_sec_ = 0.0;
+}
+
+
+
+
+
+
+
+
 bool AudioGraphManager::sendLooperOsc(const std::string& path,
                                       const std::string& type_tags,
                                       const std::string& arg) const
@@ -868,51 +1208,106 @@ bool AudioGraphManager::sendLooperOsc(const std::string& path,
 
 void AudioGraphManager::connectLooperGraph()
 {
+    // fix_looper_graph: prefer common_in/out audio ports; never Midi-Bridge.
     if (!processAlive(sl_pid_))
         return;
-    // With -l 4, SooperLooper still exposes one common stereo in/out bus
-    // that sums all 4 loops -- per-loop OSC control does not require
-    // per-loop PipeWire ports, so the link topology below is unchanged.
-    // Discover SL ports. Names vary slightly by version / pw-jack.
-    auto sl_in  = findPortsMatching(
-        {"sooperlooper", "SooperLooper", "common_in", "loop0_in"}, true);
-    auto sl_out = findPortsMatching(
-        {"sooperlooper", "SooperLooper", "common_out", "loop0_out"}, false);
 
-    if (sl_in.empty() || sl_out.empty())
-    {
-        Logger::warning("SooperLooper ports not visible yet — skip looper graph links");
+    auto filter_audio = [](std::vector<std::string> ports) {
+        std::vector<std::string> out;
+        for (const auto& p : ports) {
+            std::string low = p;
+            for (char& c : low)
+                c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+            if (low.find("midi-bridge") != std::string::npos)
+                continue;
+            out.push_back(p);
+        }
+        return out;
+    };
+
+    auto all_in = filter_audio(findPortsMatching(
+        {"sooperlooper:common_in", "sooperlooper:loop0_in",
+         "common_in", "loop0_in"}, true));
+    auto all_out = filter_audio(findPortsMatching(
+        {"sooperlooper:common_out", "sooperlooper:loop0_out",
+         "common_out", "loop0_out"}, false));
+
+    auto pick_stereo = [](const std::vector<std::string>& ports,
+                          const char* prefer_tag,
+                          const char* fallback_tag)
+        -> std::pair<std::string, std::string> {
+        std::string left, right;
+        auto match_lr = [&](const char* tag) {
+            left.clear();
+            right.clear();
+            for (const auto& p : ports) {
+                std::string low = p;
+                for (char& c : low)
+                    c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+                if (low.find(tag) == std::string::npos)
+                    continue;
+                if (low.find("_1") != std::string::npos && left.empty())
+                    left = p;
+                else if (low.find("_2") != std::string::npos && right.empty())
+                    right = p;
+            }
+            return !left.empty();
+        };
+        if (!match_lr(prefer_tag))
+            match_lr(fallback_tag);
+        if (left.empty() && !ports.empty())
+            left = ports[0];
+        if (right.empty() && ports.size() > 1)
+            right = ports[1];
+        else if (right.empty())
+            right = left;
+        return {left, right};
+    };
+
+    auto in_pair = pick_stereo(all_in, "common_in", "loop0_in");
+    auto out_pair = pick_stereo(all_out, "common_out", "loop0_out");
+
+    // Absolute fallbacks for the known PipeWire names on this instrument.
+    if (in_pair.first.empty())
+        in_pair = {"sooperlooper:common_in_1", "sooperlooper:common_in_2"};
+    if (out_pair.first.empty())
+        out_pair = {"sooperlooper:common_out_1", "sooperlooper:common_out_2"};
+
+    if (in_pair.first.empty() || out_pair.first.empty()) {
+        Logger::warning(
+            "SooperLooper audio ports not visible yet -- skip looper graph links");
         return;
     }
 
-    Logger::info("SooperLooper ports in=" + std::to_string(sl_in.size()) +
-                 " out=" + std::to_string(sl_out.size()));
-    for (const auto& p : sl_in)
-        Logger::info("  SL in:  " + p);
-    for (const auto& p : sl_out)
-        Logger::info("  SL out: " + p);
+    Logger::info("SooperLooper ports selected:");
+    Logger::info("  SL in L:  " + in_pair.first);
+    Logger::info("  SL in R:  " + in_pair.second);
+    Logger::info("  SL out L: " + out_pair.first);
+    Logger::info("  SL out R: " + out_pair.second);
 
     std::string zyn_l = cfg_.zyn_client_name + ":out_1";
     std::string zyn_r = cfg_.zyn_client_name + ":out_2";
     std::string play_l = defaultPlaybackPort(true);
     std::string play_r = defaultPlaybackPort(false);
 
-    // Feed SL from Zyn (parallel to main synth path).
-    if (!sl_in.empty())
-        pwLink(zyn_l, sl_in[0]);
-    if (sl_in.size() > 1)
-        pwLink(zyn_r, sl_in[1]);
+    pwLink(zyn_l, in_pair.first);
+    if (!in_pair.second.empty())
+        pwLink(zyn_r, in_pair.second);
+    else
+        pwLink(zyn_r, in_pair.first);
 
-    // SL output → playback (wet parallel).
-    if (!sl_out.empty() && !play_l.empty())
-        pwLink(sl_out[0], play_l);
-    if (sl_out.size() > 1 && !play_r.empty())
-        pwLink(sl_out[1], play_r);
-    else if (!sl_out.empty() && !play_r.empty())
-        pwLink(sl_out[0], play_r);
+    if (!play_l.empty())
+        pwLink(out_pair.first, play_l);
+    if (!play_r.empty()) {
+        if (!out_pair.second.empty())
+            pwLink(out_pair.second, play_r);
+        else
+            pwLink(out_pair.first, play_r);
+    }
 
-    Logger::info("Looper graph linked (Zyn → SL → playback)");
+    Logger::info("Looper graph linked (Zyn -> SL -> playback)");
 }
+
 
 
 bool AudioGraphManager::setNodeVolume(const std::string& node_name_substring,

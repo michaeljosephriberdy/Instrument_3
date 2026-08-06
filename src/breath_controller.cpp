@@ -1,4 +1,6 @@
 #include "breath_controller.h"
+#include <algorithm>
+#include <cctype>
 
 #include "logger.h"
 
@@ -9,6 +11,7 @@ BreathController::BreathController()
 seq_(nullptr),
 client_id_(-1),
 port_id_(-1),
+local_port_(-1),
 breath_value_(0),
 nod_value_(64),
 connected_(false)
@@ -31,6 +34,18 @@ bool BreathController::initialize()
     );
 
 
+        // FIX: close any handle from a previous failed attempt first -- without this,
+    // every retry in StartupManager::verifyBreathController()'s poll loop
+    // leaked a new ALSA sequencer client. After enough retries (every
+    // 500ms) this exhausts the ALSA seq client table and snd_seq_open()
+    // itself starts failing, so the controller can never be found no
+    // matter how long it's left plugged in -- confirmed in instrument.log.
+    if (seq_)
+    {
+        snd_seq_close(seq_);
+        seq_ = nullptr;
+        connected_ = false;
+    }
     if (
         snd_seq_open(
             &seq_,
@@ -63,6 +78,23 @@ bool BreathController::initialize()
         seq_,
         1
     );
+// FIX: subscribeToController() below subscribes a remote source to
+// "destination.port" on OUR client -- but without creating a port
+// here, no such port exists, so that subscribe call fails silently
+// every time regardless of whether the breath controller was
+// correctly found (confirmed root cause of the "detected but not
+// found" symptom -- see fix_breath_controller.sh).
+local_port_ = snd_seq_create_simple_port(
+    seq_,
+    "breath_in",
+    SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,
+    SND_SEQ_PORT_TYPE_APPLICATION
+);
+if (local_port_ < 0)
+{
+    Logger::error("Could not create ALSA sequencer port for breath controller.");
+    return false;
+}
 
 
 
@@ -102,87 +134,43 @@ void BreathController::shutdown()
 bool BreathController::findController()
 {
     snd_seq_client_info_t* cinfo;
-
     snd_seq_port_info_t* pinfo;
+    snd_seq_client_info_alloca(&cinfo);
+    snd_seq_port_info_alloca(&pinfo);
+    snd_seq_client_info_set_client(cinfo, -1);
 
-
-    snd_seq_client_info_alloca(
-        &cinfo
-    );
-
-
-    snd_seq_port_info_alloca(
-        &pinfo
-    );
-
-
-
-    snd_seq_client_info_set_client(
-        cinfo,
-        -1
-    );
-
-
-
-    while (
-        snd_seq_query_next_client(
-            seq_,
-            cinfo
-        ) >= 0
-    )
+    // Case-insensitive containment check.
+    auto containsCi = [](const std::string& haystack, const std::string& needle)
     {
-        int client =
-            snd_seq_client_info_get_client(
-                cinfo
-            );
-
-
-
-        snd_seq_port_info_set_client(
-            pinfo,
-            client
-        );
-
-
-        snd_seq_port_info_set_port(
-            pinfo,
-            -1
-        );
-
-
-
-        while (
-            snd_seq_query_next_port(
-                seq_,
-                pinfo
-            ) >= 0
-        )
-        {
-            std::string name =
-                snd_seq_port_info_get_name(
-                    pinfo
-                );
-
-
-
-            if (
-                name.find(
-                    "Breath Controller"
-                )
-                != std::string::npos
-            )
+        auto it = std::search(
+            haystack.begin(), haystack.end(),
+            needle.begin(), needle.end(),
+            [](unsigned char a, unsigned char b)
             {
-                return subscribeToController(
-                    client,
-                    snd_seq_port_info_get_port(
-                        pinfo
-                    )
-                );
+                return std::tolower(a) == std::tolower(b);
+            }
+        );
+        return it != haystack.end();
+    };
+
+    while (snd_seq_query_next_client(seq_, cinfo) >= 0)
+    {
+        int client = snd_seq_client_info_get_client(cinfo);
+        snd_seq_port_info_set_client(pinfo, client);
+        snd_seq_port_info_set_port(pinfo, -1);
+        while (snd_seq_query_next_port(seq_, pinfo) >= 0)
+        {
+            std::string name = snd_seq_port_info_get_name(pinfo);
+            // Logged unconditionally so a non-match is self-diagnosing
+            // from instrument.log -- if this device is still not found,
+            // the exact port name ALSA reports will be right here.
+            Logger::info("  ALSA seq port seen: \"" + name + "\"");
+            if (containsCi(name, "breath controller") || containsCi(name, "tecontrol"))
+            {
+                return subscribeToController(client, snd_seq_port_info_get_port(pinfo));
             }
         }
     }
-
-
     return false;
 }
 
@@ -214,7 +202,7 @@ bool BreathController::subscribeToController(
     destination.client =
         snd_seq_client_id(seq_);
 
-    destination.port = 0;
+    destination.port = local_port_;
 
 
 

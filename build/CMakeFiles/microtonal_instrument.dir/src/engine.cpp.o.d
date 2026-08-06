@@ -289,6 +289,7 @@ CMakeFiles/microtonal_instrument.dir/src/engine.cpp.o: \
  /home/mjr/Instrument_3/include/vial_controller.h \
  /usr/include/hidapi/hidapi.h \
  /home/mjr/Instrument_3/include/startup_manager.h \
+ /home/mjr/Instrument_3/include/status_colors.h \
  /usr/include/c++/13/chrono /usr/include/c++/13/sstream \
  /usr/include/c++/13/bits/sstream.tcc \
  /usr/include/c++/13/bits/chrono_io.h /usr/include/c++/13/iomanip \

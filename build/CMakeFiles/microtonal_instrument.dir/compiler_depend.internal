@@ -78,6 +78,7 @@ CMakeFiles/microtonal_instrument.dir/src/audio_graph_manager.cpp.o
  /usr/include/c++/13/bits/semaphore_base.h
  /usr/include/c++/13/bits/shared_ptr.h
  /usr/include/c++/13/bits/shared_ptr_base.h
+ /usr/include/c++/13/bits/specfun.h
  /usr/include/c++/13/bits/sstream.tcc
  /usr/include/c++/13/bits/std_abs.h
  /usr/include/c++/13/bits/std_mutex.h
@@ -113,6 +114,7 @@ CMakeFiles/microtonal_instrument.dir/src/audio_graph_manager.cpp.o
  /usr/include/c++/13/chrono
  /usr/include/c++/13/climits
  /usr/include/c++/13/clocale
+ /usr/include/c++/13/cmath
  /usr/include/c++/13/compare
  /usr/include/c++/13/concepts
  /usr/include/c++/13/cstddef
@@ -159,6 +161,18 @@ CMakeFiles/microtonal_instrument.dir/src/audio_graph_manager.cpp.o
  /usr/include/c++/13/string_view
  /usr/include/c++/13/system_error
  /usr/include/c++/13/thread
+ /usr/include/c++/13/tr1/bessel_function.tcc
+ /usr/include/c++/13/tr1/beta_function.tcc
+ /usr/include/c++/13/tr1/ell_integral.tcc
+ /usr/include/c++/13/tr1/exp_integral.tcc
+ /usr/include/c++/13/tr1/gamma.tcc
+ /usr/include/c++/13/tr1/hypergeometric.tcc
+ /usr/include/c++/13/tr1/legendre_function.tcc
+ /usr/include/c++/13/tr1/modified_bessel_func.tcc
+ /usr/include/c++/13/tr1/poly_hermite.tcc
+ /usr/include/c++/13/tr1/poly_laguerre.tcc
+ /usr/include/c++/13/tr1/riemann_zeta.tcc
+ /usr/include/c++/13/tr1/special_function_util.h
  /usr/include/c++/13/tuple
  /usr/include/c++/13/type_traits
  /usr/include/c++/13/typeinfo
@@ -175,6 +189,7 @@ CMakeFiles/microtonal_instrument.dir/src/audio_graph_manager.cpp.o
  /usr/include/linux/errno.h
  /usr/include/linux/limits.h
  /usr/include/locale.h
+ /usr/include/math.h
  /usr/include/pthread.h
  /usr/include/sched.h
  /usr/include/semaphore.h
@@ -203,12 +218,21 @@ CMakeFiles/microtonal_instrument.dir/src/audio_graph_manager.cpp.o
  /usr/include/x86_64-linux-gnu/bits/errno.h
  /usr/include/x86_64-linux-gnu/bits/floatn-common.h
  /usr/include/x86_64-linux-gnu/bits/floatn.h
+ /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h
+ /usr/include/x86_64-linux-gnu/bits/fp-fast.h
+ /usr/include/x86_64-linux-gnu/bits/fp-logb.h
  /usr/include/x86_64-linux-gnu/bits/getopt_core.h
  /usr/include/x86_64-linux-gnu/bits/getopt_posix.h
+ /usr/include/x86_64-linux-gnu/bits/iscanonical.h
  /usr/include/x86_64-linux-gnu/bits/libc-header-start.h
+ /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h
  /usr/include/x86_64-linux-gnu/bits/local_lim.h
  /usr/include/x86_64-linux-gnu/bits/locale.h
  /usr/include/x86_64-linux-gnu/bits/long-double.h
+ /usr/include/x86_64-linux-gnu/bits/math-vector.h
+ /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h
+ /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h
+ /usr/include/x86_64-linux-gnu/bits/mathcalls.h
  /usr/include/x86_64-linux-gnu/bits/posix1_lim.h
  /usr/include/x86_64-linux-gnu/bits/posix2_lim.h
  /usr/include/x86_64-linux-gnu/bits/posix_opt.h
@@ -359,8 +383,10 @@ CMakeFiles/microtonal_instrument.dir/src/breath_controller.cpp.o
  /usr/include/asm-generic/errno-base.h
  /usr/include/asm-generic/errno.h
  /usr/include/assert.h
+ /usr/include/c++/13/algorithm
  /usr/include/c++/13/backward/binders.h
  /usr/include/c++/13/bit
+ /usr/include/c++/13/bits/algorithmfwd.h
  /usr/include/c++/13/bits/alloc_traits.h
  /usr/include/c++/13/bits/allocator.h
  /usr/include/c++/13/bits/basic_ios.h
@@ -404,6 +430,8 @@ CMakeFiles/microtonal_instrument.dir/src/breath_controller.cpp.o
  /usr/include/c++/13/bits/predefined_ops.h
  /usr/include/c++/13/bits/ptr_traits.h
  /usr/include/c++/13/bits/range_access.h
+ /usr/include/c++/13/bits/ranges_algo.h
+ /usr/include/c++/13/bits/ranges_algobase.h
  /usr/include/c++/13/bits/ranges_base.h
  /usr/include/c++/13/bits/ranges_cmp.h
  /usr/include/c++/13/bits/ranges_util.h
@@ -411,17 +439,21 @@ CMakeFiles/microtonal_instrument.dir/src/breath_controller.cpp.o
  /usr/include/c++/13/bits/requires_hosted.h
  /usr/include/c++/13/bits/std_abs.h
  /usr/include/c++/13/bits/std_mutex.h
+ /usr/include/c++/13/bits/stl_algo.h
  /usr/include/c++/13/bits/stl_algobase.h
  /usr/include/c++/13/bits/stl_construct.h
  /usr/include/c++/13/bits/stl_function.h
+ /usr/include/c++/13/bits/stl_heap.h
  /usr/include/c++/13/bits/stl_iterator.h
  /usr/include/c++/13/bits/stl_iterator_base_funcs.h
  /usr/include/c++/13/bits/stl_iterator_base_types.h
  /usr/include/c++/13/bits/stl_pair.h
+ /usr/include/c++/13/bits/stl_tempbuf.h
  /usr/include/c++/13/bits/streambuf.tcc
  /usr/include/c++/13/bits/streambuf_iterator.h
  /usr/include/c++/13/bits/string_view.tcc
  /usr/include/c++/13/bits/stringfwd.h
+ /usr/include/c++/13/bits/uniform_int_dist.h
  /usr/include/c++/13/bits/unique_lock.h
  /usr/include/c++/13/bits/uses_allocator.h
  /usr/include/c++/13/bits/uses_allocator_args.h
@@ -456,6 +488,8 @@ CMakeFiles/microtonal_instrument.dir/src/breath_controller.cpp.o
  /usr/include/c++/13/new
  /usr/include/c++/13/numbers
  /usr/include/c++/13/ostream
+ /usr/include/c++/13/pstl/execution_defs.h
+ /usr/include/c++/13/pstl/glue_algorithm_defs.h
  /usr/include/c++/13/pstl/pstl_config.h
  /usr/include/c++/13/ratio
  /usr/include/c++/13/stdexcept
@@ -1056,6 +1090,7 @@ CMakeFiles/microtonal_instrument.dir/src/engine.cpp.o
  /home/mjr/Instrument_3/include/logger.h
  /home/mjr/Instrument_3/include/midi_engine.h
  /home/mjr/Instrument_3/include/startup_manager.h
+ /home/mjr/Instrument_3/include/status_colors.h
  /home/mjr/Instrument_3/include/vial_controller.h
  /usr/include/alloca.h
  /usr/include/alsa/asoundef.h
@@ -3697,6 +3732,7 @@ CMakeFiles/microtonal_instrument.dir/src/midi_engine.cpp.o
 CMakeFiles/microtonal_instrument.dir/src/startup_manager.cpp.o
  /home/mjr/Instrument_3/src/startup_manager.cpp
  /home/mjr/Instrument_3/include/breath_controller.h
+ /home/mjr/Instrument_3/include/id75_firmware_keymap.h
  /home/mjr/Instrument_3/include/keyboard.h
  /home/mjr/Instrument_3/include/keyboard_layout.h
  /home/mjr/Instrument_3/include/keyboard_manager.h
@@ -4348,6 +4384,7 @@ CMakeFiles/microtonal_instrument.dir/src/usb_topology.cpp.o
 
 CMakeFiles/microtonal_instrument.dir/src/vial_controller.cpp.o
  /home/mjr/Instrument_3/src/vial_controller.cpp
+ /home/mjr/Instrument_3/include/id75_firmware_keymap.h
  /home/mjr/Instrument_3/include/logger.h
  /home/mjr/Instrument_3/include/vial_controller.h
  /usr/include/alloca.h

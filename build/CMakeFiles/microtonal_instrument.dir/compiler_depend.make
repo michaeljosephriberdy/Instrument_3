@@ -77,6 +77,7 @@ CMakeFiles/microtonal_instrument.dir/src/audio_graph_manager.cpp.o: /home/mjr/In
   /usr/include/c++/13/bits/semaphore_base.h \
   /usr/include/c++/13/bits/shared_ptr.h \
   /usr/include/c++/13/bits/shared_ptr_base.h \
+  /usr/include/c++/13/bits/specfun.h \
   /usr/include/c++/13/bits/sstream.tcc \
   /usr/include/c++/13/bits/std_abs.h \
   /usr/include/c++/13/bits/std_mutex.h \
@@ -112,6 +113,7 @@ CMakeFiles/microtonal_instrument.dir/src/audio_graph_manager.cpp.o: /home/mjr/In
   /usr/include/c++/13/chrono \
   /usr/include/c++/13/climits \
   /usr/include/c++/13/clocale \
+  /usr/include/c++/13/cmath \
   /usr/include/c++/13/compare \
   /usr/include/c++/13/concepts \
   /usr/include/c++/13/cstddef \
@@ -158,6 +160,18 @@ CMakeFiles/microtonal_instrument.dir/src/audio_graph_manager.cpp.o: /home/mjr/In
   /usr/include/c++/13/string_view \
   /usr/include/c++/13/system_error \
   /usr/include/c++/13/thread \
+  /usr/include/c++/13/tr1/bessel_function.tcc \
+  /usr/include/c++/13/tr1/beta_function.tcc \
+  /usr/include/c++/13/tr1/ell_integral.tcc \
+  /usr/include/c++/13/tr1/exp_integral.tcc \
+  /usr/include/c++/13/tr1/gamma.tcc \
+  /usr/include/c++/13/tr1/hypergeometric.tcc \
+  /usr/include/c++/13/tr1/legendre_function.tcc \
+  /usr/include/c++/13/tr1/modified_bessel_func.tcc \
+  /usr/include/c++/13/tr1/poly_hermite.tcc \
+  /usr/include/c++/13/tr1/poly_laguerre.tcc \
+  /usr/include/c++/13/tr1/riemann_zeta.tcc \
+  /usr/include/c++/13/tr1/special_function_util.h \
   /usr/include/c++/13/tuple \
   /usr/include/c++/13/type_traits \
   /usr/include/c++/13/typeinfo \
@@ -174,6 +188,7 @@ CMakeFiles/microtonal_instrument.dir/src/audio_graph_manager.cpp.o: /home/mjr/In
   /usr/include/linux/errno.h \
   /usr/include/linux/limits.h \
   /usr/include/locale.h \
+  /usr/include/math.h \
   /usr/include/pthread.h \
   /usr/include/sched.h \
   /usr/include/semaphore.h \
@@ -202,12 +217,21 @@ CMakeFiles/microtonal_instrument.dir/src/audio_graph_manager.cpp.o: /home/mjr/In
   /usr/include/x86_64-linux-gnu/bits/errno.h \
   /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
   /usr/include/x86_64-linux-gnu/bits/floatn.h \
+  /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h \
+  /usr/include/x86_64-linux-gnu/bits/fp-fast.h \
+  /usr/include/x86_64-linux-gnu/bits/fp-logb.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_posix.h \
+  /usr/include/x86_64-linux-gnu/bits/iscanonical.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
+  /usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h \
   /usr/include/x86_64-linux-gnu/bits/local_lim.h \
   /usr/include/x86_64-linux-gnu/bits/locale.h \
   /usr/include/x86_64-linux-gnu/bits/long-double.h \
+  /usr/include/x86_64-linux-gnu/bits/math-vector.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h \
+  /usr/include/x86_64-linux-gnu/bits/mathcalls.h \
   /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
   /usr/include/x86_64-linux-gnu/bits/posix2_lim.h \
   /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
@@ -357,8 +381,10 @@ CMakeFiles/microtonal_instrument.dir/src/breath_controller.cpp.o: /home/mjr/Inst
   /usr/include/asm-generic/errno-base.h \
   /usr/include/asm-generic/errno.h \
   /usr/include/assert.h \
+  /usr/include/c++/13/algorithm \
   /usr/include/c++/13/backward/binders.h \
   /usr/include/c++/13/bit \
+  /usr/include/c++/13/bits/algorithmfwd.h \
   /usr/include/c++/13/bits/alloc_traits.h \
   /usr/include/c++/13/bits/allocator.h \
   /usr/include/c++/13/bits/basic_ios.h \
@@ -402,6 +428,8 @@ CMakeFiles/microtonal_instrument.dir/src/breath_controller.cpp.o: /home/mjr/Inst
   /usr/include/c++/13/bits/predefined_ops.h \
   /usr/include/c++/13/bits/ptr_traits.h \
   /usr/include/c++/13/bits/range_access.h \
+  /usr/include/c++/13/bits/ranges_algo.h \
+  /usr/include/c++/13/bits/ranges_algobase.h \
   /usr/include/c++/13/bits/ranges_base.h \
   /usr/include/c++/13/bits/ranges_cmp.h \
   /usr/include/c++/13/bits/ranges_util.h \
@@ -409,17 +437,21 @@ CMakeFiles/microtonal_instrument.dir/src/breath_controller.cpp.o: /home/mjr/Inst
   /usr/include/c++/13/bits/requires_hosted.h \
   /usr/include/c++/13/bits/std_abs.h \
   /usr/include/c++/13/bits/std_mutex.h \
+  /usr/include/c++/13/bits/stl_algo.h \
   /usr/include/c++/13/bits/stl_algobase.h \
   /usr/include/c++/13/bits/stl_construct.h \
   /usr/include/c++/13/bits/stl_function.h \
+  /usr/include/c++/13/bits/stl_heap.h \
   /usr/include/c++/13/bits/stl_iterator.h \
   /usr/include/c++/13/bits/stl_iterator_base_funcs.h \
   /usr/include/c++/13/bits/stl_iterator_base_types.h \
   /usr/include/c++/13/bits/stl_pair.h \
+  /usr/include/c++/13/bits/stl_tempbuf.h \
   /usr/include/c++/13/bits/streambuf.tcc \
   /usr/include/c++/13/bits/streambuf_iterator.h \
   /usr/include/c++/13/bits/string_view.tcc \
   /usr/include/c++/13/bits/stringfwd.h \
+  /usr/include/c++/13/bits/uniform_int_dist.h \
   /usr/include/c++/13/bits/unique_lock.h \
   /usr/include/c++/13/bits/uses_allocator.h \
   /usr/include/c++/13/bits/uses_allocator_args.h \
@@ -454,6 +486,8 @@ CMakeFiles/microtonal_instrument.dir/src/breath_controller.cpp.o: /home/mjr/Inst
   /usr/include/c++/13/new \
   /usr/include/c++/13/numbers \
   /usr/include/c++/13/ostream \
+  /usr/include/c++/13/pstl/execution_defs.h \
+  /usr/include/c++/13/pstl/glue_algorithm_defs.h \
   /usr/include/c++/13/pstl/pstl_config.h \
   /usr/include/c++/13/ratio \
   /usr/include/c++/13/stdexcept \
@@ -1052,6 +1086,7 @@ CMakeFiles/microtonal_instrument.dir/src/engine.cpp.o: /home/mjr/Instrument_3/sr
   /home/mjr/Instrument_3/include/logger.h \
   /home/mjr/Instrument_3/include/midi_engine.h \
   /home/mjr/Instrument_3/include/startup_manager.h \
+  /home/mjr/Instrument_3/include/status_colors.h \
   /home/mjr/Instrument_3/include/vial_controller.h \
   /usr/include/alloca.h \
   /usr/include/alsa/asoundef.h \
@@ -3684,6 +3719,7 @@ CMakeFiles/microtonal_instrument.dir/src/midi_engine.cpp.o: /home/mjr/Instrument
 
 CMakeFiles/microtonal_instrument.dir/src/startup_manager.cpp.o: /home/mjr/Instrument_3/src/startup_manager.cpp \
   /home/mjr/Instrument_3/include/breath_controller.h \
+  /home/mjr/Instrument_3/include/id75_firmware_keymap.h \
   /home/mjr/Instrument_3/include/keyboard.h \
   /home/mjr/Instrument_3/include/keyboard_layout.h \
   /home/mjr/Instrument_3/include/keyboard_manager.h \
@@ -4333,6 +4369,7 @@ CMakeFiles/microtonal_instrument.dir/src/usb_topology.cpp.o: /home/mjr/Instrumen
   /usr/lib/gcc/x86_64-linux-gnu/13/include/stdint.h
 
 CMakeFiles/microtonal_instrument.dir/src/vial_controller.cpp.o: /home/mjr/Instrument_3/src/vial_controller.cpp \
+  /home/mjr/Instrument_3/include/id75_firmware_keymap.h \
   /home/mjr/Instrument_3/include/logger.h \
   /home/mjr/Instrument_3/include/vial_controller.h \
   /usr/include/alloca.h \
@@ -4655,31 +4692,7 @@ CMakeFiles/microtonal_instrument.dir/src/vial_controller.cpp.o: /home/mjr/Instru
 
 /usr/include/c++/13/bits/regex_error.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
-
-/usr/include/x86_64-linux-gnu/bits/timex.h:
-
-_deps/json-src/include/nlohmann/adl_serializer.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/timesize.h:
-
-/usr/include/c++/13/bits/locale_classes.h:
-
-/usr/include/x86_64-linux-gnu/bits/time.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/clockid_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdio2.h:
-
-/usr/include/c++/13/bits/quoted_string.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdio2-decl.h:
-
-/usr/include/c++/13/bits/ptr_traits.h:
-
-/usr/include/linux/posix_types.h:
+/usr/include/c++/13/bits/regex_constants.h:
 
 /usr/include/x86_64-linux-gnu/bits/sigthread.h:
 
@@ -4695,19 +4708,31 @@ _deps/json-src/include/nlohmann/adl_serializer.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/siginfo-consts.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
-
 /usr/include/time.h:
 
 /usr/include/x86_64-linux-gnu/bits/select2.h:
 
 /usr/include/c++/13/cmath:
 
+/usr/include/x86_64-linux-gnu/bits/time.h:
+
 /usr/include/x86_64-linux-gnu/bits/sched.h:
 
 /usr/include/c++/13/climits:
 
 /usr/include/alsa/asoundef.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
+
+/usr/include/x86_64-linux-gnu/bits/iscanonical.h:
+
+/usr/include/c++/13/string_view:
+
+_deps/json-src/include/nlohmann/detail/iterators/internal_iterator.hpp:
+
+/usr/include/c++/13/map:
+
+/usr/include/x86_64-linux-gnu/bits/fp-fast.h:
 
 /usr/include/x86_64-linux-gnu/bits/floatn-common.h:
 
@@ -4729,17 +4754,9 @@ _deps/json-src/include/nlohmann/adl_serializer.hpp:
 
 /usr/include/c++/13/tr1/riemann_zeta.tcc:
 
-/usr/include/x86_64-linux-gnu/bits/semaphore.h:
-
-/usr/include/x86_64-linux-gnu/bits/struct_rwlock.h:
-
 /usr/include/strings.h:
 
 /usr/include/c++/13/iomanip:
-
-/usr/include/x86_64-linux-gnu/asm/unistd.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdio.h:
 
 /usr/include/stdlib.h:
 
@@ -4750,8 +4767,6 @@ _deps/json-src/include/nlohmann/adl_serializer.hpp:
 _deps/json-src/include/nlohmann/detail/output/output_adapters.hpp:
 
 /usr/include/c++/13/bits/regex_compiler.h:
-
-/usr/include/stdc-predef.h:
 
 /usr/include/semaphore.h:
 
@@ -4785,19 +4800,23 @@ _deps/json-src/include/nlohmann/detail/output/output_adapters.hpp:
 
 /usr/include/c++/13/vector:
 
+/usr/include/stdc-predef.h:
+
+/usr/include/x86_64-linux-gnu/bits/sigcontext.h:
+
+/usr/include/c++/13/tr1/modified_bessel_func.tcc:
+
+/usr/include/c++/13/bits/ranges_base.h:
+
+/usr/lib/gcc/x86_64-linux-gnu/13/include/limits.h:
+
+/usr/include/c++/13/bits/range_access.h:
+
 /usr/include/x86_64-linux-gnu/bits/posix_opt.h:
 
 /usr/include/c++/13/thread:
 
 /usr/include/c++/13/bits/max_size_type.h:
-
-/usr/include/c++/13/string_view:
-
-_deps/json-src/include/nlohmann/detail/iterators/internal_iterator.hpp:
-
-/usr/include/c++/13/map:
-
-/usr/include/x86_64-linux-gnu/bits/iscanonical.h:
 
 /usr/include/features.h:
 
@@ -4825,25 +4844,17 @@ _deps/json-src/include/nlohmann/detail/iterators/internal_iterator.hpp:
 
 /usr/include/c++/13/limits:
 
+/usr/include/c++/13/tuple:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
+
+/usr/include/x86_64-linux-gnu/sys/ttydefaults.h:
+
 /usr/include/c++/13/istream:
-
-/usr/include/c++/13/bits/stl_stack.h:
-
-/usr/include/x86_64-linux-gnu/bits/string_fortified.h:
-
-/usr/include/c++/13/initializer_list:
-
-/usr/include/c++/13/bits/std_thread.h:
 
 /usr/include/c++/13/tr1/bessel_function.tcc:
 
-/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h:
-
-/usr/include/x86_64-linux-gnu/bits/select.h:
-
-/usr/include/x86_64-linux-gnu/c++/13/bits/gthr-default.h:
+/usr/include/c++/13/bits/std_thread.h:
 
 /usr/include/unistd.h:
 
@@ -4858,6 +4869,10 @@ _deps/json-src/include/nlohmann/detail/iterators/internal_iterator.hpp:
 /usr/include/x86_64-linux-gnu/bits/types/struct_timeval.h:
 
 /usr/include/c++/13/ext/concurrence.h:
+
+/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
+
+/usr/include/c++/13/ext/alloc_traits.h:
 
 /usr/include/c++/13/bits/memoryfwd.h:
 
@@ -4881,9 +4896,21 @@ _deps/json-src/include/nlohmann/json.hpp:
 
 /usr/include/c++/13/bits/uniform_int_dist.h:
 
+/usr/include/x86_64-linux-gnu/bits/endian.h:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls.h:
+
+/usr/include/c++/13/bits/stl_relops.h:
+
+/usr/include/c++/13/bits/locale_classes.h:
+
+/usr/include/x86_64-linux-gnu/bits/timesize.h:
+
 /usr/include/c++/13/bits/ios_base.h:
 
 /usr/include/c++/13/iterator:
+
+/usr/include/x86_64-linux-gnu/bits/math-vector.h:
 
 /usr/include/c++/13/bits/hash_bytes.h:
 
@@ -4907,17 +4934,23 @@ _deps/json-src/include/nlohmann/thirdparty/hedley/hedley_undef.hpp:
 
 /usr/include/c++/13/typeinfo:
 
-/usr/include/x86_64-linux-gnu/bits/syscall.h:
-
-/usr/include/x86_64-linux-gnu/c++/13/bits/c++io.h:
-
 /usr/include/x86_64-linux-gnu/bits/local_lim.h:
 
 /usr/include/alsa/error.h:
 
+/usr/include/c++/13/new:
+
+/usr/include/linux/ioctl.h:
+
 /usr/include/c++/13/bits/cxxabi_init_exception.h:
 
 /home/mjr/Instrument_3/include/audio_graph_manager.h:
+
+/usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
+
+/usr/include/c++/13/bits/streambuf_iterator.h:
+
+_deps/json-src/include/nlohmann/detail/string_escape.hpp:
 
 /usr/include/c++/13/bits/localefwd.h:
 
@@ -4931,21 +4964,15 @@ _deps/json-src/include/nlohmann/thirdparty/hedley/hedley_undef.hpp:
 
 /usr/include/c++/13/ostream:
 
-/usr/include/c++/13/bits/streambuf_iterator.h:
-
-_deps/json-src/include/nlohmann/detail/string_escape.hpp:
-
-/usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
-
-/usr/include/c++/13/bits/locale_conv.h:
-
 /usr/include/c++/13/bits/istream.tcc:
 
 /usr/include/c++/13/bits/iterator_concepts.h:
 
 /home/mjr/Instrument_3/include/midi_engine.h:
+
+/home/mjr/Instrument_3/include/startup_manager.h:
+
+/usr/include/c++/13/mutex:
 
 /usr/include/c++/13/bits/unique_lock.h:
 
@@ -4953,17 +4980,9 @@ _deps/json-src/include/nlohmann/detail/string_escape.hpp:
 
 /home/mjr/Instrument_3/include/instrument_state.h:
 
-/usr/include/c++/13/ext/type_traits.h:
-
-/usr/include/x86_64-linux-gnu/bits/time64.h:
-
 /usr/include/c++/13/bits/basic_ios.h:
 
 /usr/include/c++/13/bits/shared_ptr_base.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
-
-/usr/include/wchar.h:
 
 /usr/include/c++/13/bits/char_traits.h:
 
@@ -4989,6 +5008,8 @@ _deps/json-src/include/nlohmann/json_fwd.hpp:
 
 /usr/include/c++/13/backward/binders.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/__FILE.h:
+
 /usr/include/c++/13/bits/exception_defines.h:
 
 /home/mjr/Instrument_3/src/audio_graph_manager.cpp:
@@ -5001,9 +5022,7 @@ _deps/json-src/include/nlohmann/json_fwd.hpp:
 
 /usr/include/c++/13/bits/stl_tempbuf.h:
 
-/home/mjr/Instrument_3/src/engine.cpp:
-
-/usr/include/x86_64-linux-gnu/bits/stdint-least.h:
+/usr/include/x86_64-linux-gnu/bits/wchar2.h:
 
 /usr/include/c++/13/bits/algorithmfwd.h:
 
@@ -5012,14 +5031,6 @@ _deps/json-src/include/nlohmann/json_fwd.hpp:
 /usr/include/c++/13/bits/concept_check.h:
 
 /usr/include/c++/13/bits/alloc_traits.h:
-
-/usr/include/linux/ioctl.h:
-
-/usr/include/c++/13/new:
-
-/usr/include/c++/13/mutex:
-
-/home/mjr/Instrument_3/include/startup_manager.h:
 
 /usr/include/c++/13/stdexcept:
 
@@ -5051,29 +5062,23 @@ _deps/json-src/include/nlohmann/detail/meta/cpp_future.hpp:
 
 /usr/include/c++/13/bits/chrono.h:
 
+/usr/include/c++/13/tr1/special_function_util.h:
+
+/usr/include/c++/13/tr1/poly_laguerre.tcc:
+
 /usr/include/c++/13/bits/basic_string.h:
 
-/usr/include/x86_64-linux-gnu/bits/getopt_core.h:
+/usr/include/c++/13/bits/specfun.h:
 
-/usr/include/c++/13/bits/stl_vector.h:
-
-/usr/include/x86_64-linux-gnu/bits/stdlib.h:
+/usr/include/c++/13/bits/streambuf.tcc:
 
 /usr/include/c++/13/bits/valarray_array.h:
 
+/usr/include/c++/13/tr1/exp_integral.tcc:
+
 /usr/include/c++/13/bits/atomic_timed_wait.h:
 
-/usr/include/c++/13/bits/ranges_base.h:
-
-/usr/lib/gcc/x86_64-linux-gnu/13/include/limits.h:
-
-/usr/include/c++/13/tr1/modified_bessel_func.tcc:
-
 /usr/include/c++/13/bits/fstream.tcc:
-
-/usr/include/c++/13/bits/basic_string.tcc:
-
-/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
 
 /usr/include/c++/13/bits/refwrap.h:
 
@@ -5093,13 +5098,15 @@ _deps/json-src/include/nlohmann/detail/iterators/iterator_traits.hpp:
 
 /usr/include/c++/13/utility:
 
-/usr/include/libintl.h:
+/usr/include/c++/13/bits/ptr_traits.h:
 
-/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
+/usr/include/x86_64-linux-gnu/bits/stdio2-decl.h:
 
-/usr/include/c++/13/bits/string_view.tcc:
+/usr/include/linux/posix_types.h:
 
-/usr/include/x86_64-linux-gnu/bits/sigcontext.h:
+/usr/include/c++/13/bits/quoted_string.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdio2.h:
 
 /usr/include/c++/13/bits/ostream_insert.h:
 
@@ -5107,9 +5114,9 @@ _deps/json-src/include/nlohmann/detail/iterators/iterator_traits.hpp:
 
 /usr/include/c++/13/compare:
 
-/usr/include/c++/13/bits/range_access.h:
-
 /usr/include/c++/13/bits/ranges_algobase.h:
+
+/usr/include/c++/13/tr1/beta_function.tcc:
 
 /usr/include/c++/13/bits/stl_function.h:
 
@@ -5137,9 +5144,13 @@ _deps/json-src/include/nlohmann/detail/iterators/iterator_traits.hpp:
 
 _deps/json-src/include/nlohmann/detail/meta/is_sax.hpp:
 
-/usr/include/c++/13/bits/semaphore_base.h:
+/usr/include/c++/13/bits/string_view.tcc:
 
-/usr/include/x86_64-linux-gnu/bits/struct_mutex.h:
+/usr/include/libintl.h:
+
+/usr/include/x86_64-linux-gnu/bits/thread-shared-types.h:
+
+/usr/include/c++/13/bits/semaphore_base.h:
 
 /usr/include/c++/13/bits/shared_ptr.h:
 
@@ -5205,17 +5216,21 @@ _deps/json-src/include/nlohmann/detail/meta/type_traits.hpp:
 
 /usr/include/c++/13/bits/new_allocator.h:
 
-/usr/include/c++/13/bits/streambuf.tcc:
-
-/usr/include/c++/13/bits/specfun.h:
-
 /usr/include/c++/13/bits/align.h:
 
 /usr/include/x86_64-linux-gnu/bits/ioctl-types.h:
 
 /usr/include/c++/13/bits/unique_ptr.h:
 
+/usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
+
+/usr/include/linux/falloc.h:
+
 /usr/include/c++/13/bits/postypes.h:
+
+/usr/include/alsa/mixer.h:
+
+/usr/include/c++/13/bits/uses_allocator.h:
 
 /usr/include/c++/13/exception:
 
@@ -5229,6 +5244,22 @@ _deps/json-src/include/nlohmann/detail/meta/type_traits.hpp:
 
 /usr/include/c++/13/bits/uses_allocator_args.h:
 
+/usr/include/x86_64-linux-gnu/bits/locale.h:
+
+/usr/include/x86_64-linux-gnu/bits/posix1_lim.h:
+
+/usr/include/c++/13/tr1/gamma.tcc:
+
+_deps/json-src/include/nlohmann/detail/meta/void_t.hpp:
+
+/usr/include/c++/13/ext/atomicity.h:
+
+/usr/include/c++/13/deque:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
+
+/usr/include/c++/13/cctype:
+
 /usr/include/limits.h:
 
 /usr/include/c++/13/cstdlib:
@@ -5238,6 +5269,10 @@ _deps/json-src/include/nlohmann/detail/meta/type_traits.hpp:
 /usr/include/c++/13/cstdint:
 
 /usr/include/x86_64-linux-gnu/bits/floatn.h:
+
+/usr/include/c++/13/pstl/glue_numeric_defs.h:
+
+/usr/include/c++/13/concepts:
 
 /usr/include/c++/13/bits/stringfwd.h:
 
@@ -5263,25 +5298,79 @@ _deps/json-src/include/nlohmann/detail/meta/type_traits.hpp:
 
 _deps/json-src/include/nlohmann/detail/macro_unscope.hpp:
 
-/usr/include/x86_64-linux-gnu/bits/locale.h:
+/usr/include/x86_64-linux-gnu/bits/stdint-least.h:
 
-/usr/include/x86_64-linux-gnu/bits/posix1_lim.h:
+/usr/include/x86_64-linux-gnu/bits/stdint-uintn.h:
 
-/usr/include/c++/13/concepts:
+/usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h:
 
-/usr/include/c++/13/pstl/glue_numeric_defs.h:
+/usr/include/x86_64-linux-gnu/bits/select.h:
 
-/usr/include/c++/13/cctype:
+/usr/include/x86_64-linux-gnu/c++/13/bits/gthr-default.h:
 
-/usr/include/c++/13/ext/atomicity.h:
+/usr/include/x86_64-linux-gnu/asm/unistd.h:
 
-/usr/include/c++/13/deque:
+/usr/include/x86_64-linux-gnu/bits/stdio.h:
 
-/usr/include/x86_64-linux-gnu/bits/types/struct_tm.h:
+/usr/include/c++/13/bits/locale_conv.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdio_lim.h:
+
+/usr/include/x86_64-linux-gnu/bits/timex.h:
+
+_deps/json-src/include/nlohmann/adl_serializer.hpp:
+
+/usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/clockid_t.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h:
+
+/usr/include/wchar.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdlib-float.h:
+
+/usr/include/x86_64-linux-gnu/bits/getopt_core.h:
+
+/usr/include/c++/13/bits/stl_vector.h:
+
+/usr/include/x86_64-linux-gnu/bits/stdlib.h:
+
+/usr/include/c++/13/bits/stl_stack.h:
+
+/usr/include/c++/13/initializer_list:
+
+/usr/include/x86_64-linux-gnu/bits/string_fortified.h:
+
+/home/mjr/Instrument_3/src/engine.cpp:
+
+/usr/include/x86_64-linux-gnu/bits/struct_mutex.h:
+
+/usr/include/x86_64-linux-gnu/bits/semaphore.h:
+
+/usr/include/x86_64-linux-gnu/bits/struct_rwlock.h:
+
+/usr/include/x86_64-linux-gnu/c++/13/bits/c++io.h:
+
+/usr/include/x86_64-linux-gnu/bits/syscall.h:
+
+/usr/include/c++/13/ext/type_traits.h:
+
+/usr/include/x86_64-linux-gnu/bits/time64.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/__fpos64_t.h:
+
+/usr/include/c++/13/bits/basic_string.tcc:
+
+/usr/include/x86_64-linux-gnu/bits/types/__fpos_t.h:
 
 _deps/json-src/include/nlohmann/detail/input/parser.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/types/__locale_t.h:
+
+/home/mjr/Instrument_3/include/id75_firmware_keymap.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_sigstack.h:
 
@@ -5309,6 +5398,10 @@ _deps/json-src/include/nlohmann/detail/input/parser.hpp:
 
 /usr/include/c++/13/bits/hashtable.h:
 
+/usr/include/x86_64-linux-gnu/bits/fp-logb.h:
+
+/usr/include/x86_64-linux-gnu/bits/types/idtype_t.h:
+
 /usr/include/c++/13/type_traits:
 
 /usr/include/features-time64.h:
@@ -5327,23 +5420,21 @@ _deps/json-src/include/nlohmann/detail/conversions/from_json.hpp:
 
 /usr/include/asm-generic/bitsperlong.h:
 
+/usr/include/c++/13/tr1/legendre_function.tcc:
+
+/usr/include/asm-generic/types.h:
+
 /usr/include/x86_64-linux-gnu/bits/types/sigval_t.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/stack_t.h:
 
-/usr/include/c++/13/tuple:
-
-/usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h:
-
-/usr/include/c++/13/ext/alloc_traits.h:
-
-/usr/include/x86_64-linux-gnu/bits/libm-simd-decl-stubs.h:
-
-/usr/include/x86_64-linux-gnu/sys/ttydefaults.h:
-
 /usr/include/c++/13/ios:
 
 /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h:
+
+/usr/include/c++/13/tr1/poly_hermite.tcc:
+
+/usr/include/x86_64-linux-gnu/bits/types/timer_t.h:
 
 _deps/json-src/include/nlohmann/detail/iterators/json_reverse_iterator.hpp:
 
@@ -5370,12 +5461,6 @@ _deps/json-src/include/nlohmann/detail/iterators/json_reverse_iterator.hpp:
 /usr/include/c++/13/bits/std_abs.h:
 
 /usr/include/x86_64-linux-gnu/bits/wchar2-decl.h:
-
-/usr/include/x86_64-linux-gnu/bits/wchar2.h:
-
-/usr/include/x86_64-linux-gnu/bits/types/idtype_t.h:
-
-/usr/include/x86_64-linux-gnu/bits/fp-logb.h:
 
 /usr/include/c++/13/charconv:
 
@@ -5473,9 +5558,9 @@ _deps/json-src/include/nlohmann/detail/json_pointer.hpp:
 
 /usr/include/alsa/control.h:
 
-/usr/include/x86_64-linux-gnu/bits/types.h:
-
 /usr/include/x86_64-linux-gnu/bits/signal_ext.h:
+
+/usr/include/x86_64-linux-gnu/bits/types.h:
 
 /usr/include/alsa/hwdep.h:
 
@@ -5484,14 +5569,6 @@ _deps/json-src/include/nlohmann/detail/json_ref.hpp:
 /usr/include/c++/13/stdlib.h:
 
 /usr/include/alsa/input.h:
-
-/usr/include/c++/13/bits/uses_allocator.h:
-
-/usr/include/alsa/mixer.h:
-
-/usr/include/asm-generic/types.h:
-
-/usr/include/c++/13/tr1/legendre_function.tcc:
 
 /usr/include/alsa/output.h:
 
@@ -5511,13 +5588,15 @@ _deps/json-src/include/nlohmann/detail/json_ref.hpp:
 
 _deps/json-src/include/nlohmann/detail/conversions/to_json.hpp:
 
-/usr/include/x86_64-linux-gnu/bits/types/mbstate_t.h:
+/usr/include/c++/13/algorithm:
 
-/usr/include/linux/falloc.h:
+/usr/include/alsa/timer.h:
 
-/usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h:
+/usr/include/c++/13/pstl/execution_defs.h:
 
-/usr/include/x86_64-linux-gnu/bits/mathcalls-narrow.h:
+_deps/json-src/include/nlohmann/detail/output/binary_writer.hpp:
+
+/usr/include/c++/13/pstl/glue_algorithm_defs.h:
 
 /usr/include/x86_64-linux-gnu/bits/fcntl-linux.h:
 
@@ -5529,11 +5608,11 @@ _deps/json-src/include/nlohmann/detail/conversions/to_json.hpp:
 
 /usr/include/signal.h:
 
+/usr/include/c++/13/tr1/hypergeometric.tcc:
+
 /usr/include/x86_64-linux-gnu/bits/types/wint_t.h:
 
 _deps/json-src/include/nlohmann/detail/meta/call_std/end.hpp:
-
-/usr/include/c++/13/tr1/hypergeometric.tcc:
 
 /usr/include/x86_64-linux-gnu/bits/struct_stat.h:
 
@@ -5567,6 +5646,10 @@ _deps/json-src/include/nlohmann/detail/iterators/iteration_proxy.hpp:
 
 _deps/json-src/include/nlohmann/detail/json_custom_base_class.hpp:
 
+/usr/include/c++/13/tr1/ell_integral.tcc:
+
+_deps/json-src/include/nlohmann/detail/macro_scope.hpp:
+
 /usr/include/c++/13/array:
 
 /usr/include/x86_64-linux-gnu/bits/types/sigevent_t.h:
@@ -5578,10 +5661,6 @@ _deps/json-src/include/nlohmann/detail/meta/identity_tag.hpp:
 /usr/include/c++/13/bits/fs_ops.h:
 
 _deps/json-src/include/nlohmann/detail/meta/std_fs.hpp:
-
-_deps/json-src/include/nlohmann/detail/meta/void_t.hpp:
-
-/usr/include/c++/13/tr1/gamma.tcc:
 
 /usr/include/x86_64-linux-gnu/bits/posix2_lim.h:
 
@@ -5609,8 +5688,6 @@ _deps/json-src/include/nlohmann/detail/string_concat.hpp:
 
 /usr/include/asm-generic/posix_types.h:
 
-/usr/include/c++/13/algorithm:
-
 /usr/include/c++/13/backward/auto_ptr.h:
 
 /usr/include/c++/13/bits/fs_dir.h:
@@ -5635,12 +5712,6 @@ _deps/json-src/include/nlohmann/byte_container_with_subtype.hpp:
 
 /usr/include/c++/13/bits/stl_raw_storage_iter.h:
 
-/usr/include/c++/13/bits/stl_relops.h:
-
-/usr/include/x86_64-linux-gnu/bits/endian.h:
-
-/usr/include/x86_64-linux-gnu/bits/mathcalls.h:
-
 /usr/include/c++/13/bits/unordered_map.h:
 
 /usr/include/c++/13/bits/valarray_array.tcc:
@@ -5655,31 +5726,7 @@ _deps/json-src/include/nlohmann/byte_container_with_subtype.hpp:
 
 /usr/include/c++/13/functional:
 
-/usr/include/alsa/timer.h:
-
-/usr/include/c++/13/pstl/execution_defs.h:
-
-_deps/json-src/include/nlohmann/detail/output/binary_writer.hpp:
-
-/usr/include/c++/13/pstl/glue_algorithm_defs.h:
-
 /usr/include/c++/13/ranges:
-
-/usr/include/c++/13/tr1/beta_function.tcc:
-
-_deps/json-src/include/nlohmann/detail/macro_scope.hpp:
-
-/usr/include/c++/13/tr1/ell_integral.tcc:
-
-/usr/include/c++/13/tr1/exp_integral.tcc:
-
-/usr/include/x86_64-linux-gnu/bits/types/timer_t.h:
-
-/usr/include/c++/13/tr1/poly_hermite.tcc:
-
-/usr/include/c++/13/tr1/special_function_util.h:
-
-/usr/include/c++/13/tr1/poly_laguerre.tcc:
 
 /usr/include/x86_64-linux-gnu/bits/errno.h:
 
@@ -5697,12 +5744,6 @@ _deps/json-src/include/nlohmann/detail/macro_scope.hpp:
 
 /usr/include/x86_64-linux-gnu/asm/ioctls.h:
 
-/usr/include/x86_64-linux-gnu/bits/fp-fast.h:
-
-/usr/include/x86_64-linux-gnu/bits/math-vector.h:
-
-/usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
-
 /home/mjr/Instrument_3/include/actions.h:
 
 /usr/include/x86_64-linux-gnu/bits/getopt_posix.h:
@@ -5715,6 +5756,8 @@ _deps/json-src/include/nlohmann/detail/iterators/primitive_iterator.hpp:
 
 /home/mjr/Instrument_3/include/engine.h:
 
+/home/mjr/Instrument_3/include/status_colors.h:
+
 /home/mjr/Instrument_3/include/vial_controller.h:
 
 /usr/include/asm-generic/errno.h:
@@ -5726,8 +5769,6 @@ _deps/json-src/include/nlohmann/detail/iterators/primitive_iterator.hpp:
 /usr/include/x86_64-linux-gnu/c++/13/bits/time_members.h:
 
 /home/mjr/Instrument_3/src/midi_engine.cpp:
-
-/home/mjr/Instrument_3/include/status_colors.h:
 
 /usr/include/c++/13/bits/deque.tcc:
 
@@ -5742,5 +5783,3 @@ _deps/json-src/include/nlohmann/detail/iterators/primitive_iterator.hpp:
 /usr/include/c++/13/bits/stl_uninitialized.h:
 
 /usr/include/c++/13/bits/regex_automaton.tcc:
-
-/usr/include/c++/13/bits/regex_constants.h:

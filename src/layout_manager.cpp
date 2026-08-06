@@ -202,13 +202,13 @@ void LayoutManager::buildPhysicalLayoutV1(KeyboardLayout& bl,
  // row 3 — Transpose / Octave / Panic / Mode 1-2-3
  // row 4 — Mixer (MasterVol / VocoderMix / DrumMix / DryMix)
  tl.name = "top_left";
- tl.inverted = true; // top boards mounted upside-down
+ tl.inverted = false; // upright default; set true in JSON when board is rotated 180 // top boards mounted upside-down
  for (auto& a : tl.actions)
  a = Action{};
  // Row 0: Note rail, +10 (same horizontal rule as BottomLeft).
  for (int c = 0; c < ID75_COLS; ++c)
  {
- int cents = (ID75_COLS - 1 - c) * 100 + 10;
+ int cents = c * 100 + 10; // pre-flipped for inverted column lookup
  tl.actions[index(0, c)] = makeNote(cents);
  }
  // Row 1: Percussion — all 15 pads.
@@ -256,11 +256,11 @@ void LayoutManager::buildPhysicalLayoutV1(KeyboardLayout& bl,
  // ----- Top Right (mirror of Top Left, except row 0 notes) -----
  tr = tl;
  tr.name = "top_right";
- tr.inverted = true;
+ tr.inverted = false; // upright default; set true in JSON when board is rotated 180
  // Row 0: Note rail, -50 (same horizontal rule as BottomRight).
  for (int c = 0; c < ID75_COLS; ++c)
  {
- int cents = c * 100 - 50;
+ int cents = (ID75_COLS - 1 - c) * 100 - 50; // pre-flipped for inverted column lookup
  tr.actions[index(0, c)] = makeNote(cents);
  }
 }

@@ -1,351 +1,286 @@
 {
   "name": "top_right",
   "inverted": true,
-  "layout_version": "v1.1-4loop-rails",
+  "layout_version": "v1.2-overdub-simple",
   "keys": [
     {
       "row": 0,
-      "col": 0,
-      "action": "note",
-      "cents": -50
-    },
-    {
-      "row": 0,
-      "col": 1,
-      "action": "note",
-      "cents": 50
-    },
-    {
-      "row": 0,
-      "col": 2,
-      "action": "note",
-      "cents": 150
-    },
-    {
-      "row": 0,
-      "col": 3,
-      "action": "note",
-      "cents": 250
-    },
-    {
-      "row": 0,
-      "col": 4,
-      "action": "note",
-      "cents": 350
-    },
-    {
-      "row": 0,
-      "col": 5,
-      "action": "note",
-      "cents": 450
-    },
-    {
-      "row": 0,
-      "col": 6,
-      "action": "note",
-      "cents": 550
-    },
-    {
-      "row": 0,
       "col": 7,
-      "action": "note",
-      "cents": 650
+      "action": "dry_mix_down"
     },
     {
       "row": 0,
       "col": 8,
-      "action": "note",
-      "cents": 750
+      "action": "dry_mix_up"
     },
     {
       "row": 0,
       "col": 9,
-      "action": "note",
-      "cents": 850
+      "action": "drum_mix_down"
     },
     {
       "row": 0,
       "col": 10,
-      "action": "note",
-      "cents": 950
+      "action": "drum_mix_up"
     },
     {
       "row": 0,
       "col": 11,
-      "action": "note",
-      "cents": 1050
+      "action": "vocoder_mix_down"
     },
     {
       "row": 0,
       "col": 12,
-      "action": "note",
-      "cents": 1150
+      "action": "vocoder_mix_up"
     },
     {
       "row": 0,
       "col": 13,
-      "action": "note",
-      "cents": 1250
+      "action": "master_vol_down"
     },
     {
       "row": 0,
       "col": 14,
-      "action": "note",
-      "cents": 1350
+      "action": "master_vol_up"
     },
     {
       "row": 1,
+      "col": 7,
+      "action": "mode_vocoder_dry"
+    },
+    {
+      "row": 1,
+      "col": 8,
+      "action": "mode_vocoder"
+    },
+    {
+      "row": 1,
+      "col": 9,
+      "action": "mode_instrument"
+    },
+    {
+      "row": 1,
+      "col": 10,
+      "action": "panic"
+    },
+    {
+      "row": 1,
+      "col": 13,
+      "action": "transpose_down"
+    },
+    {
+      "row": 1,
+      "col": 14,
+      "action": "transpose_up"
+    },
+    {
+      "row": 3,
       "col": 0,
-      "action": "drum",
-      "drum_note": 36
-    },
-    {
-      "row": 1,
-      "col": 1,
       "action": "drum",
       "drum_note": 38
     },
     {
-      "row": 1,
+      "row": 3,
+      "col": 1,
+      "action": "drum",
+      "drum_note": 36
+    },
+    {
+      "row": 3,
       "col": 2,
       "action": "drum",
-      "drum_note": 46
+      "drum_note": 50
     },
     {
-      "row": 1,
+      "row": 3,
       "col": 3,
-      "action": "drum",
-      "drum_note": 42
-    },
-    {
-      "row": 1,
-      "col": 4,
-      "action": "drum",
-      "drum_note": 51
-    },
-    {
-      "row": 1,
-      "col": 5,
       "action": "drum",
       "drum_note": 49
     },
     {
-      "row": 1,
+      "row": 3,
+      "col": 4,
+      "action": "drum",
+      "drum_note": 48
+    },
+    {
+      "row": 3,
+      "col": 5,
+      "action": "drum",
+      "drum_note": 47
+    },
+    {
+      "row": 3,
       "col": 6,
       "action": "drum",
       "drum_note": 45
     },
     {
-      "row": 1,
+      "row": 3,
       "col": 7,
       "action": "drum",
-      "drum_note": 47
+      "drum_note": 43
     },
     {
-      "row": 1,
+      "row": 3,
       "col": 8,
       "action": "drum",
-      "drum_note": 50
+      "drum_note": 41
     },
     {
-      "row": 1,
+      "row": 3,
       "col": 9,
       "action": "drum",
-      "drum_note": 36
+      "drum_note": 37
     },
     {
-      "row": 1,
+      "row": 3,
       "col": 10,
-      "action": "drum",
-      "drum_note": 38
-    },
-    {
-      "row": 1,
-      "col": 11,
       "action": "drum",
       "drum_note": 46
     },
     {
-      "row": 1,
+      "row": 3,
+      "col": 11,
+      "action": "drum",
+      "drum_note": 44
+    },
+    {
+      "row": 3,
       "col": 12,
       "action": "drum",
       "drum_note": 42
     },
     {
-      "row": 1,
+      "row": 3,
       "col": 13,
       "action": "drum",
-      "drum_note": 51
+      "drum_note": 38
     },
     {
-      "row": 1,
+      "row": 3,
       "col": 14,
       "action": "drum",
-      "drum_note": 49
+      "drum_note": 36
     },
     {
-      "row": 2,
+      "row": 4,
       "col": 0,
-      "action": "loop_record"
+      "action": "note",
+      "cents": -50
     },
     {
-      "row": 2,
+      "row": 4,
       "col": 1,
-      "action": "loop_mute"
+      "action": "note",
+      "cents": 50
     },
     {
-      "row": 2,
+      "row": 4,
       "col": 2,
-      "action": "loop_clear"
+      "action": "note",
+      "cents": 150
     },
     {
-      "row": 2,
+      "row": 4,
       "col": 3,
-      "action": "loop_record",
-      "loop_track": 1
+      "action": "note",
+      "cents": 250
     },
     {
-      "row": 2,
+      "row": 4,
       "col": 4,
-      "action": "loop_mute",
-      "loop_track": 1
+      "action": "note",
+      "cents": 350
     },
     {
-      "row": 2,
+      "row": 4,
       "col": 5,
-      "action": "loop_clear",
-      "loop_track": 1
+      "action": "note",
+      "cents": 450
     },
     {
-      "row": 2,
+      "row": 4,
       "col": 6,
-      "action": "loop_record",
-      "loop_track": 2
+      "action": "note",
+      "cents": 550
     },
     {
-      "row": 2,
+      "row": 4,
       "col": 7,
-      "action": "loop_mute",
-      "loop_track": 2
+      "action": "note",
+      "cents": 650
     },
     {
-      "row": 2,
+      "row": 4,
       "col": 8,
-      "action": "loop_clear",
-      "loop_track": 2
+      "action": "note",
+      "cents": 750
     },
     {
-      "row": 2,
+      "row": 4,
       "col": 9,
-      "action": "loop_record",
-      "loop_track": 3
+      "action": "note",
+      "cents": 850
     },
     {
-      "row": 2,
+      "row": 4,
       "col": 10,
-      "action": "loop_mute",
-      "loop_track": 3
+      "action": "note",
+      "cents": 950
+    },
+    {
+      "row": 4,
+      "col": 11,
+      "action": "note",
+      "cents": 1050
+    },
+    {
+      "row": 4,
+      "col": 12,
+      "action": "note",
+      "cents": 1150
+    },
+    {
+      "row": 4,
+      "col": 13,
+      "action": "note",
+      "cents": 1250
+    },
+    {
+      "row": 4,
+      "col": 14,
+      "action": "note",
+      "cents": 1350
     },
     {
       "row": 2,
-      "col": 11,
-      "action": "loop_clear",
-      "loop_track": 3
+      "col": 14,
+      "action": "loop_record",
+      "loop_track": 0
+    },
+    {
+      "row": 2,
+      "col": 13,
+      "action": "loop_record",
+      "loop_track": 1
     },
     {
       "row": 2,
       "col": 12,
-      "action": "loop_overdub"
+      "action": "loop_clear",
+      "loop_track": 1
     },
     {
       "row": 2,
-      "col": 13,
+      "col": 11,
       "action": "loop_mute_all"
     },
     {
       "row": 2,
-      "col": 14,
-      "action": "loop_undo"
-    },
-    {
-      "row": 3,
-      "col": 0,
-      "action": "transpose_up"
-    },
-    {
-      "row": 3,
-      "col": 1,
-      "action": "transpose_down"
-    },
-    {
-      "row": 3,
-      "col": 2,
-      "action": "octave_up"
-    },
-    {
-      "row": 3,
-      "col": 3,
-      "action": "octave_down"
-    },
-    {
-      "row": 3,
-      "col": 4,
-      "action": "panic"
-    },
-    {
-      "row": 3,
-      "col": 5,
-      "action": "mode_instrument"
-    },
-    {
-      "row": 3,
-      "col": 6,
-      "action": "mode_vocoder"
-    },
-    {
-      "row": 3,
-      "col": 7,
-      "action": "mode_vocoder_dry"
-    },
-    {
-      "row": 4,
-      "col": 0,
-      "action": "master_vol_up"
-    },
-    {
-      "row": 4,
-      "col": 1,
-      "action": "master_vol_down"
-    },
-    {
-      "row": 4,
-      "col": 2,
-      "action": "vocoder_mix_up"
-    },
-    {
-      "row": 4,
-      "col": 3,
-      "action": "vocoder_mix_down"
-    },
-    {
-      "row": 4,
-      "col": 4,
-      "action": "drum_mix_up"
-    },
-    {
-      "row": 4,
-      "col": 5,
-      "action": "drum_mix_down"
-    },
-    {
-      "row": 4,
-      "col": 6,
-      "action": "dry_mix_up"
-    },
-    {
-      "row": 4,
-      "col": 7,
-      "action": "dry_mix_down"
+      "col": 10,
+      "action": "loop_clear",
+      "loop_track": 0
     }
   ]
 }

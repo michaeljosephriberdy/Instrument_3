@@ -11,6 +11,7 @@
 #include "midi_engine.h"
 #include "vial_controller.h"
 #include "startup_manager.h"
+#include "status_colors.h"
 #include "keyboard_layout.h"   // ID75_ROWS
 
 #include <chrono>
@@ -218,6 +219,13 @@ bool Engine::initialize()
 
 void Engine::run()
 {
+    // Hot-plug support state (see fix_breath_controller.sh): retried on a
+    // throttle below rather than only once at startup, so the breath
+    // controller can be plugged in at any time -- before launch, during
+    // board assignment, or mid-performance -- and still get picked up.
+    auto next_breath_retry = std::chrono::steady_clock::now();
+    auto breath_led_off_at = std::chrono::steady_clock::now();
+    bool breath_led_active = false;
     Logger::info("Entering performance loop.");
 
     std::vector<KeyEvent> events;
@@ -225,6 +233,33 @@ void Engine::run()
 
     while (running_)
     {
+        auto now = std::chrono::steady_clock::now();
+        // Retry every 2s without blocking the performance loop; flash the
+        // boards green briefly on reconnect, same visual language as startup.
+        if (breath_ && !breath_->isConnected() && now >= next_breath_retry)
+        {
+            next_breath_retry = now + std::chrono::seconds(2);
+            if (breath_->initialize())
+            {
+                Logger::info("Breath controller connected (hot-plugged during performance).");
+                if (vial_)
+                {
+                    for (int i = 0; i < vial_->deviceCount(); ++i)
+                        vial_->setColor(i, StatusColors::Green);
+                }
+                breath_led_off_at = now + std::chrono::milliseconds(400);
+                breath_led_active = true;
+            }
+        }
+        if (breath_led_active && now >= breath_led_off_at)
+        {
+            if (vial_)
+            {
+                for (int i = 0; i < vial_->deviceCount(); ++i)
+                    vial_->turnOff(i);
+            }
+            breath_led_active = false;
+        }
         if (breath_)
         {
             breath_->update();
@@ -366,8 +401,7 @@ void Engine::handleAction(const Action& action, int keyboard_index, int keycode,
             const auto& boards = keyboard_->keyboards();
             const Keyboard& kb = boards[keyboard_index];
             int channel = kb.channel_offset + row; // restored: 1 of 10 chordal tracks (0-9)
-                int bend_cents = kb.row_cents[row]; // fixed per-row shim, like Instrument_2
-                (void)residual; // superseded by the row's fixed cents, kept for note rounding only
+                int bend_cents = residual; // layout cents are the sole microtonal source
 
             uint32_t key_id =
                 (static_cast<uint32_t>(keyboard_index) << 16) |

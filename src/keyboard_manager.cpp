@@ -150,15 +150,15 @@ void KeyboardManager::setAssignmentCallback(AssignmentCallback callback)
 
 void KeyboardManager::applyTuning(Keyboard& kb, int logical_index)
 {
+    // channel_offset still splits left/right onto independent MIDI channel
+    // banks so each physical row can hold its own pitch-bend state.
+    // Microtonal offsets themselves come solely from layout JSON cents
+    // (see Engine Note path -- bend = residual). Zero the old Instrument_2
+    // per-row shims so they cannot fight the layout.
     bool group_a = (logical_index == 0 || logical_index == 1);
-
     kb.channel_offset = group_a ? 0 : 5;
-
-    const int* src = group_a ? GROUP_A_CENTS : GROUP_B_CENTS;
     for (int r = 0; r < ID75_ROWS; ++r)
-    {
-        kb.row_cents[r] = src[r];
-    }
+        kb.row_cents[r] = 0;
 }
 
 bool KeyboardManager::allAssigned() const
