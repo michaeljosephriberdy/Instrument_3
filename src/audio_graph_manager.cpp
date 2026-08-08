@@ -106,12 +106,25 @@ void AudioGraphManager::setConfig(const Config& cfg)
     cfg_ = cfg;
 }
 
-bool AudioGraphManager::processAlive(pid_t pid) const
-{
-    if (pid <= 0)
+bool AudioGraphManager::processAlive(pid_t pid) const {
+    if (pid <= 0) {
         return false;
+    }
+    // kill(pid, 0) succeeds for a zombie too -- the PID stays valid in
+    // the process table until the parent reaps it with waitpid(). Reap
+    // first so a child that crashed on its own (segfault, killed by a
+    // PipeWire/wireplumber restart, etc.) actually reads as dead. That
+    // lets ensureHealthyGraph() and launchSooperLooper()/launchZyn()/
+    // launchZynDrums()/launchVocoder() detect the crash and relaunch.
+    int status = 0;
+    pid_t reaped = waitpid(pid, &status, WNOHANG);
+    if (reaped == pid) {
+        return false;
+    }
     return kill(pid, 0) == 0;
 }
+
+
 
 bool AudioGraphManager::zynRunning() const
 {
@@ -570,10 +583,14 @@ bool AudioGraphManager::launchVocoder()
 
 bool AudioGraphManager::startProcesses()
 {
-    bool ok = launchZyn();
-    launchZynDrums();
-    launchSooperLooper();
-    started_ = ok;
+ // Launch everything once at instrument boot. Mode switches only rewire.
+ bool ok = launchZyn();
+ launchZynDrums();
+ launchSooperLooper();
+ launchVocoder(); // keep host alive; Mode 1 simply leaves it unlinked
+ started_ = ok;
+ // Ensure USB mic capture ports exist in PipeWire before first mode build (called before return -- was dead code)
+    activateMicCapturePorts();
     return ok;
 }
 
@@ -747,6 +764,8 @@ bool AudioGraphManager::buildMode1()
 
 bool AudioGraphManager::buildMode2()
 {
+ // Ports/names refreshed every entry (and by ensureHealthyGraph).
+
     // Mode 2 — VocoderOnly.
     // Intermediate: melody → vocoder carrier, mic → vocoder modulator.
     // Final:       vocoder out + drums → SL + headphones; SL → headphones.
@@ -942,20 +961,171 @@ bool AudioGraphManager::buildMode3()
     return true;
 }
 
-bool AudioGraphManager::setMode(PerformanceMode mode)
+
+bool AudioGraphManager::buildMode4()
 {
+ // Mode 4 uses the same PipeWire routing as Mode 1.
+ // Breath/volume policy is enforced in Engine (octave via nod;
+ // chordal synth volume via SynthVol buttons → CC7).
+ Logger::info("Building Mode4 (BreathOctave) — same routing as Mode1");
+ return buildMode1();
+}
+
+bool AudioGraphManager::buildMode5()
+{
+ if (!buildMode4())
+ return false;
+
+ if (!processAlive(sl_pid_))
+ launchSooperLooper();
+
+ // Fresh mic lookup every Mode5 entry (addresses change after unplug/replug)
+ MicInfo mic = queryMic();
+ if (!mic.present || mic.capture_ports.empty()) {
+ Logger::warning("Mode5: mic has no capture ports (yet)");
+ return true;
+ }
+
+ std::string sl_in_l, sl_in_r, sl_out_l, sl_out_r;
+ if (!resolveLooperPorts(sl_in_l, sl_in_r, sl_out_l, sl_out_r)) {
+ sl_in_l = "sooperlooper:common_in_1";
+ sl_in_r = "sooperlooper:common_in_2";
+ }
+ std::string play_l = defaultPlaybackPort(true);
+ std::string play_r = defaultPlaybackPort(false);
+ if (play_l.empty())
+ play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
+ if (play_r.empty())
+ play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
+
+ for (const auto& mic_p : mic.capture_ports) {
+ pwLink(mic_p, sl_in_l);
+ pwLink(mic_p, sl_in_r);
+ pwLink(mic_p, play_l);
+ pwLink(mic_p, play_r);
+ Logger::info("Mode5: " + mic_p + " → SL + headphones");
+ }
+ return true;
+}
+
+
+void AudioGraphManager::ensureHealthyGraph() {
+    // ------------------------------------------------------------------
+    // 1) Refresh knowledge of every entity (even if unused in this mode)
+    // ------------------------------------------------------------------
+    MicInfo mic = queryMic(); // updates capture port names after unplug/replug
+
+    // Playback targets can change if the user switches sinks
+    std::string play_l = defaultPlaybackPort(true);
+    std::string play_r = defaultPlaybackPort(false);
+    if (play_l.empty())
+        play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
+    if (play_r.empty())
+        play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
+
+    // ------------------------------------------------------------------
+    // 2) Ensure processes exist (relaunch only if dead -- never kill healthy)
+    // ------------------------------------------------------------------
+    bool need_rebuild = false;
+    if (!processAlive(zyn_pid_)) {
+        Logger::warning("Health: melody Zyn dead -- relaunching");
+        launchZyn();
+        need_rebuild = true;
+    }
+    if (!processAlive(zyn_drums_pid_)) {
+        Logger::warning("Health: drums Zyn dead -- relaunching");
+        launchZynDrums();
+        need_rebuild = true;
+    }
+    if (!processAlive(sl_pid_)) {
+        Logger::warning("Health: SooperLooper dead -- relaunching");
+        launchSooperLooper();
+        need_rebuild = true;
+    }
+    if (!processAlive(voc_pid_)) {
+        Logger::warning("Health: Vocoder host dead -- relaunching");
+        launchVocoder();
+        need_rebuild = true;
+    }
+
+    // ------------------------------------------------------------------
+    // 3) Resolve ports; if any critical name vanished, force rebuild
+    // ------------------------------------------------------------------
+    std::string mel_l = resolveClientPort(cfg_.zyn_client_name, "out_1", false);
+    std::string mel_r = resolveClientPort(cfg_.zyn_client_name, "out_2", false);
+    if (mel_l.empty() || mel_r.empty()) {
+        Logger::warning("Health: melody ports missing -- rebuild");
+        need_rebuild = true;
+    }
+    std::string sl_in_l, sl_in_r, sl_out_l, sl_out_r;
+    if (!resolveLooperPorts(sl_in_l, sl_in_r, sl_out_l, sl_out_r)) {
+        Logger::warning("Health: SL ports missing -- rebuild");
+        need_rebuild = true;
+    }
+    // Vocoder ports (always tracked; Mode 1 leaves them unlinked)
+    auto voc_ports = findPorts("InstrumentVocoder", false);
+    auto voc_in = findPorts("InstrumentVocoder", true);
+    if (processAlive(voc_pid_) && voc_ports.empty() && voc_in.empty()) {
+        // Host alive but ports not visible yet -- small wait then recheck once
+        // (caller runs every 2s so next tick will catch it; still flag rebuild)
+        need_rebuild = true;
+    }
+    // Mic: ALSA sees it but PipeWire may not have exported capture yet.
+    // Activate profile in-process (no GUI). Do NOT force a full graph
+    // rebuild just for this in Mode 1 -- that was causing periodic xruns.
+    if (mic.present && mic.capture_ports.empty()) {
+        Logger::warning("Health: mic present in ALSA but no PW capture ports yet");
+        if (activateMicCapturePorts()) {
+            mic = queryMic();
+            // Ports just appeared: rebuild so Mode 2/3/5 can link them.
+            if (mode_ == PerformanceMode::VocoderOnly
+                || mode_ == PerformanceMode::SynthAndVocoder
+                || mode_ == PerformanceMode::BreathOctaveMic) {
+                need_rebuild = true;
+            }
+        }
+    }
+
+    // ------------------------------------------------------------------
+    // 4) Rebuild current mode wiring only when something actually
+    // changed or died (dead process, missing ports). No blind rebuild
+    // on a timer: a rebuild tears down and relinks every owned
+    // connection (see forceDisconnectInstrumentGraph()) and produces
+    // an audible JACK xrun every time it fires, so it must only run
+    // when need_rebuild says something real is actually wrong.
+    // ------------------------------------------------------------------
+    PerformanceMode m = mode_;
+    if (need_rebuild) {
+        Logger::debug(
+            std::string("Health: ensureHealthyGraph mode=")
+            + std::to_string(static_cast<int>(m))
+            + " rebuild=yes");
+        setMode(m);
+        applyMixerLevels(last_master_, last_dry_, last_vocoder_, last_drums_,
+                          last_synth_, last_mic_);
+    }
+}
+
+
+
+bool AudioGraphManager::setMode(PerformanceMode mode) {
     mode_ = mode;
-    switch (mode)
-    {
+    switch (mode) {
         case PerformanceMode::SynthOnly:
             return buildMode1();
         case PerformanceMode::VocoderOnly:
             return buildMode2();
         case PerformanceMode::SynthAndVocoder:
             return buildMode3();
+        case PerformanceMode::BreathOctave:
+            return buildMode4();
+        case PerformanceMode::BreathOctaveMic:
+            return buildMode5();
     }
     return buildMode1();
 }
+
+
 
 
 
@@ -968,6 +1138,8 @@ std::string AudioGraphManager::statusSummary() const
     case PerformanceMode::SynthOnly: ss << "SynthOnly"; break;
     case PerformanceMode::VocoderOnly: ss << "VocoderOnly"; break;
     case PerformanceMode::SynthAndVocoder: ss << "SynthAndVocoder"; break;
+ case PerformanceMode::BreathOctave: ss << "BreathOctave"; break;
+ case PerformanceMode::BreathOctaveMic: ss << "BreathOctaveMic"; break;
     }
     ss << " melody=" << (processAlive(zyn_pid_) ? "up" : "down")
        << " drums=" << (processAlive(zyn_drums_pid_) ? "up" : "down")
@@ -1299,6 +1471,190 @@ AudioGraphManager::MicInfo AudioGraphManager::queryMic() const
     return info;
 }
 
+bool AudioGraphManager::activateMicCapturePorts()
+{
+    // Throttle: at most once per 8s (showtime-safe, no GUI).
+    static auto last_try = std::chrono::steady_clock::time_point{};
+    auto now = std::chrono::steady_clock::now();
+    if (last_try.time_since_epoch().count() != 0
+        && now - last_try < std::chrono::seconds(8)) {
+        return !queryMic().capture_ports.empty();
+    }
+    last_try = now;
+
+    if (!queryMic().capture_ports.empty())
+        return true;
+
+    std::string cards = shellCapture("arecord -l 2>/dev/null");
+    std::string cards_low = cards;
+    for (char& c : cards_low)
+        c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    std::string hint_low = cfg_.mic_name_hint;
+    for (char& c : hint_low)
+        c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+    if (cards_low.find(hint_low) == std::string::npos
+        && cards_low.find("shure") == std::string::npos
+        && cards_low.find("mvx2u") == std::string::npos) {
+        return false;
+    }
+
+    Logger::info(
+        "Mic: ALSA present, no PipeWire capture ports — activating profile");
+
+    auto sleep_ms = [](int ms) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(ms));
+    };
+
+    const char* profiles[] = {
+        "pro-audio",
+        "analog-stereo",
+        "Analog Stereo",
+        "output:analog-stereo+input:analog-stereo",
+        "Analog Stereo Duplex",
+        "analog-stereo-input",
+        "Analog Stereo Input",
+        "HiFi",
+        nullptr
+    };
+
+    // --- wpctl ---
+    std::string wpctl = which("wpctl");
+    if (!wpctl.empty()) {
+        std::string status = shellCapture(wpctl + " status 2>/dev/null");
+        std::vector<std::string> ids;
+        std::istringstream ss(status);
+        std::string line;
+        while (std::getline(ss, line)) {
+            std::string low = line;
+            for (char& c : low)
+                c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+            bool mention = (low.find("mvx2u") != std::string::npos)
+                           || (low.find("shure") != std::string::npos)
+                           || (!hint_low.empty()
+                               && low.find(hint_low) != std::string::npos);
+            if (!mention)
+                continue;
+            for (size_t i = 0; i < line.size(); ++i) {
+                if (!std::isdigit(static_cast<unsigned char>(line[i])))
+                    continue;
+                size_t j = i;
+                while (j < line.size()
+                       && std::isdigit(static_cast<unsigned char>(line[j])))
+                    ++j;
+                ids.push_back(line.substr(i, j - i));
+                break;
+            }
+        }
+        // Fallback: numeric ids in the Audio section of wpctl status
+        if (ids.empty()) {
+            bool in_audio = false;
+            std::istringstream ss2(status);
+            while (std::getline(ss2, line)) {
+                if (line.find("Audio") != std::string::npos)
+                    in_audio = true;
+                if (in_audio && line.find("Video") != std::string::npos)
+                    break;
+                if (!in_audio)
+                    continue;
+                for (size_t i = 0; i < line.size(); ++i) {
+                    if (!std::isdigit(static_cast<unsigned char>(line[i])))
+                        continue;
+                    size_t j = i;
+                    while (j < line.size()
+                           && std::isdigit(static_cast<unsigned char>(line[j])))
+                        ++j;
+                    ids.push_back(line.substr(i, j - i));
+                    break;
+                }
+                if (ids.size() > 16)
+                    break;
+            }
+        }
+        for (const auto& id : ids) {
+            for (int p = 0; profiles[p]; ++p) {
+                std::string cmd = wpctl + " set-profile " + id + " \""
+                                  + profiles[p] + "\" 2>/dev/null";
+                (void)std::system(cmd.c_str());
+            }
+        }
+        sleep_ms(700);
+        if (!queryMic().capture_ports.empty()) {
+            Logger::info("Mic: PipeWire capture ports active (wpctl)");
+            return true;
+        }
+    }
+
+    // --- pactl ---
+    std::string pactl = which("pactl");
+    if (!pactl.empty()) {
+        std::string short_cards =
+            shellCapture(pactl + " list cards short 2>/dev/null");
+        std::istringstream ss(short_cards);
+        std::string line;
+        while (std::getline(ss, line)) {
+            std::string low = line;
+            for (char& c : low)
+                c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+            if (low.find("mvx2u") == std::string::npos
+                && low.find("shure") == std::string::npos
+                && low.find("usb") == std::string::npos)
+                continue;
+            std::string card = line;
+            auto sp = card.find_first_of(" \t");
+            if (sp != std::string::npos)
+                card = card.substr(0, sp);
+            for (int p = 0; profiles[p]; ++p) {
+                std::string cmd = pactl + " set-card-profile " + card + " "
+                                  + profiles[p] + " 2>/dev/null";
+                (void)std::system(cmd.c_str());
+            }
+        }
+        sleep_ms(700);
+        if (!queryMic().capture_ports.empty()) {
+            Logger::info("Mic: PipeWire capture ports active (pactl)");
+            return true;
+        }
+    }
+
+    
+  // Profile switching alone did not expose capture ports. That usually
+  // means WirePlumber never created a node for the device at all (not
+  // just the wrong profile) -- e.g. it was plugged in before the
+  // session started, or a stale node is stuck. Restarting the user
+  // PipeWire/WirePlumber session forces a fresh ALSA re-probe, which is
+  // the actual fix in that case. Hard-throttled (60s) since it briefly
+  // interrupts audio.
+  static auto last_restart = std::chrono::steady_clock::time_point{};
+  auto now_r = std::chrono::steady_clock::now();
+  if (last_restart.time_since_epoch().count() == 0
+      || now_r - last_restart > std::chrono::seconds(60)) {
+    last_restart = now_r;
+    std::string systemctl = which("systemctl");
+    if (!systemctl.empty()) {
+      Logger::warning(
+          "Mic: profile switching failed -- restarting PipeWire/"
+          "WirePlumber user session as last resort");
+      (void)std::system((systemctl +
+          " --user restart wireplumber pipewire pipewire-pulse "
+          "2>/dev/null").c_str());
+      sleep_ms(3000);
+      if (!queryMic().capture_ports.empty()) {
+        Logger::info(
+            "Mic: PipeWire capture ports active after session restart");
+        return true;
+      }
+    } else {
+      Logger::warning(
+          "Mic: systemctl not found -- cannot restart PipeWire session "
+          "automatically");
+    }
+  }
+
+  Logger::warning("Mic: still no PipeWire capture ports after profile activation");
+    return false;
+}
+
+
 
 
 // Keep micPresent() in sync with queryMic().
@@ -1592,12 +1948,59 @@ bool AudioGraphManager::setNodeVolume(const std::string& node_name_substring,
     return false;
 }
 
-void AudioGraphManager::applyMixerLevels(int master, int dry, int vocoder, int drums)
+bool AudioGraphManager::setSourceVolume(const std::string& node_name_substring,
+                                         float linear)
+{
+    // Mirrors setNodeVolume(), but for a capture SOURCE (mic/input)
+    // instead of a playback sink. A USB mic shows up in PipeWire/ALSA as
+    // a source, never a sink, so setNodeVolume() alone can never find it
+    // -- that was the reason the dry-mix buttons never touched real mic
+    // hardware gain.
+    if (linear < 0.f) linear = 0.f;
+    if (linear > 1.f) linear = 1.f;
+
+    std::string pactl = which("pactl");
+    if (!pactl.empty())
+    {
+        std::string sources = shellCapture(pactl + " list short sources 2>/dev/null");
+        std::istringstream ss(sources);
+        std::string line;
+        while (std::getline(ss, line))
+        {
+            if (line.find(node_name_substring) == std::string::npos)
+                continue;
+            // Skip monitor sources ("...analog-stereo.monitor") -- those
+            // mirror a sink's playback, not the mic's real capture input.
+            if (line.find(".monitor") != std::string::npos)
+                continue;
+            std::istringstream ls(line);
+            std::string id, name;
+            ls >> id >> name;
+            int percent = static_cast<int>(linear * 100.0f + 0.5f);
+            std::string setcmd = pactl + " set-source-volume " + id + " " +
+                                  std::to_string(percent) + "% 2>/dev/null";
+            if (std::system(setcmd.c_str()) == 0)
+            {
+                Logger::info("Input gain " + name + " -> " + std::to_string(percent) + "%");
+                return true;
+            }
+        }
+    }
+    Logger::debug("setSourceVolume '" + node_name_substring + "' linear=" +
+                  std::to_string(linear) + " (no matching source; recorded only)");
+    return false;
+}
+
+
+void AudioGraphManager::applyMixerLevels(int master, int dry, int vocoder, int drums,
+ int synth, int mic)
 {
     last_master_  = master;
     last_dry_     = dry;
     last_vocoder_ = vocoder;
     last_drums_   = drums;
+ last_synth_ = synth;
+ last_mic_ = mic;
 
     float m = master / 127.0f;
     float d = dry / 127.0f;
@@ -1609,10 +2012,10 @@ void AudioGraphManager::applyMixerLevels(int master, int dry, int vocoder, int d
     float vocoder_final = v * dry_final;
 
     Logger::info(
-        "Mixer apply master=" + std::to_string(master) +
-        " dry=" + std::to_string(dry) +
-        " vocoder=" + std::to_string(vocoder) +
-        " drums=" + std::to_string(drums));
+ "Mixer master=" + std::to_string(master) +
+ " dry=" + std::to_string(dry) + " (" + std::to_string((dry * 100) / 127) + "%)" +
+ " vocoder=" + std::to_string(vocoder) + " (" + std::to_string((vocoder * 100) / 127) + "%)" +
+ " drums=" + std::to_string(drums) + " (" + std::to_string((drums * 100) / 127) + "%)");
 
     std::string wpctl = which("wpctl");
     if (!wpctl.empty())
@@ -1629,7 +2032,18 @@ void AudioGraphManager::applyMixerLevels(int master, int dry, int vocoder, int d
 
     setNodeVolume("InstrumentVocoder", vocoder_final);
     if (!cfg_.mic_name_hint.empty())
-        setNodeVolume(cfg_.mic_name_hint, dry_final);
+    {
+        // The dry-mix buttons ARE the mic's input-gain buttons: apply the
+        // level directly at the USB interface's capture source, as a flat
+        // fraction of whatever the mic picks up. Deliberately NOT
+        // multiplied by master/vocoder -- those are downstream mix
+        // decisions; this is the input stage, before anything else
+        // touches the signal. dry=64 (50%) means capture gain = 50%,
+        // full stop.
+        float mic_capture_gain = static_cast<float>(dry) / 127.0f;
+        setSourceVolume(cfg_.mic_name_hint, mic_capture_gain);
+    }
+
     // NOTE: 'drums' is intentionally not applied to any PipeWire node
     // here -- drum loudness is a MIDI-velocity path, not an audio-graph
     // gain: Engine::handleAction's ActionType::Drum case scales note-on

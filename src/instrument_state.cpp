@@ -21,6 +21,8 @@ void InstrumentState::reset()
     dry_mix_ = 100;
     vocoder_mix_ = 100;
     drum_mix_ = 100;
+ synth_mix_ = 100;
+ mic_mix_ = 100;
 
     panic_requested_ = false;
 }
@@ -164,6 +166,15 @@ void InstrumentState::adjustVocoderMix(int delta)  { setVocoderMix(vocoder_mix_ 
 void InstrumentState::setDrumMix(int value)     { drum_mix_ = clamp127(value); }
 int  InstrumentState::drumMix() const           { return drum_mix_; }
 void InstrumentState::adjustDrumMix(int delta)  { setDrumMix(drum_mix_ + delta); }
+
+void InstrumentState::setSynthMix(int value) { synth_mix_ = clamp127(value); }
+int InstrumentState::synthMix() const { return synth_mix_; }
+void InstrumentState::adjustSynthMix(int delta) { setSynthMix(synth_mix_ + delta); }
+
+void InstrumentState::setMicMix(int value) { mic_mix_ = clamp127(value); }
+int InstrumentState::micMix() const { return mic_mix_; }
+void InstrumentState::adjustMicMix(int delta) { setMicMix(mic_mix_ + delta); }
+
 
 // ================= Panic =================
 

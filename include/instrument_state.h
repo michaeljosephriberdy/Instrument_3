@@ -17,7 +17,9 @@ enum class PerformanceMode
 {
     SynthOnly,       // Mode 1 — instrument only
     VocoderOnly,     // Mode 2
-    SynthAndVocoder  // Mode 3 — vocoder + dry voice path
+    SynthAndVocoder,
+ BreathOctave,
+ BreathOctaveMic  // Mode 3 — vocoder + dry voice path
 };
 
 struct KeyboardAssignment
@@ -75,6 +77,12 @@ public:
     void setDrumMix(int value);
     int drumMix() const;
     void adjustDrumMix(int delta);
+ void setSynthMix(int value);
+ int synthMix() const;
+ void adjustSynthMix(int delta);
+ void setMicMix(int value);
+ int micMix() const;
+ void adjustMicMix(int delta);
 
     // One-shot flags consumed by Engine
     void requestPanic();
@@ -98,6 +106,8 @@ private:
     int dry_mix_;
     int vocoder_mix_;
     int drum_mix_;
+ int synth_mix_;
+ int mic_mix_;
 
     bool panic_requested_;
 };

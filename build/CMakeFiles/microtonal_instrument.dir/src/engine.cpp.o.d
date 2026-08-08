@@ -285,6 +285,7 @@ CMakeFiles/microtonal_instrument.dir/src/engine.cpp.o: \
  /usr/include/alsa/mixer.h /usr/include/alsa/seq_event.h \
  /usr/include/alsa/seq.h /usr/include/alsa/seqmid.h \
  /usr/include/alsa/seq_midi_event.h \
+ /home/mjr/Instrument_3/include/usb_topology.h \
  /home/mjr/Instrument_3/include/midi_engine.h \
  /home/mjr/Instrument_3/include/vial_controller.h \
  /usr/include/hidapi/hidapi.h \

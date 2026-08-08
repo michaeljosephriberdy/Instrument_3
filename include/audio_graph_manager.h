@@ -14,6 +14,8 @@
 // Mode 1 (SynthOnly):       Zyn → system playback
 // Mode 2 (VocoderOnly):     Zyn (carrier) + mic (modulator) → Calf Vocoder → playback
 // Mode 3 (SynthAndVocoder): Mode 2 + dry mic path with independent level
+// Mode 4 (BreathOctave): Mode 1 routing; breath drives octave only
+// Mode 5 (BreathOctaveMic): Mode 4 + dry mic → SL + headphones
 //
 // Looper (SooperLooper) sits on a side chain and is controlled via OSC;
 // it is not driven by raw keyboard events.
@@ -70,13 +72,18 @@ public:
     // Build / rebuild the PipeWire graph for the requested mode.
     // Returns false only on hard failure (e.g. Zyn not running for Mode 1).
     bool setMode(PerformanceMode mode);
+ // Every ~2s from Engine: refresh entity ports, relaunch dead
+ // processes, rebuild current-mode wiring. Safe to call often.
+ void ensureHealthyGraph();
+
 
     PerformanceMode mode() const { return mode_; }
 
     // Apply mixer levels (0–127) to whatever gain nodes we currently own.
     // Phase 4.1: master → Zyn-facing CC path is left to Engine/MidiEngine;
     //            dry/vocoder levels are logged until real nodes exist.
-    void applyMixerLevels(int master, int dry, int vocoder, int drums);
+    void applyMixerLevels(int master, int dry, int vocoder, int drums,
+ int synth = 100, int mic = 100);
 
     // True if an input port matching mic_name_hint is visible to PipeWire/ALSA.
     bool micPresent() const;
@@ -113,6 +120,11 @@ public:
 
     // Snapshot of what we currently believe about the Shure interface.
     MicInfo queryMic() const;
+    // If ALSA sees the mic but PipeWire has no capture ports,
+    // force a capture-capable card profile (wpctl/pactl). Throttled.
+    // Returns true if capture ports are visible after the attempt.
+    bool activateMicCapturePorts();
+
     // Ports whose node/port name contains any of the needles.
     std::vector<std::string> findPortsMatching(
         const std::vector<std::string>& needles,
@@ -154,12 +166,17 @@ private:
 
     // 0.0-1.0 linear gain on a PipeWire node via wpctl or pw-cli (best-effort).
     bool setNodeVolume(const std::string& node_name_substring, float linear);
+    // Same idea, but for a capture SOURCE (mic/input), not a playback sink --
+    // setNodeVolume() alone can never find a USB mic, since it only queries sinks.
+    bool setSourceVolume(const std::string& node_name_substring, float linear);
 
     // Cache last mixer values so mode rebuilds can re-apply.
     int last_master_  = 127;
     int last_dry_     = 100;
     int last_vocoder_ = 100;
     int last_drums_ = 100;
+ int last_synth_ = 100;
+ int last_mic_ = 100;
  // Shared target for Overdub/Undo; armed by Record on that loop track.
  int armed_loop_ = 0;
     // Dynamic cycle master: -1 = none (next Record becomes master).
@@ -188,6 +205,8 @@ private:
     bool buildMode1();
     bool buildMode2();
     bool buildMode3();
+ bool buildMode4();
+ bool buildMode5();
 
     // Discover the real PipeWire name of our ALSA MIDI sequencer
     // output (MidiEngine client "Instrument_3", port "MIDI Output").

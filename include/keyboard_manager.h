@@ -62,6 +62,13 @@ public:
     // Non-blocking. Call once per Engine::run() tick once all boards are
     // assigned; appends every pending press/release across all boards.
     void pollPerformance(std::vector<KeyEvent>& out);
+ // Hotplug: mark boards whose event node vanished; attempt to open new ones.
+ // Returns number of currently live (connected && fd>=0) boards.
+ int checkLiveness();
+ // Clear assigned flags and assignment index so user can re-tap BR→TR→BL→TL.
+ void resetAssignments();
+ int liveCount() const;
+
 
     std::vector<Keyboard>& keyboards();
     const std::vector<Keyboard>& keyboards() const;

@@ -8,6 +8,7 @@
 #include "instrument_state.h"
 #include "keyboard_manager.h"
 #include "breath_controller.h"
+#include "usb_topology.h"
 #include "midi_engine.h"
 #include "vial_controller.h"
 #include "startup_manager.h"
@@ -217,93 +218,266 @@ bool Engine::initialize()
 
 
 
+
 void Engine::run()
 {
-    // Hot-plug support state (see fix_breath_controller.sh): retried on a
-    // throttle below rather than only once at startup, so the breath
-    // controller can be plugged in at any time -- before launch, during
-    // board assignment, or mid-performance -- and still get picked up.
+    // Hot-plug support state
     auto next_breath_retry = std::chrono::steady_clock::now();
     auto breath_led_off_at = std::chrono::steady_clock::now();
     bool breath_led_active = false;
-    Logger::info("Entering performance loop.");
 
+    Logger::info("Entering performance loop.");
     std::vector<KeyEvent> events;
     int last_sent_volume = -1;
 
     while (running_)
     {
         auto now = std::chrono::steady_clock::now();
-        // Retry every 2s without blocking the performance loop; flash the
-        // boards green briefly on reconnect, same visual language as startup.
-        if (breath_ && !breath_->isConnected() && now >= next_breath_retry)
-        {
+
+        // ===== HOTPLUG STATUS (keyboards / mic / breath / graph) =====
+        static auto next_kb_check = std::chrono::steady_clock::now();
+        static auto next_mic_check = std::chrono::steady_clock::now();
+        static auto next_graph_check = std::chrono::steady_clock::now();
+        static bool kb_fault = false;
+        static bool mic_fault = false;
+        static bool breath_fault = false;
+        static bool awaiting_kb_reassign = false;
+        static bool assign_callback_armed = false;
+        static int last_live_count = 4;
+
+        auto paint_unassigned = [&](const VialController::Color& color) {
+            if (!keyboard_ || !vial_) return;
+            vial_->rescan();
+            for (auto& kb : keyboard_->keyboards()) {
+                kb.rgb_device_index = -1;
+                if (kb.event_path.empty() || kb.fd < 0) continue;
+                std::string kb_port = usbDevicePortAddress(kb.event_path);
+                if (kb_port.empty()) continue;
+                for (int vi = 0; vi < vial_->deviceCount(); ++vi) {
+                    if (usbDevicePortAddress(vial_->devicePath(vi)) == kb_port) {
+                        kb.rgb_device_index = vi;
+                        break;
+                    }
+                }
+            }
+            for (const auto& kb : keyboard_->keyboards()) {
+                if (kb.fd < 0 || kb.rgb_device_index < 0) continue;
+                if (kb.assigned) continue;
+                vial_->setColor(kb.rgb_device_index, color);
+            }
+            for (int vi = 0; vi < vial_->deviceCount(); ++vi) {
+                bool claimed = false;
+                for (const auto& kb : keyboard_->keyboards()) {
+                    if (kb.rgb_device_index == vi) { claimed = true; break; }
+                }
+                if (!claimed)
+                    vial_->setColor(vi, color);
+            }
+        };
+
+        // Keyboards every 500ms
+        if (keyboard_ && now >= next_kb_check) {
+            next_kb_check = now + std::chrono::milliseconds(500);
+            int live = keyboard_->checkLiveness();
+            if (live < 4) {
+                if (!kb_fault || live != last_live_count) {
+                    Logger::warning(
+                        "Keyboard hotplug: " + std::to_string(live) +
+                        "/4 live - unassigned boards BLUE");
+                    kb_fault = true;
+                    awaiting_kb_reassign = true;
+                    keyboard_->resetAssignments();
+                    assign_callback_armed = false;
+                    paint_unassigned(StatusColors::Blue);
+                }
+                if (!assign_callback_armed) {
+                    assign_callback_armed = true;
+                    keyboard_->setAssignmentCallback(
+                        [this](int physical, KeyboardManager::KeyboardPosition) {
+                            if (!keyboard_ || !vial_) return;
+                            if (physical < 0 ||
+                                physical >= static_cast<int>(keyboard_->keyboards().size()))
+                                return;
+                            auto& kb = keyboard_->keyboards()[physical];
+                            if (kb.rgb_device_index < 0 && !kb.event_path.empty()) {
+                                vial_->rescan();
+                                std::string kb_port = usbDevicePortAddress(kb.event_path);
+                                for (int vi = 0; vi < vial_->deviceCount(); ++vi) {
+                                    if (usbDevicePortAddress(vial_->devicePath(vi)) == kb_port) {
+                                        kb.rgb_device_index = vi;
+                                        break;
+                                    }
+                                }
+                            }
+                            if (kb.rgb_device_index >= 0)
+                                vial_->setColor(kb.rgb_device_index, StatusColors::Green);
+                            Logger::info(
+                                "Assigned board " + std::to_string(physical) +
+                                " solid green (rgb " +
+                                std::to_string(kb.rgb_device_index) + ")");
+                        });
+                }
+            } else if (awaiting_kb_reassign) {
+                if (kb_fault || last_live_count < 4) {
+                    Logger::info(
+                        "All 4 keyboards detected - assignment: Bottom Right, "
+                        "Top Right, Bottom Left, Top Left");
+                    if (kb_fault) {
+                        keyboard_->resetAssignments();
+                        assign_callback_armed = false;
+                        kb_fault = false;
+                    }
+                    paint_unassigned(StatusColors::Blue);
+                    if (!assign_callback_armed) {
+                        assign_callback_armed = true;
+                        keyboard_->setAssignmentCallback(
+                            [this](int physical, KeyboardManager::KeyboardPosition) {
+                                if (!keyboard_ || !vial_) return;
+                                if (physical < 0 ||
+                                    physical >= static_cast<int>(keyboard_->keyboards().size()))
+                                    return;
+                                auto& kb = keyboard_->keyboards()[physical];
+                                if (kb.rgb_device_index < 0 && !kb.event_path.empty()) {
+                                    vial_->rescan();
+                                    std::string kb_port = usbDevicePortAddress(kb.event_path);
+                                    for (int vi = 0; vi < vial_->deviceCount(); ++vi) {
+                                        if (usbDevicePortAddress(vial_->devicePath(vi)) == kb_port) {
+                                            kb.rgb_device_index = vi;
+                                            break;
+                                        }
+                                    }
+                                }
+                                if (kb.rgb_device_index >= 0)
+                                    vial_->setColor(kb.rgb_device_index, StatusColors::Green);
+                                Logger::info(
+                                    "Assigned board " + std::to_string(physical) +
+                                    " solid green (rgb " +
+                                    std::to_string(kb.rgb_device_index) + ")");
+                            });
+                    }
+                }
+            }
+            last_live_count = live;
+        }
+
+        if (awaiting_kb_reassign && keyboard_) {
+            keyboard_->poll();
+            if (keyboard_->allAssigned()) {
+                Logger::info("Keyboard re-assignment complete - LEDs off");
+                awaiting_kb_reassign = false;
+                kb_fault = false;
+                assign_callback_armed = false;
+                keyboard_->setAssignmentCallback(nullptr);
+                if (vial_) {
+                    for (int vi = 0; vi < vial_->deviceCount(); ++vi)
+                        vial_->turnOff(vi);
+                }
+            }
+        }
+
+        // Mic every 2s
+        if (now >= next_mic_check) {
+            next_mic_check = now + std::chrono::seconds(2);
+            bool mic_ok = audio_ && audio_->micPresent();
+            if (!mic_ok) {
+                if (!mic_fault) {
+                    Logger::warning("Microphone disconnected - ORANGE");
+                    mic_fault = true;
+                    if (!awaiting_kb_reassign && vial_) {
+                        for (int vi = 0; vi < vial_->deviceCount(); ++vi)
+                            vial_->setColor(vi, StatusColors::Orange);
+                    }
+                }
+            } else if (mic_fault) {
+                Logger::info("Microphone redetected - full graph health rebuild");
+                mic_fault = false;
+                if (audio_)
+                    audio_->ensureHealthyGraph();
+                if (!awaiting_kb_reassign && !breath_fault && vial_) {
+                    for (int vi = 0; vi < vial_->deviceCount(); ++vi)
+                        vial_->turnOff(vi);
+                }
+            }
+        }
+
+        // Breath reconnect retry + GREEN while missing
+        if (breath_ && !breath_->isConnected() && now >= next_breath_retry) {
             next_breath_retry = now + std::chrono::seconds(2);
-            if (breath_->initialize())
-            {
-                Logger::info("Breath controller connected (hot-plugged during performance).");
-                if (vial_)
-                {
-                    for (int i = 0; i < vial_->deviceCount(); ++i)
-                        vial_->setColor(i, StatusColors::Green);
+            if (breath_->initialize()) {
+                Logger::info("Breath controller connected (hot-plugged).");
+                if (vial_) {
+                    for (int vi = 0; vi < vial_->deviceCount(); ++vi)
+                        vial_->setColor(vi, StatusColors::Green);
                 }
                 breath_led_off_at = now + std::chrono::milliseconds(400);
                 breath_led_active = true;
+                breath_fault = false;
             }
         }
-        if (breath_led_active && now >= breath_led_off_at)
-        {
-            if (vial_)
-            {
-                for (int i = 0; i < vial_->deviceCount(); ++i)
-                    vial_->turnOff(i);
+        if (breath_led_active && now >= breath_led_off_at) {
+            if (vial_ && !awaiting_kb_reassign && !mic_fault && !breath_fault) {
+                for (int vi = 0; vi < vial_->deviceCount(); ++vi)
+                    vial_->turnOff(vi);
             }
             breath_led_active = false;
         }
-        if (breath_)
-        {
-            breath_->update();
-
-            int breath_value = breath_->breathValue();
-                int breath_pressure = (breath_value < 12) ? 0 : breath_value;
-                state_->setBreath(breath_pressure);
-                // Instrument/synth volume = breath_pressure * (masterVolume/127),
-                // sent as CC7 on every channel EXCEPT the drum channel. Breath
-                // never affects drums, the dry/mic node, or the vocoder node --
-                // those are scaled elsewhere (Drum note-on velocity, and
-                // AudioGraphManager::applyMixerLevels for the audio graph).
-                // [vocoder-fix] Breath pressure must only drive volume in Mode 1
-                // (SynthOnly). In Mode 2/3 the breath controller's sole job is
-                // octave via nod angle -- letting it also gate CC7 here was
-                // starving the chordal Zyn instance that feeds the vocoder as
-                // carrier, which is why vocoding produced no sound.
-                if (state_->mode() == PerformanceMode::SynthOnly) {
-                int scaled_volume = (breath_pressure * state_->masterVolume()) / 127;
-                if (scaled_volume != last_sent_volume)
-                {
-                    for (int ch = 0; ch < 16; ++ch)
-                    {
-                        /* drums use separate MIDI port; do not skip melody ch */
-                        midi_->sendControlChange(ch, breath_volume_cc_, scaled_volume);
+        if (breath_) {
+            if (!breath_->isConnected()) {
+                if (!breath_fault) {
+                    Logger::warning("Breath disconnected - GREEN");
+                    breath_fault = true;
+                    if (!awaiting_kb_reassign && !mic_fault && vial_) {
+                        for (int vi = 0; vi < vial_->deviceCount(); ++vi)
+                            vial_->setColor(vi, StatusColors::Green);
                     }
-                    last_sent_volume = scaled_volume;
-                } // [vocoder-fix] end Mode-1-only breath volume gate
                 }
+            } else if (breath_fault) {
+                breath_fault = false;
+                Logger::info("Breath restored");
+                if (!awaiting_kb_reassign && !mic_fault && vial_) {
+                    for (int vi = 0; vi < vial_->deviceCount(); ++vi)
+                        vial_->turnOff(vi);
+                }
+            }
+        }
 
+        // Full audio graph health every 2s
+        if (audio_ && now >= next_graph_check) {
+            next_graph_check = now + std::chrono::seconds(2);
+            audio_->ensureHealthyGraph();
+        }
+        // ===== END HOTPLUG =====
+
+        // Breath values -> state / volume (Mode 1 only for CC7)
+        if (breath_) {
+            breath_->update();
+            int breath_value = breath_->breathValue();
+            int breath_pressure = (breath_value < 12) ? 0 : breath_value;
+            state_->setBreath(breath_pressure);
+            if (state_->mode() == PerformanceMode::SynthOnly) {
+                int scaled_volume = (breath_pressure * state_->masterVolume()) / 127;
+                if (scaled_volume != last_sent_volume) {
+                    for (int ch = 0; ch < 16; ++ch)
+                        midi_->sendControlChange(ch, breath_volume_cc_, scaled_volume);
+                    last_sent_volume = scaled_volume;
+                }
+            }
             state_->setOctave(computeOctaveFromNod(breath_->nodValue()));
         }
 
-        keyboard_->pollPerformance(events);
-
+        // Keys: skip performance polling while re-assigning
+        if (!awaiting_kb_reassign)
+            keyboard_->pollPerformance(events);
+        else
+            events.clear();
         for (const auto& event : events)
-        {
             handleKeyEvent(event);
-        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
     Logger::info("Performance loop exited.");
 }
-
 
 void Engine::shutdown()
 {
@@ -508,7 +682,54 @@ void Engine::handleAction(const Action& action, int keyboard_index, int keycode,
             Logger::info("Octave " + std::to_string(state_->octave()));
             return;
 
-        case ActionType::VolumeUp:
+       
+ case ActionType::SynthVolUp:
+ state_->adjustSynthMix(mix_step_);
+ {
+ int v = state_->synthMix();
+ for (int ch = 0; ch < 16; ++ch)
+ midi_->sendControlChange(ch, breath_volume_cc_, v);
+ }
+ if (audio_)
+ audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(),
+ state_->vocoderMix(), state_->drumMix(),
+ state_->synthMix(), state_->micMix());
+ Logger::info("Synth volume " + std::to_string((state_->synthMix() * 100) / 127) + "% (" + std::to_string(state_->synthMix()) + "/127)");
+
+return;
+ case ActionType::SynthVolDown:
+ state_->adjustSynthMix(-mix_step_);
+ {
+ int v = state_->synthMix();
+ for (int ch = 0; ch < 16; ++ch)
+ midi_->sendControlChange(ch, breath_volume_cc_, v);
+ }
+ if (audio_)
+ audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(),
+ state_->vocoderMix(), state_->drumMix(),
+ state_->synthMix(), state_->micMix());
+ Logger::info("Synth volume " + std::to_string((state_->synthMix() * 100) / 127) + "% (" + std::to_string(state_->synthMix()) + "/127)");
+
+return;
+ case ActionType::MicVolUp:
+ state_->adjustMicMix(mix_step_);
+ if (audio_)
+ audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(),
+ state_->vocoderMix(), state_->drumMix(),
+ state_->synthMix(), state_->micMix());
+ Logger::info("Mic volume " + std::to_string((state_->micMix() * 100) / 127) + "% (" + std::to_string(state_->micMix()) + "/127)");
+
+return;
+ case ActionType::MicVolDown:
+ state_->adjustMicMix(-mix_step_);
+ if (audio_)
+ audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(),
+ state_->vocoderMix(), state_->drumMix(),
+ state_->synthMix(), state_->micMix());
+ Logger::info("Mic volume " + std::to_string((state_->micMix() * 100) / 127) + "% (" + std::to_string(state_->micMix()) + "/127)");
+
+return;
+ case ActionType::VolumeUp:
             state_->adjustMasterVolume(mix_step_);
             if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
             Logger::info("Master volume " + std::to_string(state_->masterVolume()));
@@ -532,33 +753,39 @@ void Engine::handleAction(const Action& action, int keyboard_index, int keycode,
 
         case ActionType::DryMixUp:
             state_->adjustDryMix(mix_step_);
-            Logger::info("Dry mix " + std::to_string(state_->dryMix()));
-            if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
+if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
+ Logger::info("Dry mix " + std::to_string((state_->dryMix() * 100) / 127) + "% (" + std::to_string(state_->dryMix()) + "/127)");
+
             return;
         case ActionType::DryMixDown:
             state_->adjustDryMix(-mix_step_);
-            Logger::info("Dry mix " + std::to_string(state_->dryMix()));
-            if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
+if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
+ Logger::info("Dry mix " + std::to_string((state_->dryMix() * 100) / 127) + "% (" + std::to_string(state_->dryMix()) + "/127)");
+
             return;
         case ActionType::VocoderMixUp:
             state_->adjustVocoderMix(mix_step_);
-            Logger::info("Vocoder mix " + std::to_string(state_->vocoderMix()));
-            if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
+if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
+ Logger::info("Vocoder mix " + std::to_string((state_->vocoderMix() * 100) / 127) + "% (" + std::to_string(state_->vocoderMix()) + "/127)");
+
             return;
         case ActionType::VocoderMixDown:
             state_->adjustVocoderMix(-mix_step_);
-            Logger::info("Vocoder mix " + std::to_string(state_->vocoderMix()));
-            if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
+if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
+ Logger::info("Vocoder mix " + std::to_string((state_->vocoderMix() * 100) / 127) + "% (" + std::to_string(state_->vocoderMix()) + "/127)");
+
             return;
         case ActionType::DrumMixUp:
             state_->adjustDrumMix(mix_step_);
-            Logger::info("Drum mix " + std::to_string(state_->drumMix()));
-            if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
+if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
+ Logger::info("Drum mix " + std::to_string((state_->drumMix() * 100) / 127) + "% (" + std::to_string(state_->drumMix()) + "/127)");
+
             return;
         case ActionType::DrumMixDown:
             state_->adjustDrumMix(-mix_step_);
-            Logger::info("Drum mix " + std::to_string(state_->drumMix()));
-            if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
+if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());
+ Logger::info("Drum mix " + std::to_string((state_->drumMix() * 100) / 127) + "% (" + std::to_string(state_->drumMix()) + "/127)");
+
             return;
 
         case ActionType::ModeInstrument:
@@ -572,8 +799,9 @@ void Engine::handleAction(const Action& action, int keyboard_index, int keycode,
         // [vocoder-fix] Breath no longer controls chordal-Zyn volume in
         // Mode 2; seed a fixed full CC7 level so the vocoder carrier
         // is never silent because of wherever breath pressure last left it.
-        for (int ch = 0; ch < 16; ++ch)
+        for (int ch = 0; ch < 16; ++ch) {
             midi_->sendControlChange(ch, breath_volume_cc_, 127);
+            }
             Logger::info("Mode VocoderOnly (Mode 2)");
             return;
         case ActionType::ModeVocoderDry:
@@ -582,12 +810,38 @@ void Engine::handleAction(const Action& action, int keyboard_index, int keycode,
         // [vocoder-fix] Breath no longer controls chordal-Zyn volume in
         // Mode 3; seed a fixed full CC7 level so the vocoder carrier
         // is never silent because of wherever breath pressure last left it.
-        for (int ch = 0; ch < 16; ++ch)
+        for (int ch = 0; ch < 16; ++ch) {
             midi_->sendControlChange(ch, breath_volume_cc_, 127);
+            }
             Logger::info("Mode SynthAndVocoder (Mode 3)");
             return;
 
-        case ActionType::Panic:
+       
+ case ActionType::ModeBreathOctave:
+ state_->setMode(PerformanceMode::BreathOctave);
+ if (audio_) audio_->setMode(PerformanceMode::BreathOctave);
+ {
+ int v = state_->synthMix();
+ for (int ch = 0; ch < 16; ++ch)
+ midi_->sendControlChange(ch, breath_volume_cc_, v);
+ }
+ Logger::info("Mode BreathOctave (Mode 4) — breath=octave, synth vol via buttons");
+ return;
+ case ActionType::ModeBreathOctaveMic:
+ state_->setMode(PerformanceMode::BreathOctaveMic);
+ if (audio_) audio_->setMode(PerformanceMode::BreathOctaveMic);
+ if (audio_)
+ audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(),
+ state_->vocoderMix(), state_->drumMix(),
+ state_->synthMix(), state_->micMix());
+ {
+ int v = state_->synthMix();
+ for (int ch = 0; ch < 16; ++ch)
+ midi_->sendControlChange(ch, breath_volume_cc_, v);
+ }
+ Logger::info("Mode BreathOctaveMic (Mode 5) — Mode 4 + dry mic");
+ return;
+ case ActionType::Panic:
             Logger::warning("PANIC — all notes off");
             allNotesOff();
             state_->requestPanic();

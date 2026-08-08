@@ -248,6 +248,23 @@ bool BreathController::subscribeToController(
 
 void BreathController::update()
 {
+ // HOTPLUG_BREATH: if our ALSA client vanished, mark disconnected so Engine
+ // can show yellow LEDs and retry initialize().
+ if (!seq_) {
+ connected_ = false;
+ return;
+ }
+ if (connected_) {
+ // Probe: controller client still in the system?
+ snd_seq_client_info_t* cinfo;
+ snd_seq_client_info_alloca(&cinfo);
+ if (snd_seq_get_any_client_info(seq_, client_id_, cinfo) < 0) {
+ Logger::warning("Breath controller client gone — marking disconnected");
+ connected_ = false;
+ return;
+ }
+ }
+
     if (!seq_)
         return;
 

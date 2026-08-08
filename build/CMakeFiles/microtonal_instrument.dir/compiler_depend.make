@@ -1113,6 +1113,7 @@ CMakeFiles/microtonal_instrument.dir/src/engine.cpp.o: /home/mjr/Instrument_3/sr
   /home/mjr/Instrument_3/include/midi_engine.h \
   /home/mjr/Instrument_3/include/startup_manager.h \
   /home/mjr/Instrument_3/include/status_colors.h \
+  /home/mjr/Instrument_3/include/usb_topology.h \
   /home/mjr/Instrument_3/include/vial_controller.h \
   /usr/include/alloca.h \
   /usr/include/alsa/asoundef.h \
@@ -2300,6 +2301,7 @@ CMakeFiles/microtonal_instrument.dir/src/keyboard_manager.cpp.o: /home/mjr/Instr
   /usr/include/c++/13/cstdint \
   /usr/include/c++/13/cstdio \
   /usr/include/c++/13/cstdlib \
+  /usr/include/c++/13/cstring \
   /usr/include/c++/13/ctime \
   /usr/include/c++/13/cwchar \
   /usr/include/c++/13/cwctype \
@@ -2337,15 +2339,19 @@ CMakeFiles/microtonal_instrument.dir/src/keyboard_manager.cpp.o: /home/mjr/Instr
   /usr/include/c++/13/unordered_map \
   /usr/include/c++/13/vector \
   /usr/include/ctype.h \
+  /usr/include/dirent.h \
   /usr/include/endian.h \
   /usr/include/errno.h \
+  /usr/include/fcntl.h \
   /usr/include/features-time64.h \
   /usr/include/features.h \
   /usr/include/linux/close_range.h \
   /usr/include/linux/errno.h \
+  /usr/include/linux/falloc.h \
   /usr/include/linux/input-event-codes.h \
   /usr/include/linux/input.h \
   /usr/include/linux/ioctl.h \
+  /usr/include/linux/limits.h \
   /usr/include/linux/posix_types.h \
   /usr/include/linux/stddef.h \
   /usr/include/linux/types.h \
@@ -2357,6 +2363,8 @@ CMakeFiles/microtonal_instrument.dir/src/keyboard_manager.cpp.o: /home/mjr/Instr
   /usr/include/stdint.h \
   /usr/include/stdio.h \
   /usr/include/stdlib.h \
+  /usr/include/string.h \
+  /usr/include/strings.h \
   /usr/include/time.h \
   /usr/include/unistd.h \
   /usr/include/wchar.h \
@@ -2372,10 +2380,15 @@ CMakeFiles/microtonal_instrument.dir/src/keyboard_manager.cpp.o: /home/mjr/Instr
   /usr/include/x86_64-linux-gnu/bits/byteswap.h \
   /usr/include/x86_64-linux-gnu/bits/confname.h \
   /usr/include/x86_64-linux-gnu/bits/cpu-set.h \
+  /usr/include/x86_64-linux-gnu/bits/dirent.h \
+  /usr/include/x86_64-linux-gnu/bits/dirent_ext.h \
   /usr/include/x86_64-linux-gnu/bits/endian.h \
   /usr/include/x86_64-linux-gnu/bits/endianness.h \
   /usr/include/x86_64-linux-gnu/bits/environments.h \
   /usr/include/x86_64-linux-gnu/bits/errno.h \
+  /usr/include/x86_64-linux-gnu/bits/fcntl-linux.h \
+  /usr/include/x86_64-linux-gnu/bits/fcntl.h \
+  /usr/include/x86_64-linux-gnu/bits/fcntl2.h \
   /usr/include/x86_64-linux-gnu/bits/floatn-common.h \
   /usr/include/x86_64-linux-gnu/bits/floatn.h \
   /usr/include/x86_64-linux-gnu/bits/getopt_core.h \
@@ -2383,10 +2396,12 @@ CMakeFiles/microtonal_instrument.dir/src/keyboard_manager.cpp.o: /home/mjr/Instr
   /usr/include/x86_64-linux-gnu/bits/ioctl-types.h \
   /usr/include/x86_64-linux-gnu/bits/ioctls.h \
   /usr/include/x86_64-linux-gnu/bits/libc-header-start.h \
+  /usr/include/x86_64-linux-gnu/bits/local_lim.h \
   /usr/include/x86_64-linux-gnu/bits/locale.h \
   /usr/include/x86_64-linux-gnu/bits/long-double.h \
   /usr/include/x86_64-linux-gnu/bits/poll.h \
   /usr/include/x86_64-linux-gnu/bits/poll2.h \
+  /usr/include/x86_64-linux-gnu/bits/posix1_lim.h \
   /usr/include/x86_64-linux-gnu/bits/posix_opt.h \
   /usr/include/x86_64-linux-gnu/bits/pthread_stack_min-dynamic.h \
   /usr/include/x86_64-linux-gnu/bits/pthreadtypes-arch.h \
@@ -2396,6 +2411,7 @@ CMakeFiles/microtonal_instrument.dir/src/keyboard_manager.cpp.o: /home/mjr/Instr
   /usr/include/x86_64-linux-gnu/bits/select.h \
   /usr/include/x86_64-linux-gnu/bits/select2.h \
   /usr/include/x86_64-linux-gnu/bits/setjmp.h \
+  /usr/include/x86_64-linux-gnu/bits/stat.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-intn.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-least.h \
   /usr/include/x86_64-linux-gnu/bits/stdint-uintn.h \
@@ -2406,8 +2422,11 @@ CMakeFiles/microtonal_instrument.dir/src/keyboard_manager.cpp.o: /home/mjr/Instr
   /usr/include/x86_64-linux-gnu/bits/stdlib-bsearch.h \
   /usr/include/x86_64-linux-gnu/bits/stdlib-float.h \
   /usr/include/x86_64-linux-gnu/bits/stdlib.h \
+  /usr/include/x86_64-linux-gnu/bits/string_fortified.h \
+  /usr/include/x86_64-linux-gnu/bits/strings_fortified.h \
   /usr/include/x86_64-linux-gnu/bits/struct_mutex.h \
   /usr/include/x86_64-linux-gnu/bits/struct_rwlock.h \
+  /usr/include/x86_64-linux-gnu/bits/struct_stat.h \
   /usr/include/x86_64-linux-gnu/bits/thread-shared-types.h \
   /usr/include/x86_64-linux-gnu/bits/time.h \
   /usr/include/x86_64-linux-gnu/bits/time64.h \
@@ -2430,6 +2449,7 @@ CMakeFiles/microtonal_instrument.dir/src/keyboard_manager.cpp.o: /home/mjr/Instr
   /usr/include/x86_64-linux-gnu/bits/types/sigset_t.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_FILE.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct___jmp_buf_tag.h \
+  /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_itimerspec.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_sched_param.h \
   /usr/include/x86_64-linux-gnu/bits/types/struct_timespec.h \
@@ -4706,11 +4726,11 @@ CMakeFiles/microtonal_instrument.dir/src/vial_controller.cpp.o: /home/mjr/Instru
 
 /home/mjr/Instrument_3/src/usb_topology.cpp:
 
-/home/mjr/Instrument_3/include/usb_topology.h:
-
 /home/mjr/Instrument_3/src/logger.cpp:
 
 /home/mjr/Instrument_3/src/layout_manager.cpp:
+
+/usr/include/dirent.h:
 
 /home/mjr/Instrument_3/src/keyboard_discovery.cpp:
 
@@ -4719,6 +4739,10 @@ CMakeFiles/microtonal_instrument.dir/src/vial_controller.cpp.o: /home/mjr/Instru
 /home/mjr/Instrument_3/src/keyboard_assignment.cpp:
 
 /usr/include/x86_64-linux-gnu/bits/mathcalls-helper-functions.h:
+
+/usr/include/hidapi/hidapi.h:
+
+_deps/json-src/include/nlohmann/thirdparty/hedley/hedley_undef.hpp:
 
 /usr/include/x86_64-linux-gnu/bits/iscanonical.h:
 
@@ -4807,6 +4831,8 @@ _deps/json-src/include/nlohmann/detail/output/output_adapters.hpp:
 /usr/include/c++/13/string:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-intn.h:
+
+/home/mjr/Instrument_3/include/usb_topology.h:
 
 /usr/include/c++/13/sstream:
 
@@ -4969,6 +4995,8 @@ _deps/json-src/include/nlohmann/detail/input/lexer.hpp:
 /usr/include/c++/13/bits/cxxabi_init_exception.h:
 
 /home/mjr/Instrument_3/include/audio_graph_manager.h:
+
+/usr/include/x86_64-linux-gnu/bits/dirent_ext.h:
 
 /usr/include/x86_64-linux-gnu/bits/flt-eval-method.h:
 
@@ -5363,10 +5391,6 @@ _deps/json-src/include/nlohmann/detail/input/input_adapters.hpp:
 /usr/include/x86_64-linux-gnu/bits/ss_flags.h:
 
 /usr/include/x86_64-linux-gnu/bits/types/sig_atomic_t.h:
-
-_deps/json-src/include/nlohmann/thirdparty/hedley/hedley_undef.hpp:
-
-/usr/include/hidapi/hidapi.h:
 
 /usr/include/x86_64-linux-gnu/bits/stdint-least.h:
 
@@ -5801,6 +5825,8 @@ _deps/json-src/include/nlohmann/byte_container_with_subtype.hpp:
 _deps/json-src/include/nlohmann/detail/iterators/primitive_iterator.hpp:
 
 /home/mjr/Instrument_3/include/engine.h:
+
+/usr/include/x86_64-linux-gnu/bits/dirent.h:
 
 /home/mjr/Instrument_3/include/status_colors.h:
 

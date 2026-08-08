@@ -4,6 +4,10 @@
 #include <sys/ioctl.h>
 #include <poll.h>
 #include <unistd.h>
+#include <cstring>
+#include <dirent.h>
+#include <errno.h>
+#include <fcntl.h>
 
 namespace
 {
@@ -249,3 +253,124 @@ void KeyboardManager::pollPerformance(std::vector<KeyEvent>& out)
         out.push_back(KeyEvent{static_cast<int>(i), event.code, event.value == 1});
     }
 }
+
+int KeyboardManager::liveCount() const
+{
+ int n = 0;
+ for (const auto& kb : keyboards_)
+ if (kb.connected && kb.fd >= 0)
+ ++n;
+ return n;
+}
+
+void KeyboardManager::resetAssignments()
+{
+ next_assignment_index_ = 0;
+ for (auto& kb : keyboards_) {
+ kb.assigned = false;
+ kb.logical_index = -1;
+ }
+ Logger::info("Keyboard assignments cleared — waiting for re-tap BR → TR → BL → TL");
+}
+
+int KeyboardManager::checkLiveness()
+{
+ // 1) Drop boards whose event node is gone or whose fd is in error.
+ for (auto& kb : keyboards_) {
+ if (kb.fd < 0) {
+ kb.connected = false;
+ continue;
+ }
+ // Path gone?
+ if (!kb.event_path.empty() && access(kb.event_path.c_str(), F_OK) != 0) {
+ Logger::warning("Keyboard node vanished: " + kb.event_path);
+ ioctl(kb.fd, EVIOCGRAB, 0);
+ close(kb.fd);
+ kb.fd = -1;
+ kb.connected = false;
+ kb.assigned = false;
+ continue;
+ }
+ // fd error/hangup?
+ struct pollfd pfd{};
+ pfd.fd = kb.fd;
+ pfd.events = POLLIN | POLLERR | POLLHUP;
+ if (::poll(&pfd, 1, 0) > 0) {
+ if (pfd.revents & (POLLERR | POLLHUP | POLLNVAL)) {
+ Logger::warning("Keyboard fd error/hangup: " + kb.event_path);
+ ioctl(kb.fd, EVIOCGRAB, 0);
+ close(kb.fd);
+ kb.fd = -1;
+ kb.connected = false;
+ kb.assigned = false;
+ }
+ }
+ }
+
+ // 2) If fewer than 4 live, scan /dev/input for new ID75 event nodes.
+ if (liveCount() < 4) {
+ DIR* dir = opendir("/dev/input");
+ if (dir) {
+ struct dirent* ent;
+ while ((ent = readdir(dir)) != nullptr) {
+ if (strncmp(ent->d_name, "event", 5) != 0)
+ continue;
+ std::string path = std::string("/dev/input/") + ent->d_name;
+ // Skip if already open
+ bool already = false;
+ for (const auto& kb : keyboards_) {
+ if (kb.event_path == path && kb.fd >= 0) {
+ already = true;
+ break;
+ }
+ }
+ if (already)
+ continue;
+ // Try open + check name for ID75 / 0x6964 vendor via EVIOCGID or name
+ int fd = open(path.c_str(), O_RDONLY | O_NONBLOCK);
+ if (fd < 0)
+ continue;
+ char name[256] = {};
+ if (ioctl(fd, EVIOCGNAME(sizeof(name)), name) < 0) {
+ close(fd);
+ continue;
+ }
+ std::string nm(name);
+ // Match same heuristic as discoverKeyboards (ID75 / vial / 0x6964 boards)
+ // Exact name used by discoverKeyboards() in keyboard_discovery.cpp
+ if (nm != "THH ID75 Rev2 Keyboard") {
+ close(fd);
+ continue;
+ }
+ // Grab and register
+ ioctl(fd, EVIOCGRAB, 1);
+ Keyboard kb;
+ kb.fd = fd;
+ kb.event_path = path;
+ kb.connected = true;
+ kb.assigned = false;
+ kb.logical_index = -1;
+ keyboards_.push_back(kb);
+ Logger::info("Hotplug: found keyboard at " + path + " (\"" + nm + "\")");
+ }
+ closedir(dir);
+ }
+ // Prune dead slots (fd < 0) to keep vector tidy — but keep assigned ones
+ // only if still live. Compact:
+ std::vector<Keyboard> live;
+ live.reserve(keyboards_.size());
+ for (auto& kb : keyboards_) {
+ if (kb.fd >= 0 && kb.connected)
+ live.push_back(kb);
+ else if (kb.fd >= 0) {
+ ioctl(kb.fd, EVIOCGRAB, 0);
+ close(kb.fd);
+ }
+ }
+ keyboards_.swap(live);
+ }
+
+ return liveCount();
+}
+
+
