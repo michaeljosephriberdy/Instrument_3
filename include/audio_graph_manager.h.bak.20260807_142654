@@ -30,9 +30,7 @@ public:
     struct Config
     {
         std::string zyn_instrument = "config/mkb.xmz";
-        std::string zyn_drums_instrument = "config/drums.xmz";
-        std::string zyn_drums_client_name = "zyn-drums";
-        std::string zyn_client_name = "zyn-melody";
+        std::string zyn_client_name = "zynaddsubfx";
         std::string engine_midi_name = "Midi-Bridge:Instrument_3MIDI Output (capture)";
 
         // ALSA / PipeWire name fragments used to find the Shure MVX2U.
@@ -85,7 +83,6 @@ public:
     std::string statusSummary() const;
 
     bool zynRunning() const;
-    bool drumsZynRunning() const;
     bool sooperlooperRunning() const;
     bool vocoderRunning() const;
 
@@ -120,12 +117,6 @@ public:
     // Link SooperLooper into the current graph (dry/wet parallel path).
     // Safe no-op if SL is not running or ports are missing.
     void connectLooperGraph();
-    bool resolveLooperPorts(std::string& in_l, std::string& in_r,
-                            std::string& out_l, std::string& out_r);
-    void linkStereoToLooper(const std::string& src_l, const std::string& src_r,
-                            const std::string& sl_in_l, const std::string& sl_in_r);
-    std::string findEngineMidiPort() const;
-    std::string findEngineDrumsMidiPort() const;
 
     // Send one OSC message to SooperLooper (uses oscsend from liblo-tools).
     bool sendLooperOsc(const std::string& path,
@@ -172,7 +163,6 @@ private:
 
 
     bool launchZyn();
-    bool launchZynDrums();
     bool launchSooperLooper();
     bool launchVocoder();
 
@@ -183,7 +173,6 @@ private:
     bool pwLink(const std::string& src, const std::string& dst);
     bool pwUnlink(const std::string& src, const std::string& dst);
     void disconnectAllOwnedLinks();
-    void forceDisconnectInstrumentGraph();
 
     bool buildMode1();
     bool buildMode2();
@@ -193,24 +182,16 @@ private:
     // output (MidiEngine client "Instrument_3", port "MIDI Output").
     // Bridge naming varies (e.g. "Midi-Bridge:Instrument_3MIDI Output
     // (capture)" vs "Instrument_3:MIDI Output"); look it up at runtime.
-    
+    std::string findEngineMidiPort() const;
 
     // Find PipeWire port names containing a substring (empty if none).
     std::vector<std::string> findPorts(const std::string& substring,
                                        bool inputs) const;
 
-    // Real PipeWire name for a JACK client started with -N <name>.
-    // e.g. -N zyn-melody → zynaddsubfx_zyn-melody:out_1 (not zyn-melody:out_1).
-    std::string resolveClientPort(const std::string& client_name,
-                                 const std::string& suffix,
-                                 bool inputs) const;
-
-
     Config cfg_;
     PerformanceMode mode_ = PerformanceMode::SynthOnly;
 
     pid_t zyn_pid_ = -1;
-    pid_t zyn_drums_pid_ = -1;
     pid_t sl_pid_  = -1;
     pid_t voc_pid_ = -1;
 

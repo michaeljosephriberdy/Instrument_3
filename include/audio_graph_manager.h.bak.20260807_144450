@@ -183,7 +183,6 @@ private:
     bool pwLink(const std::string& src, const std::string& dst);
     bool pwUnlink(const std::string& src, const std::string& dst);
     void disconnectAllOwnedLinks();
-    void forceDisconnectInstrumentGraph();
 
     bool buildMode1();
     bool buildMode2();
@@ -198,13 +197,6 @@ private:
     // Find PipeWire port names containing a substring (empty if none).
     std::vector<std::string> findPorts(const std::string& substring,
                                        bool inputs) const;
-
-    // Real PipeWire name for a JACK client started with -N <name>.
-    // e.g. -N zyn-melody → zynaddsubfx_zyn-melody:out_1 (not zyn-melody:out_1).
-    std::string resolveClientPort(const std::string& client_name,
-                                 const std::string& suffix,
-                                 bool inputs) const;
-
 
     Config cfg_;
     PerformanceMode mode_ = PerformanceMode::SynthOnly;

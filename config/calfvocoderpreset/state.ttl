@@ -1,0 +1,642 @@
+@prefix atom: <http://lv2plug.in/ns/ext/atom#> .
+@prefix lv2: <http://lv2plug.in/ns/lv2core#> .
+@prefix pset: <http://lv2plug.in/ns/ext/presets#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix state: <http://lv2plug.in/ns/ext/state#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<>
+	a pset:Preset ;
+	lv2:appliesTo <http://calf.sourceforge.net/plugins/Vocoder> ;
+	lv2:port [
+		lv2:symbol "analyzer" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "attack" ;
+		pset:value 5.0
+	] , [
+		lv2:symbol "bands" ;
+		pset:value 4.0
+	] , [
+		lv2:symbol "bypass" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "carrier" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "carrier_in" ;
+		pset:value 0.88379836
+	] , [
+		lv2:symbol "detectors" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "hiq" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "link" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "lower" ;
+		pset:value 20.0
+	] , [
+		lv2:symbol "mod1" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod10" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod11" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod12" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod13" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod14" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod15" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod16" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod17" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod18" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod19" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod2" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod20" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod21" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod22" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod23" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod24" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod25" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod26" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod27" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod28" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod29" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod3" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod30" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod31" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod32" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod4" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod5" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod6" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod7" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod8" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod9" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "mod_in" ;
+		pset:value 0.79698098
+	] , [
+		lv2:symbol "modulator" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "noise1" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise10" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise11" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise12" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise13" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise14" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise15" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise16" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise17" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise18" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise19" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise2" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise20" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise21" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise22" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise23" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise24" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise25" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise26" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise27" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise28" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise29" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise3" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise30" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise31" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise32" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise4" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise5" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise6" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise7" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise8" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "noise9" ;
+		pset:value 0.00001585
+	] , [
+		lv2:symbol "order" ;
+		pset:value 9.0
+	] , [
+		lv2:symbol "out" ;
+		pset:value 0.88379836
+	] , [
+		lv2:symbol "pan1" ;
+		pset:value -0.67842603
+	] , [
+		lv2:symbol "pan10" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan11" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan12" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan13" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan14" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan15" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan16" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan17" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan18" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan19" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan2" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan20" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan21" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan22" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan23" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan24" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan25" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan26" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan27" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan28" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan29" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan3" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan30" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan31" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan32" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan4" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan5" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan6" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan7" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan8" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "pan9" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "processed" ;
+		pset:value 1.99730015
+	] , [
+		lv2:symbol "q1" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q10" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q11" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q12" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q13" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q14" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q15" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q16" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q17" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q18" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q19" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q2" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q20" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q21" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q22" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q23" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q24" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q25" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q26" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q27" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q28" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q29" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q3" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q30" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q31" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q32" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q4" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q5" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q6" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q7" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q8" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "q9" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "release" ;
+		pset:value 50.00000381
+	] , [
+		lv2:symbol "solo1" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo10" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo11" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo12" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo13" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo14" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo15" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo16" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo17" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo18" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo19" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo2" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo20" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo21" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo22" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo23" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo24" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo25" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo26" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo27" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo28" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo29" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo3" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo30" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo31" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo32" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo4" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo5" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo6" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo7" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo8" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "solo9" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "tilt" ;
+		pset:value 0.0
+	] , [
+		lv2:symbol "upper" ;
+		pset:value 20000.0
+	] , [
+		lv2:symbol "volume1" ;
+		pset:value 1.05293202
+	] , [
+		lv2:symbol "volume10" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume11" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume12" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume13" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume14" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume15" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume16" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume17" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume18" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume19" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume2" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume20" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume21" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume22" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume23" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume24" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume25" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume26" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume27" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume28" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume29" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume3" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume30" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume31" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume32" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume4" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume5" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume6" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume7" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume8" ;
+		pset:value 1.0
+	] , [
+		lv2:symbol "volume9" ;
+		pset:value 1.0
+	] .

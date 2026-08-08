@@ -62,7 +62,7 @@ private:
 
     int mix_step_ = 5;
     int transpose_step_ = 1;
-    int drum_channel_ = 10;
+    int drum_channel_ = 0;
     int breath_volume_cc_ = 7; // breath-expression CC number, from config
 
     std::map<uint32_t, ActiveKey> active_keys_;

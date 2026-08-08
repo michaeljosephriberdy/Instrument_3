@@ -60,38 +60,18 @@ namespace
 
     // First non-HDMI playback sink port matching left/right preference.
     std::string defaultPlaybackPort(bool left)
-{
-    // Resolve playback ports via shell. Prefer Headphones; never MVX2U/HDMI.
-    const char* flfr = left ? "playback_FL" : "playback_FR";
-    // Try Headphones first.
-    std::string cmd =
-        std::string("pw-link -i 2>/dev/null | grep -i '") + flfr +
-        "' | grep -vi hdmi | grep -vi mvx2u | grep -vi shure | "
-        "grep -i headphone | head -n 1";
-    std::string line = shellCapture(cmd);
-    if (line.empty()) {
-        // Any non-MVX2U, non-HDMI sink.
-        cmd =
-            std::string("pw-link -i 2>/dev/null | grep -i '") + flfr +
-            "' | grep -vi hdmi | grep -vi mvx2u | grep -vi shure | head -n 1";
-        line = shellCapture(cmd);
-    }
-    if (line.empty()) {
-        // Last resort: any matching playback port.
-        cmd =
-            std::string("pw-link -i 2>/dev/null | grep -i '") + flfr +
+    {
+        // Prefer PipeWire port list; fall back to a common pattern.
+        std::string needle = left ? "playback_FL" : "playback_FR";
+        std::string cmd =
+            "pw-link -i 2>/dev/null | grep -i '" + needle +
             "' | grep -vi hdmi | head -n 1";
-        line = shellCapture(cmd);
-    }
-    while (!line.empty()) {
-        const int b = static_cast<unsigned char>(line.back());
-        if (b == 10 || b == 13 || b == 32)
+        std::string line = shellCapture(cmd);
+        while (!line.empty() && (line.back() == '\n' || line.back() == '\r' ||
+                                 line.back() == ' '))
             line.pop_back();
-        else
-            break;
+        return line;
     }
-    return line;
-}
 }
 
 AudioGraphManager::AudioGraphManager() = default;
@@ -193,10 +173,7 @@ bool AudioGraphManager::pwLink(const std::string& src, const std::string& dst)
 
 bool AudioGraphManager::pwUnlink(const std::string& src, const std::string& dst)
 {
-    if (src.empty() || dst.empty())
-        return false;
-    // Quote exactly like pwLink — names can contain spaces.
-    std::string cmd = "pw-link -d '" + src + "' '" + dst + "' 2>/dev/null";
+    std::string cmd = "pw-link -d " + src + " " + dst + " 2>/dev/null";
     return std::system(cmd.c_str()) == 0;
 }
 
@@ -318,21 +295,6 @@ bool AudioGraphManager::launchZyn()
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
         if (!findPortsMatching({cfg_.zyn_client_name}, false).empty()) {
             Logger::info("Melody Zyn ports visible");
-    // PipeWire often auto-links new JACK clients to the default sink.
-    // Kill that immediately so Mode graphs own the routing.
-    {
-        std::string play_l = defaultPlaybackPort(true);
-        std::string play_r = defaultPlaybackPort(false);
-        if (play_l.empty())
-            play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
-        if (play_r.empty())
-            play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
-        std::string ol = resolveClientPort(cfg_.zyn_client_name, "out_1", false);
-        std::string or_ = resolveClientPort(cfg_.zyn_client_name, "out_2", false);
-        if (ol.empty()) ol = "zynaddsubfx_zyn-melody:out_1";
-        if (or_.empty()) or_ = "zynaddsubfx_zyn-melody:out_2";
-        pwUnlink(ol, play_l); pwUnlink(or_, play_r);
-    }
             break;
         }
     }
@@ -384,19 +346,6 @@ bool AudioGraphManager::launchZynDrums()
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
         if (!findPortsMatching({cfg_.zyn_drums_client_name}, false).empty()) {
             Logger::info("Drums Zyn ports visible");
-    {
-        std::string play_l = defaultPlaybackPort(true);
-        std::string play_r = defaultPlaybackPort(false);
-        if (play_l.empty())
-            play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
-        if (play_r.empty())
-            play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
-        std::string ol = resolveClientPort(cfg_.zyn_drums_client_name, "out_1", false);
-        std::string or_ = resolveClientPort(cfg_.zyn_drums_client_name, "out_2", false);
-        if (ol.empty()) ol = "zynaddsubfx_zyn-drums:out_1";
-        if (or_.empty()) or_ = "zynaddsubfx_zyn-drums:out_2";
-        pwUnlink(ol, play_l); pwUnlink(or_, play_r);
-    }
             break;
         }
     }
@@ -509,26 +458,17 @@ bool AudioGraphManager::launchVocoder()
     if (pid == 0)
     {
         // -n sets JACK/PipeWire node name prefix when supported.
-        // [vocoder-diag] Without this, a launch failure (missing jalv,
-        // wrong LV2 URI, plugin load error, etc.) vanishes into
-        // whatever launched the instrument process, and Mode 2/3
-        // just silently fall back to un-vocoded audio with no clue
-        // why. Capture it so it's actually visible.
-        (void)freopen("/tmp/instrument_vocoder.log", "w", stdout);
-        (void)freopen("/tmp/instrument_vocoder.log", "a", stderr);
         std::string pwjack = which("pw-jack");
         if (!pwjack.empty())
         {
             execlp("pw-jack", "pw-jack",
                    jalv.c_str(),
                    "-n", "InstrumentVocoder",
-                   "-l", "config/calfvocoderpreset/state.ttl",
                    cfg_.calf_vocoder_uri.c_str(),
                    static_cast<char*>(nullptr));
         }
         execlp(jalv.c_str(), jalv.c_str(),
                "-n", "InstrumentVocoder",
-               "-l", "config/calfvocoderpreset/state.ttl",
                cfg_.calf_vocoder_uri.c_str(),
                static_cast<char*>(nullptr));
         _exit(127);
@@ -537,22 +477,6 @@ bool AudioGraphManager::launchVocoder()
     voc_pid_ = pid;
     Logger::info("Launched Calf Vocoder host pid=" + std::to_string(pid) +
                  " node=InstrumentVocoder");
-                 // [vocoder-diag] A plugin-load failure (e.g. wrong LV2 URI) makes
-                 // jalv exit within milliseconds. Catch that immediately
-                 // instead of only noticing later that no ports ever showed up.
-                 std::this_thread::sleep_for(std::chrono::milliseconds(300));
-                 if (!processAlive(voc_pid_)) {
-                     int voc_status = 0;
-                     waitpid(voc_pid_, &voc_status, WNOHANG);
-                     std::string voc_tail = shellCapture("tail -n 20 /tmp/instrument_vocoder.log 2>/dev/null");
-                     Logger::error("Vocoder host exited immediately after launch (pid=" +
-                         std::to_string(voc_pid_) + "). This is why Mode 2/3 fall back to " +
-                         "un-vocoded audio. Check jalv and the Calf Vocoder LV2 URI ('" +
-                         cfg_.calf_vocoder_uri + "'). Run diag_mode23_preflight.sh for a " +
-                         "full check. Last vocoder output:\n" + voc_tail);
-                     voc_pid_ = -1;
-                     return false;
-                 }
 
     for (int i = 0; i < 20; ++i)
     {
@@ -593,150 +517,67 @@ void AudioGraphManager::stopProcesses()
 
 
 
-
-// Force-remove every link this instrument cares about, including ones
-// PipeWire auto-created when Zyn/SL/jalv started (those never landed in
-// owned_links_, so disconnectAllOwnedLinks alone cannot clear them).
-void AudioGraphManager::forceDisconnectInstrumentGraph()
-{
-    auto kill = [this](const std::string& src, const std::string& dst) {
-        if (!src.empty() && !dst.empty())
-            pwUnlink(src, dst);
-    };
-
-    // Resolve current port names (same helpers the builders use).
-    std::string mel_l = resolveClientPort(cfg_.zyn_client_name, "out_1", false);
-    std::string mel_r = resolveClientPort(cfg_.zyn_client_name, "out_2", false);
-    std::string dr_l  = resolveClientPort(cfg_.zyn_drums_client_name, "out_1", false);
-    std::string dr_r  = resolveClientPort(cfg_.zyn_drums_client_name, "out_2", false);
-    if (mel_l.empty()) mel_l = "zynaddsubfx_zyn-melody:out_1";
-    if (mel_r.empty()) mel_r = "zynaddsubfx_zyn-melody:out_2";
-    if (dr_l.empty())  dr_l  = "zynaddsubfx_zyn-drums:out_1";
-    if (dr_r.empty())  dr_r  = "zynaddsubfx_zyn-drums:out_2";
-
-    std::string sl_in_l = "sooperlooper:common_in_1";
-    std::string sl_in_r = "sooperlooper:common_in_2";
-    std::string sl_out_l = "sooperlooper:common_out_1";
-    std::string sl_out_r = "sooperlooper:common_out_2";
-    {
-        std::string a, b, c, d;
-        if (resolveLooperPorts(a, b, c, d)) {
-            sl_in_l = a; sl_in_r = b; sl_out_l = c; sl_out_r = d;
-        }
-    }
-
-    std::string play_l = defaultPlaybackPort(true);
-    std::string play_r = defaultPlaybackPort(false);
-    if (play_l.empty())
-        play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
-    if (play_r.empty())
-        play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
-
-    const std::string vin_l  = "InstrumentVocoder:in_l";
-    const std::string vin_r  = "InstrumentVocoder:in_r";
-    const std::string vside  = "InstrumentVocoder:sidechain";
-    const std::string vside2 = "InstrumentVocoder:sidechain2";
-    const std::string vout_l = "InstrumentVocoder:out_l";
-    const std::string vout_r = "InstrumentVocoder:out_r";
-
-    // melody anywhere
-    for (const auto& s : {mel_l, mel_r}) {
-        kill(s, sl_in_l); kill(s, sl_in_r);
-        kill(s, play_l);  kill(s, play_r);
-        kill(s, vin_l);   kill(s, vin_r);
-    }
-    // drums anywhere
-    for (const auto& s : {dr_l, dr_r}) {
-        kill(s, sl_in_l); kill(s, sl_in_r);
-        kill(s, play_l);  kill(s, play_r);
-    }
-    // vocoder outs anywhere
-    for (const auto& s : {vout_l, vout_r}) {
-        kill(s, sl_in_l); kill(s, sl_in_r);
-        kill(s, play_l);  kill(s, play_r);
-    }
-    // mic anywhere (capture ports)
-    MicInfo mic = queryMic();
-    for (const auto& s : mic.capture_ports) {
-        kill(s, vin_l); kill(s, vin_r);
-        kill(s, vside); kill(s, vside2);
-        kill(s, sl_in_l); kill(s, sl_in_r);
-        kill(s, play_l);  kill(s, play_r);
-    }
-    // SL → headphones
-    kill(sl_out_l, play_l);
-    kill(sl_out_r, play_r);
-
-    // Also clear owned_links_ tracking so we start clean.
-    owned_links_.clear();
-    Logger::info("forceDisconnectInstrumentGraph: cleared auto + owned links");
-}
-
-
 bool AudioGraphManager::buildMode1()
 {
-    // Mode 1 — final audio only (melody + drums).
-    // Final rule: every final source → SL AND headphones (hear live + loop).
     disconnectAllOwnedLinks();
-    forceDisconnectInstrumentGraph();
-
     if (!processAlive(zyn_pid_) && !launchZyn())
         return false;
     launchZynDrums();
     if (!processAlive(sl_pid_))
         launchSooperLooper();
 
+    // Wait until named clients show ports (runtime identity).
+    for (int i = 0; i < 15; ++i) {
+        bool mel = !findPortsMatching({cfg_.zyn_client_name}, false).empty();
+        bool dru = !processAlive(zyn_drums_pid_) ||
+                   !findPortsMatching({cfg_.zyn_drums_client_name}, false).empty();
+        if (mel && dru)
+            break;
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+    }
+
     std::string mel_l = resolveClientPort(cfg_.zyn_client_name, "out_1", false);
     std::string mel_r = resolveClientPort(cfg_.zyn_client_name, "out_2", false);
     std::string dr_l  = resolveClientPort(cfg_.zyn_drums_client_name, "out_1", false);
     std::string dr_r  = resolveClientPort(cfg_.zyn_drums_client_name, "out_2", false);
-    if (mel_l.empty()) mel_l = "zynaddsubfx_zyn-melody:out_1";
-    if (mel_r.empty()) mel_r = "zynaddsubfx_zyn-melody:out_2";
-    if (dr_l.empty())  dr_l  = "zynaddsubfx_zyn-drums:out_1";
-    if (dr_r.empty())  dr_r  = "zynaddsubfx_zyn-drums:out_2";
     Logger::info("Resolved melody ports: " + mel_l + " / " + mel_r);
-    Logger::info("Resolved drums ports: " + dr_l + " / " + dr_r);
+    Logger::info("Resolved drums  ports: " + dr_l + " / " + dr_r);
 
     std::string sl_in_l, sl_in_r, sl_out_l, sl_out_r;
-    if (!resolveLooperPorts(sl_in_l, sl_in_r, sl_out_l, sl_out_r)) {
-        sl_in_l  = "sooperlooper:common_in_1";
-        sl_in_r  = "sooperlooper:common_in_2";
-        sl_out_l = "sooperlooper:common_out_1";
-        sl_out_r = "sooperlooper:common_out_2";
-    }
-    Logger::info("SL ports in=" + sl_in_l + "/" + sl_in_r +
-                 " out=" + sl_out_l + "/" + sl_out_r);
+    bool sl_ok = resolveLooperPorts(sl_in_l, sl_in_r, sl_out_l, sl_out_r);
 
-    std::string play_l = defaultPlaybackPort(true);
-    std::string play_r = defaultPlaybackPort(false);
-    if (play_l.empty())
-        play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
-    if (play_r.empty())
-        play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
-    Logger::info("Playback targets: " + play_l + " / " + play_r);
-
-    // melody (final) → SL + headphones
-    pwLink(mel_l, sl_in_l);
-    pwLink(mel_r, sl_in_r);
-    pwLink(mel_l, play_l);
-    pwLink(mel_r, play_r);
-
-    // drums (final) → SL + headphones
-    if (processAlive(zyn_drums_pid_)) {
-        pwLink(dr_l, sl_in_l);
-        pwLink(dr_r, sl_in_r);
-        pwLink(dr_l, play_l);
-        pwLink(dr_r, play_r);
+    if (sl_ok) {
+        linkStereoToLooper(mel_l, mel_r, sl_in_l, sl_in_r);
+        if (processAlive(zyn_drums_pid_))
+            linkStereoToLooper(dr_l, dr_r, sl_in_l, sl_in_r);
+        std::string play_l = defaultPlaybackPort(true);
+        std::string play_r = defaultPlaybackPort(false);
+        if (!play_l.empty())
+            pwLink(sl_out_l, play_l);
+        if (!play_r.empty())
+            pwLink(sl_out_r.empty() ? sl_out_l : sl_out_r, play_r);
+        Logger::info("Mode1: zyn-melody + zyn-drums → SL → headphones");
+    } else {
+        std::string play_l = defaultPlaybackPort(true);
+        std::string play_r = defaultPlaybackPort(false);
+        if (!play_l.empty()) {
+            pwLink(mel_l, play_l);
+            if (processAlive(zyn_drums_pid_))
+                pwLink(dr_l, play_l);
+        }
+        if (!play_r.empty()) {
+            pwLink(mel_r, play_r);
+            if (processAlive(zyn_drums_pid_))
+                pwLink(dr_r, play_r);
+        }
+        Logger::warning("Mode1: SL missing — direct to headphones");
     }
 
-    // SL → headphones
-    pwLink(sl_out_l, play_l);
-    pwLink(sl_out_r, play_r);
-
-    Logger::info("Mode1: melody + drums → SL + headphones; SL → headphones");
-
+    // MIDI: separate ports → separate Zyns (channel numbers irrelevant)
     std::string midi_mel = findEngineMidiPort();
     std::string midi_dru = findEngineDrumsMidiPort();
+    Logger::info("MIDI melody port='" + midi_mel + "' → " + cfg_.zyn_client_name);
+    Logger::info("MIDI drums  port='" + midi_dru + "' → " + cfg_.zyn_drums_client_name);
     if (!midi_mel.empty())
         pwLink(midi_mel, resolveClientPort(cfg_.zyn_client_name, "midi_input", true));
     if (!midi_dru.empty() && processAlive(zyn_drums_pid_))
@@ -745,15 +586,12 @@ bool AudioGraphManager::buildMode1()
     return true;
 }
 
+
+
+
 bool AudioGraphManager::buildMode2()
 {
-    // Mode 2 — VocoderOnly.
-    // Intermediate: melody → vocoder carrier, mic → vocoder modulator.
-    // Final:       vocoder out + drums → SL + headphones; SL → headphones.
-    // NEVER link dry melody or dry mic to SL/headphones.
     disconnectAllOwnedLinks();
-    forceDisconnectInstrumentGraph();
-
     if (!processAlive(zyn_pid_) && !launchZyn())
         return false;
     launchZynDrums();
@@ -761,27 +599,17 @@ bool AudioGraphManager::buildMode2()
         launchSooperLooper();
 
     MicInfo mic = queryMic();
-    if (!mic.present || mic.capture_ports.empty()) {
-        std::string guess = shellCapture(
-            "pw-link -o 2>/dev/null | grep -i 'alsa_input.*MVX2U.*capture' | head -n1");
-        while (!guess.empty() &&
-               (guess.back() == 10 || guess.back() == 13 || guess.back() == 32))
-            guess.pop_back();
-        if (!guess.empty()) {
-            mic.present = true;
-            mic.capture_ports = {guess};
-            Logger::info("Mode2: mic fallback " + guess);
-        } else {
-            Logger::warning("Mode2: no mic — fallback Mode1");
-            return buildMode1();
-        }
+    if (!mic.present) {
+        Logger::warning("Mode2: no mic — fallback Mode1");
+        return buildMode1();
     }
     for (const auto& p : mic.capture_ports)
-        Logger::info("mic: " + p);
+        Logger::info("  mic: " + p);
 
     if (!processAlive(voc_pid_))
         launchVocoder();
-    for (int i = 0; i < 30; ++i) {
+    // Wait for vocoder ports
+    for (int i = 0; i < 20; ++i) {
         auto vin = findPortsMatching({"InstrumentVocoder"}, true);
         if (!vin.empty())
             break;
@@ -793,21 +621,21 @@ bool AudioGraphManager::buildMode2()
             c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
         return s;
     };
-    std::string vin_l, vin_r, vside, vside2, vout_l, vout_r;
-    for (const auto& p : findPortsMatching({"InstrumentVocoder"}, true)) {
+    std::string vin_l, vin_r, vside, vout_l, vout_r;
+    for (const auto& p : findPortsMatching({"InstrumentVocoder", "Vocoder"}, true)) {
         auto l = lower(p);
         if (l.find("events") != std::string::npos)
             continue;
-        if (l.find("sidechain2") != std::string::npos)
-            vside2 = p;
-        else if (l.find("sidechain") != std::string::npos)
-            vside = p;
-        else if (vin_l.empty() && l.find("in_l") != std::string::npos)
+        if (vin_l.empty() && l.find("in_l") != std::string::npos)
             vin_l = p;
         else if (vin_r.empty() && l.find("in_r") != std::string::npos)
             vin_r = p;
+        else if (l.find("sidechain") != std::string::npos) {
+            if (vside.empty() || l.find("sidechain2") == std::string::npos)
+                vside = p;
+        }
     }
-    for (const auto& p : findPortsMatching({"InstrumentVocoder"}, false)) {
+    for (const auto& p : findPortsMatching({"InstrumentVocoder", "Vocoder"}, false)) {
         auto l = lower(p);
         if (l.find("events") != std::string::npos)
             continue;
@@ -816,84 +644,52 @@ bool AudioGraphManager::buildMode2()
         else if (vout_r.empty() && l.find("out_r") != std::string::npos)
             vout_r = p;
     }
-    if (vin_l.empty())  vin_l  = "InstrumentVocoder:in_l";
-    if (vin_r.empty())  vin_r  = "InstrumentVocoder:in_r";
-    if (vside.empty())  vside  = "InstrumentVocoder:sidechain";
-    if (vside2.empty()) vside2 = "InstrumentVocoder:sidechain2";
-    if (vout_l.empty()) vout_l = "InstrumentVocoder:out_l";
-    if (vout_r.empty()) vout_r = "InstrumentVocoder:out_r";
-    Logger::info("Vocoder: " + vin_l + " / " + vin_r +
-                 " mod=" + vside + "/" + vside2 +
+    Logger::info("Vocoder: " + vin_l + " / " + vin_r + " mod=" + vside +
                  " out=" + vout_l + "/" + vout_r);
 
     std::string mel_l = resolveClientPort(cfg_.zyn_client_name, "out_1", false);
     std::string mel_r = resolveClientPort(cfg_.zyn_client_name, "out_2", false);
     std::string dr_l  = resolveClientPort(cfg_.zyn_drums_client_name, "out_1", false);
     std::string dr_r  = resolveClientPort(cfg_.zyn_drums_client_name, "out_2", false);
-    if (mel_l.empty()) mel_l = "zynaddsubfx_zyn-melody:out_1";
-    if (mel_r.empty()) mel_r = "zynaddsubfx_zyn-melody:out_2";
-    if (dr_l.empty())  dr_l  = "zynaddsubfx_zyn-drums:out_1";
-    if (dr_r.empty())  dr_r  = "zynaddsubfx_zyn-drums:out_2";
     Logger::info("Resolved melody ports: " + mel_l + " / " + mel_r);
-    Logger::info("Resolved drums ports: " + dr_l + " / " + dr_r);
+    Logger::info("Resolved drums  ports: " + dr_l + " / " + dr_r);
 
     std::string sl_in_l, sl_in_r, sl_out_l, sl_out_r;
-    if (!resolveLooperPorts(sl_in_l, sl_in_r, sl_out_l, sl_out_r)) {
-        sl_in_l  = "sooperlooper:common_in_1";
-        sl_in_r  = "sooperlooper:common_in_2";
-        sl_out_l = "sooperlooper:common_out_1";
-        sl_out_r = "sooperlooper:common_out_2";
-    }
-    Logger::info("SL ports in=" + sl_in_l + "/" + sl_in_r +
-                 " out=" + sl_out_l + "/" + sl_out_r);
+    bool sl_ok = resolveLooperPorts(sl_in_l, sl_in_r, sl_out_l, sl_out_r);
+    bool voc_ok = processAlive(voc_pid_) && !vin_l.empty() && !vout_l.empty();
 
-    std::string play_l = defaultPlaybackPort(true);
-    std::string play_r = defaultPlaybackPort(false);
-    if (play_l.empty())
-        play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
-    if (play_r.empty())
-        play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
-    Logger::info("Playback targets: " + play_l + " / " + play_r);
-
-    bool voc_ok = processAlive(voc_pid_);
-    if (!voc_ok) {
-        Logger::error("Mode2: Calf Vocoder host not running — "
-                      "falling back to un-vocoded Mode1 path. "
-                      "Check /tmp/instrument_vocoder.log");
-        pwLink(mel_l, sl_in_l);
-        pwLink(mel_r, sl_in_r);
-        pwLink(mel_l, play_l);
-        pwLink(mel_r, play_r);
-    } else {
-        // INTERMEDIATE: carrier = melody → vocoder in (NOT to SL/headphones)
+    if (voc_ok) {
+        // Melody instance ONLY → vocoder
         pwLink(mel_l, vin_l);
-        pwLink(mel_r, vin_r);
-        // INTERMEDIATE: modulator = mic → sidechain (NOT to SL/headphones)
-        const std::string& mic_p = mic.capture_ports[0];
-        pwLink(mic_p, vside);
-        pwLink(mic_p, vside2);
-        Logger::info("Mode2: mic modulator " + mic_p +
-                     " → " + vside + " + " + vside2);
-        // FINAL: vocoder out → SL + headphones
-        pwLink(vout_l, sl_in_l);
-        pwLink(vout_r, sl_in_r);
-        pwLink(vout_l, play_l);
-        pwLink(vout_r, play_r);
-        Logger::info("Mode2: vocoder out → SL + headphones");
+        if (!vin_r.empty())
+            pwLink(mel_r, vin_r);
+        // Mic → modulator (one copy of the capture stream)
+        if (!vside.empty() && !mic.capture_ports.empty())
+            pwLink(mic.capture_ports[0], vside);
+        // Vocoder wet → SL
+        if (sl_ok)
+            linkStereoToLooper(vout_l, vout_r.empty() ? vout_l : vout_r,
+                               sl_in_l, sl_in_r);
+        Logger::info("Mode2: zyn-melody → vocoder → SL");
+    } else if (sl_ok) {
+        linkStereoToLooper(mel_l, mel_r, sl_in_l, sl_in_r);
+        Logger::warning("Mode2: vocoder unavailable — melody dry → SL");
     }
 
-    // FINAL: drums → SL + headphones (never vocoded)
-    if (processAlive(zyn_drums_pid_)) {
-        pwLink(dr_l, sl_in_l);
-        pwLink(dr_r, sl_in_r);
-        pwLink(dr_l, play_l);
-        pwLink(dr_r, play_r);
-        Logger::info("Mode2: zyn-drums → SL + headphones (not vocoded)");
+    // Drums instance ALWAYS → SL, never vocoder
+    if (processAlive(zyn_drums_pid_) && sl_ok) {
+        linkStereoToLooper(dr_l, dr_r, sl_in_l, sl_in_r);
+        Logger::info("Mode2: zyn-drums → SL (not vocoded)");
     }
 
-    // SL → headphones
-    pwLink(sl_out_l, play_l);
-    pwLink(sl_out_r, play_r);
+    if (sl_ok) {
+        std::string play_l = defaultPlaybackPort(true);
+        std::string play_r = defaultPlaybackPort(false);
+        if (!play_l.empty())
+            pwLink(sl_out_l, play_l);
+        if (!play_r.empty())
+            pwLink(sl_out_r.empty() ? sl_out_l : sl_out_r, play_r);
+    }
 
     std::string midi_mel = findEngineMidiPort();
     std::string midi_dru = findEngineDrumsMidiPort();
@@ -906,9 +702,14 @@ bool AudioGraphManager::buildMode2()
     return true;
 }
 
+
+
+
+
 bool AudioGraphManager::buildMode3()
 {
-    // Mode 3 = Mode 2 + dry mic as FINAL audio (→ SL + headphones).
+    // Mode 2 graph, then a SECOND link of the same mic capture → headphones
+    // (PipeWire allows one source to multiple sinks = "two copies").
     if (!buildMode2())
         return false;
 
@@ -917,30 +718,22 @@ bool AudioGraphManager::buildMode3()
         Logger::warning("Mode3: no mic for dry path");
         return true;
     }
-
-    std::string sl_in_l, sl_in_r, sl_out_l, sl_out_r;
-    if (!resolveLooperPorts(sl_in_l, sl_in_r, sl_out_l, sl_out_r)) {
-        sl_in_l = "sooperlooper:common_in_1";
-        sl_in_r = "sooperlooper:common_in_2";
-    }
-
     std::string play_l = defaultPlaybackPort(true);
     std::string play_r = defaultPlaybackPort(false);
-    if (play_l.empty())
-        play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
-    if (play_r.empty())
-        play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
+    // Dry copy of mic (wet copy already feeds vocoder sidechain from Mode2)
+    if (!play_l.empty())
+        pwLink(mic.capture_ports[0], play_l);
+    if (mic.capture_ports.size() > 1 && !play_r.empty())
+        pwLink(mic.capture_ports[1], play_r);
+    else if (!play_r.empty())
+        pwLink(mic.capture_ports[0], play_r);
 
-    // FINAL: dry mic → SL + headphones (parallel to vocoded wet path)
-    const std::string& mic_p = mic.capture_ports[0];
-    pwLink(mic_p, sl_in_l);
-    pwLink(mic_p, sl_in_r);
-    pwLink(mic_p, play_l);
-    pwLink(mic_p, play_r);
-    Logger::info("Mode3: dry mic → SL + headphones (parallel to vocoder wet path)");
-
+    Logger::info("Mode3: dry mic → headphones (parallel to vocoder wet path)");
     return true;
 }
+
+
+
 
 bool AudioGraphManager::setMode(PerformanceMode mode)
 {
@@ -1475,15 +1268,6 @@ void AudioGraphManager::connectLooperGraph()
         return;
     std::string play_l = defaultPlaybackPort(true);
     std::string play_r = defaultPlaybackPort(false);
-    if (play_l.empty()) {
-        play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
-        Logger::warning("defaultPlaybackPort(L) empty; using Headphones fallback");
-    }
-    if (play_r.empty()) {
-        play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
-        Logger::warning("defaultPlaybackPort(R) empty; using Headphones fallback");
-    }
-    Logger::info("Playback targets: " + play_l + " / " + play_r);
     if (!play_l.empty())
         pwLink(out_l, play_l);
     if (!play_r.empty())

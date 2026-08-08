@@ -318,21 +318,6 @@ bool AudioGraphManager::launchZyn()
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
         if (!findPortsMatching({cfg_.zyn_client_name}, false).empty()) {
             Logger::info("Melody Zyn ports visible");
-    // PipeWire often auto-links new JACK clients to the default sink.
-    // Kill that immediately so Mode graphs own the routing.
-    {
-        std::string play_l = defaultPlaybackPort(true);
-        std::string play_r = defaultPlaybackPort(false);
-        if (play_l.empty())
-            play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
-        if (play_r.empty())
-            play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
-        std::string ol = resolveClientPort(cfg_.zyn_client_name, "out_1", false);
-        std::string or_ = resolveClientPort(cfg_.zyn_client_name, "out_2", false);
-        if (ol.empty()) ol = "zynaddsubfx_zyn-melody:out_1";
-        if (or_.empty()) or_ = "zynaddsubfx_zyn-melody:out_2";
-        pwUnlink(ol, play_l); pwUnlink(or_, play_r);
-    }
             break;
         }
     }
@@ -384,19 +369,6 @@ bool AudioGraphManager::launchZynDrums()
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
         if (!findPortsMatching({cfg_.zyn_drums_client_name}, false).empty()) {
             Logger::info("Drums Zyn ports visible");
-    {
-        std::string play_l = defaultPlaybackPort(true);
-        std::string play_r = defaultPlaybackPort(false);
-        if (play_l.empty())
-            play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
-        if (play_r.empty())
-            play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
-        std::string ol = resolveClientPort(cfg_.zyn_drums_client_name, "out_1", false);
-        std::string or_ = resolveClientPort(cfg_.zyn_drums_client_name, "out_2", false);
-        if (ol.empty()) ol = "zynaddsubfx_zyn-drums:out_1";
-        if (or_.empty()) or_ = "zynaddsubfx_zyn-drums:out_2";
-        pwUnlink(ol, play_l); pwUnlink(or_, play_r);
-    }
             break;
         }
     }
@@ -593,92 +565,11 @@ void AudioGraphManager::stopProcesses()
 
 
 
-
-// Force-remove every link this instrument cares about, including ones
-// PipeWire auto-created when Zyn/SL/jalv started (those never landed in
-// owned_links_, so disconnectAllOwnedLinks alone cannot clear them).
-void AudioGraphManager::forceDisconnectInstrumentGraph()
-{
-    auto kill = [this](const std::string& src, const std::string& dst) {
-        if (!src.empty() && !dst.empty())
-            pwUnlink(src, dst);
-    };
-
-    // Resolve current port names (same helpers the builders use).
-    std::string mel_l = resolveClientPort(cfg_.zyn_client_name, "out_1", false);
-    std::string mel_r = resolveClientPort(cfg_.zyn_client_name, "out_2", false);
-    std::string dr_l  = resolveClientPort(cfg_.zyn_drums_client_name, "out_1", false);
-    std::string dr_r  = resolveClientPort(cfg_.zyn_drums_client_name, "out_2", false);
-    if (mel_l.empty()) mel_l = "zynaddsubfx_zyn-melody:out_1";
-    if (mel_r.empty()) mel_r = "zynaddsubfx_zyn-melody:out_2";
-    if (dr_l.empty())  dr_l  = "zynaddsubfx_zyn-drums:out_1";
-    if (dr_r.empty())  dr_r  = "zynaddsubfx_zyn-drums:out_2";
-
-    std::string sl_in_l = "sooperlooper:common_in_1";
-    std::string sl_in_r = "sooperlooper:common_in_2";
-    std::string sl_out_l = "sooperlooper:common_out_1";
-    std::string sl_out_r = "sooperlooper:common_out_2";
-    {
-        std::string a, b, c, d;
-        if (resolveLooperPorts(a, b, c, d)) {
-            sl_in_l = a; sl_in_r = b; sl_out_l = c; sl_out_r = d;
-        }
-    }
-
-    std::string play_l = defaultPlaybackPort(true);
-    std::string play_r = defaultPlaybackPort(false);
-    if (play_l.empty())
-        play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
-    if (play_r.empty())
-        play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
-
-    const std::string vin_l  = "InstrumentVocoder:in_l";
-    const std::string vin_r  = "InstrumentVocoder:in_r";
-    const std::string vside  = "InstrumentVocoder:sidechain";
-    const std::string vside2 = "InstrumentVocoder:sidechain2";
-    const std::string vout_l = "InstrumentVocoder:out_l";
-    const std::string vout_r = "InstrumentVocoder:out_r";
-
-    // melody anywhere
-    for (const auto& s : {mel_l, mel_r}) {
-        kill(s, sl_in_l); kill(s, sl_in_r);
-        kill(s, play_l);  kill(s, play_r);
-        kill(s, vin_l);   kill(s, vin_r);
-    }
-    // drums anywhere
-    for (const auto& s : {dr_l, dr_r}) {
-        kill(s, sl_in_l); kill(s, sl_in_r);
-        kill(s, play_l);  kill(s, play_r);
-    }
-    // vocoder outs anywhere
-    for (const auto& s : {vout_l, vout_r}) {
-        kill(s, sl_in_l); kill(s, sl_in_r);
-        kill(s, play_l);  kill(s, play_r);
-    }
-    // mic anywhere (capture ports)
-    MicInfo mic = queryMic();
-    for (const auto& s : mic.capture_ports) {
-        kill(s, vin_l); kill(s, vin_r);
-        kill(s, vside); kill(s, vside2);
-        kill(s, sl_in_l); kill(s, sl_in_r);
-        kill(s, play_l);  kill(s, play_r);
-    }
-    // SL → headphones
-    kill(sl_out_l, play_l);
-    kill(sl_out_r, play_r);
-
-    // Also clear owned_links_ tracking so we start clean.
-    owned_links_.clear();
-    Logger::info("forceDisconnectInstrumentGraph: cleared auto + owned links");
-}
-
-
 bool AudioGraphManager::buildMode1()
 {
     // Mode 1 — final audio only (melody + drums).
     // Final rule: every final source → SL AND headphones (hear live + loop).
     disconnectAllOwnedLinks();
-    forceDisconnectInstrumentGraph();
 
     if (!processAlive(zyn_pid_) && !launchZyn())
         return false;
@@ -752,7 +643,6 @@ bool AudioGraphManager::buildMode2()
     // Final:       vocoder out + drums → SL + headphones; SL → headphones.
     // NEVER link dry melody or dry mic to SL/headphones.
     disconnectAllOwnedLinks();
-    forceDisconnectInstrumentGraph();
 
     if (!processAlive(zyn_pid_) && !launchZyn())
         return false;

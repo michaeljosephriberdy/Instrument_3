@@ -20,7 +20,7 @@ public:
         std::string zyn_instrument = "config/mkb.xmz";
         int default_volume = 127;
         int default_transpose = 0;
-        int drum_channel = 0;  // ch 1 (drums.xmz) // MIDI channel for percussion (0-based: 10 = ch 11, the 11th track)
+        int drum_channel = 10; // MIDI channel for percussion (0-based: 10 = ch 11, the 11th track)
     };
 
     struct ControlConfiguration
