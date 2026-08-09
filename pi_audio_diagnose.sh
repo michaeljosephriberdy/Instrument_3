@@ -88,8 +88,7 @@ WHAT TO DO WITH THIS OUTPUT
 
 3. Run pi_setup.sh with those two values, e.g.:
 
-     ./pi_setup.sh \
-       --repo /home/pi/microtonal_instrument \
-       --left  "alsa_output.platform-soc_audio.stereo-fallback:playback_FL" \
-       --right "alsa_output.platform-soc_audio.stereo-fallback:playback_FR"
+	sudo ./build.sh --headless-boot \
+	  --audio-left  "<FL port from diagnose>" \
+	  --audio-right "<FR port from diagnose>"
 EOF
