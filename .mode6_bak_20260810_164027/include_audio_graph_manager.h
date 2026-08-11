@@ -15,8 +15,7 @@
 // Mode 2 (VocoderOnly):     Zyn (carrier) + mic (modulator) → Calf Vocoder → playback
 // Mode 3 (SynthAndVocoder): Mode 2 + dry mic path with independent level
 // Mode 4 (BreathOctave): Mode 1 routing; breath drives octave only
-// Mode 5 (BreathOctaveMic)
-// Mode 6 (Talkbox): sawtooth melody → MVX2U jack; mic → SL + phones: Mode 4 + dry mic → SL + headphones
+// Mode 5 (BreathOctaveMic): Mode 4 + dry mic → SL + headphones
 //
 // Looper (SooperLooper) sits on a side chain and is controlled via OSC;
 // it is not driven by raw keyboard events.
@@ -33,9 +32,6 @@ public:
     struct Config
     {
         std::string zyn_instrument = "config/mkb.xmz";
- std::string zyn_talkbox_instrument = "config/talkbox.xmz";
- std::string zyn_normal_instrument = "config/mkb.xmz";
- std::string mvx2u_pure_playback_preset = "config/NoMic.toml";
         std::string zyn_drums_instrument = "config/drums.xmz";
         std::string zyn_drums_client_name = "zyn-drums";
         std::string zyn_client_name = "zyn-melody";
@@ -128,8 +124,6 @@ public:
     // force a capture-capable card profile (wpctl/pactl). Throttled.
     // Returns true if capture ports are visible after the attempt.
     bool activateMicCapturePorts();
- // Force ALSA+PipeWire mic capture live (gain/unmute). Not Monitor Mix.
- bool ensureMvx2uMicCaptureLive();
 
     // Ports whose node/port name contains any of the needles.
     std::vector<std::string> findPortsMatching(
@@ -213,10 +207,6 @@ private:
     bool buildMode3();
  bool buildMode4();
  bool buildMode5();
- bool buildMode6();
- bool reloadMelodyInstrument(const std::string& xmz_path);
- bool forceMvx2uPurePlayback();
- bool resolveMvx2uPlaybackPorts(std::string& out_l, std::string& out_r);
 
     // Discover the real PipeWire name of our ALSA MIDI sequencer
     // output (MidiEngine client "Instrument_3", port "MIDI Output").

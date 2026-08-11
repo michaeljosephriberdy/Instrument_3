@@ -28002,3 +28002,1650 @@
 2026-08-08 13:07:30 [INFO] VialController shut down.
 2026-08-08 13:07:30 [INFO] MIDI engine shut down.
 2026-08-08 13:07:30 [INFO] Logger shutting down
+2026-08-10 16:52:44 [INFO] ========== Logger started ==========
+2026-08-10 16:52:44 [INFO] Starting engine initialization
+2026-08-10 16:52:44 [INFO] Initializing MIDI engine...
+2026-08-10 16:52:44 [INFO] MIDI ports: 'MIDI Output' (melody) and 'MIDI Drums' (drums)
+2026-08-10 16:52:44 [INFO] Initializing KeyboardManager...
+2026-08-10 16:52:44 [INFO] Initializing VialController...
+2026-08-10 16:52:44 [INFO] VialController initialized with 4 devices.
+2026-08-10 16:52:44 [INFO] === Startup sequence beginning ===
+2026-08-10 16:52:44 [INFO] Searching for ID75 keyboards...
+2026-08-10 16:52:45 [INFO] Found keyboard at /dev/input/event10
+2026-08-10 16:52:45 [INFO] Found keyboard at /dev/input/event12
+2026-08-10 16:52:45 [INFO] Found keyboard at /dev/input/event14
+2026-08-10 16:52:45 [INFO] Found keyboard at /dev/input/event16
+2026-08-10 16:52:45 [INFO] Detected 4 keyboard(s).
+2026-08-10 16:52:45 [INFO] 4 Vial RGB device(s) after rescan.
+2026-08-10 16:52:45 [INFO] Correlating keyboards to their RGB (Vial) devices...
+2026-08-10 16:52:45 [INFO] Correlated /dev/input/event10 -> Vial RGB device index 0
+2026-08-10 16:52:45 [INFO] Correlated /dev/input/event12 -> Vial RGB device index 1
+2026-08-10 16:52:45 [INFO] Correlated /dev/input/event14 -> Vial RGB device index 2
+2026-08-10 16:52:45 [INFO] Correlated /dev/input/event16 -> Vial RGB device index 3
+2026-08-10 16:52:45 [INFO] All 4 keyboards detected and correlated.
+2026-08-10 16:52:45 [INFO] Correlating keyboards to their RGB (Vial) devices...
+2026-08-10 16:52:45 [INFO] Correlated /dev/input/event10 -> Vial RGB device index 0
+2026-08-10 16:52:45 [INFO] Correlated /dev/input/event12 -> Vial RGB device index 1
+2026-08-10 16:52:45 [INFO] Correlated /dev/input/event14 -> Vial RGB device index 2
+2026-08-10 16:52:45 [INFO] Correlated /dev/input/event16 -> Vial RGB device index 3
+2026-08-10 16:52:45 [INFO] Waiting for keyboard assignment: touch any key on Bottom Right, then Top Right, then Bottom Left, then Top Left.
+2026-08-10 16:52:48 [INFO] Assigned physical keyboard 3 -> Bottom Right
+2026-08-10 16:52:48 [INFO] Assigned physical keyboard 2 -> Top Right
+2026-08-10 16:52:49 [INFO] Assigned physical keyboard 1 -> Bottom Left
+2026-08-10 16:52:50 [INFO] Assigned physical keyboard 0 -> Top Left
+2026-08-10 16:52:50 [INFO] All keyboards assigned and programmed.
+2026-08-10 16:52:51 [INFO] Checking breath controller...
+2026-08-10 16:52:51 [INFO] Initializing breath controller...
+2026-08-10 16:52:51 [INFO]   ALSA seq port seen: "Timer"
+2026-08-10 16:52:51 [INFO]   ALSA seq port seen: "Announce"
+2026-08-10 16:52:51 [INFO]   ALSA seq port seen: "Midi Through Port-0"
+2026-08-10 16:52:51 [INFO]   ALSA seq port seen: "Breath Controller 5.2-18261F3A "
+2026-08-10 16:52:51 [INFO] Breath controller connected.
+2026-08-10 16:52:51 [INFO] Breath controller connected.
+2026-08-10 16:52:52 [INFO] Checking USB microphone interface (Shure MVX2U)...
+2026-08-10 16:52:52 [INFO] Microphone interface detected:  		node.description = "Shure MVX2U Mono"
+2026-08-10 16:52:52 [INFO] Running final health check...
+2026-08-10 16:52:52 [INFO] Final health check passed.
+2026-08-10 16:52:53 [INFO] === Startup sequence complete ===
+2026-08-10 16:52:53 [INFO] Loaded configuration from config/instrument.json
+2026-08-10 16:52:53 [INFO] Loaded layout 'bottom_right' from config/layouts/bottom_right.json
+2026-08-10 16:52:53 [INFO] Loaded layout 'top_right' from config/layouts/top_right.json
+2026-08-10 16:52:53 [INFO] Loaded layout 'bottom_left' from config/layouts/bottom_left.json
+2026-08-10 16:52:53 [INFO] Loaded layout 'top_left' from config/layouts/top_left.json
+2026-08-10 16:52:53 [INFO] Layouts loaded (disk + fallbacks).
+2026-08-10 16:52:53 [INFO] Layouts loaded from JSON.
+2026-08-10 16:52:53 [INFO] Launched MELODY Zyn pid=28583 client='zyn-melody' file=config/mkb.xmz
+2026-08-10 16:52:53 [INFO] Melody Zyn ports visible
+2026-08-10 16:52:53 [INFO] Launched DRUMS Zyn pid=28621 client='zyn-drums' file=config/drums.xmz
+2026-08-10 16:52:54 [INFO] Drums Zyn ports visible
+2026-08-10 16:52:54 [INFO] Launched SooperLooper pid=28659 OSC :9951
+2026-08-10 16:52:54 [INFO] Launched Calf Vocoder host pid=28675 node=InstrumentVocoder
+2026-08-10 16:52:55 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:52:55 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 16:52:55 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 16:52:55 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 16:52:55 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:52:55 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:52:55 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:52:55 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → sooperlooper:common_in_1
+2026-08-10 16:52:55 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → sooperlooper:common_in_2
+2026-08-10 16:52:55 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:52:55 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:52:55 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 16:52:55 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 16:52:55 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:52:55 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:52:55 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:52:55 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:52:55 [INFO] Mode1: melody + drums → SL + headphones; SL → headphones
+2026-08-10 16:52:55 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 16:52:55 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 16:52:55 [INFO] Audio graph: mode=SynthOnly melody=up drums=up sl=up voc=up mic=yes links=12
+2026-08-10 16:52:55 [INFO] Shure MVX2U mic detected ALSA hw:3,0 ports=1
+2026-08-10 16:52:55 [INFO]   capture: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 16:52:55 [INFO] Engine initialization complete
+2026-08-10 16:52:55 [INFO] Entering performance loop.
+2026-08-10 16:52:55 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:52:57 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:52:59 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:01 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:03 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:05 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:07 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:09 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:11 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:13 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:15 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:17 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:19 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:21 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:23 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:25 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:27 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:29 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:31 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:33 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:33 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:34 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 16:53:34 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 16:53:34 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 16:53:34 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:34 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:34 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:53:34 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → sooperlooper:common_in_1
+2026-08-10 16:53:34 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → sooperlooper:common_in_2
+2026-08-10 16:53:34 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:53:34 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:53:34 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 16:53:34 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 16:53:34 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:53:34 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:53:34 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:53:34 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:53:34 [INFO] Mode1: melody + drums → SL + headphones; SL → headphones
+2026-08-10 16:53:34 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 16:53:34 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 16:53:34 [INFO] Mode SynthOnly (Mode 1)
+2026-08-10 16:53:35 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:35 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 16:53:35 [INFO] mic: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 16:53:35 [INFO] Vocoder: InstrumentVocoder:in_l / InstrumentVocoder:in_r mod=InstrumentVocoder:sidechain/InstrumentVocoder:sidechain2 out=InstrumentVocoder:out_l/InstrumentVocoder:out_r
+2026-08-10 16:53:35 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 16:53:35 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 16:53:35 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:35 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:35 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:53:35 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → InstrumentVocoder:in_l
+2026-08-10 16:53:35 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → InstrumentVocoder:in_r
+2026-08-10 16:53:35 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain
+2026-08-10 16:53:35 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain2
+2026-08-10 16:53:35 [INFO] Mode2: mic modulator alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain + InstrumentVocoder:sidechain2
+2026-08-10 16:53:35 [INFO] pw-link: InstrumentVocoder:out_l → sooperlooper:common_in_1
+2026-08-10 16:53:35 [INFO] pw-link: InstrumentVocoder:out_r → sooperlooper:common_in_2
+2026-08-10 16:53:35 [INFO] pw-link: InstrumentVocoder:out_l → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:53:35 [INFO] pw-link: InstrumentVocoder:out_r → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:53:35 [INFO] Mode2: vocoder out → SL + headphones
+2026-08-10 16:53:35 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 16:53:35 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 16:53:35 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:53:35 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:53:35 [INFO] Mode2: zyn-drums → SL + headphones (not vocoded)
+2026-08-10 16:53:35 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:53:35 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:53:35 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 16:53:35 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 16:53:35 [INFO] Graph Mode2 complete
+2026-08-10 16:53:35 [INFO] Mode VocoderOnly (Mode 2)
+2026-08-10 16:53:35 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:37 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:39 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:41 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:43 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:45 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:47 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:49 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:51 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:53 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:55 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:57 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:53:59 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:01 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:03 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:05 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:07 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:09 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:11 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:13 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:15 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:17 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:19 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:21 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:23 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:25 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:27 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:29 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:31 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:33 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:35 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:37 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:39 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:39 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 16:54:39 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 16:54:39 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 16:54:39 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:39 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:39 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:54:39 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → sooperlooper:common_in_1
+2026-08-10 16:54:39 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → sooperlooper:common_in_2
+2026-08-10 16:54:39 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:54:39 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:54:39 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 16:54:39 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 16:54:39 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:54:39 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:54:39 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:54:39 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:54:39 [INFO] Mode1: melody + drums → SL + headphones; SL → headphones
+2026-08-10 16:54:39 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 16:54:39 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 16:54:39 [INFO] Mode SynthOnly (Mode 1)
+2026-08-10 16:54:39 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:41 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:43 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:44 [WARNING] PANIC — all notes off
+2026-08-10 16:54:45 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:46 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 16:54:46 [INFO] mic: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 16:54:46 [INFO] Vocoder: InstrumentVocoder:in_l / InstrumentVocoder:in_r mod=InstrumentVocoder:sidechain/InstrumentVocoder:sidechain2 out=InstrumentVocoder:out_l/InstrumentVocoder:out_r
+2026-08-10 16:54:46 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 16:54:46 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 16:54:46 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:46 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:46 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:54:46 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → InstrumentVocoder:in_l
+2026-08-10 16:54:46 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → InstrumentVocoder:in_r
+2026-08-10 16:54:46 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain
+2026-08-10 16:54:46 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain2
+2026-08-10 16:54:46 [INFO] Mode2: mic modulator alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain + InstrumentVocoder:sidechain2
+2026-08-10 16:54:46 [INFO] pw-link: InstrumentVocoder:out_l → sooperlooper:common_in_1
+2026-08-10 16:54:46 [INFO] pw-link: InstrumentVocoder:out_r → sooperlooper:common_in_2
+2026-08-10 16:54:46 [INFO] pw-link: InstrumentVocoder:out_l → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:54:46 [INFO] pw-link: InstrumentVocoder:out_r → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:54:46 [INFO] Mode2: vocoder out → SL + headphones
+2026-08-10 16:54:46 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 16:54:46 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 16:54:46 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:54:46 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:54:46 [INFO] Mode2: zyn-drums → SL + headphones (not vocoded)
+2026-08-10 16:54:46 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:54:46 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:54:46 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 16:54:46 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 16:54:46 [INFO] Graph Mode2 complete
+2026-08-10 16:54:46 [INFO] Mode VocoderOnly (Mode 2)
+2026-08-10 16:54:46 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:48 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:50 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:52 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:54 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:56 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:54:58 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:00 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:02 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:03 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:03 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 16:55:03 [INFO] mic: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 16:55:03 [INFO] Vocoder: InstrumentVocoder:in_l / InstrumentVocoder:in_r mod=InstrumentVocoder:sidechain/InstrumentVocoder:sidechain2 out=InstrumentVocoder:out_l/InstrumentVocoder:out_r
+2026-08-10 16:55:03 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 16:55:03 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 16:55:03 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:03 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:03 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:55:03 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → InstrumentVocoder:in_l
+2026-08-10 16:55:03 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → InstrumentVocoder:in_r
+2026-08-10 16:55:03 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain
+2026-08-10 16:55:03 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain2
+2026-08-10 16:55:03 [INFO] Mode2: mic modulator alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain + InstrumentVocoder:sidechain2
+2026-08-10 16:55:05 [WARNING] pw-link failed: InstrumentVocoder:out_l → sooperlooper:common_in_1 -- failed to link ports: Invalid argument
+2026-08-10 16:55:05 [WARNING] pw-link failed: InstrumentVocoder:out_r → sooperlooper:common_in_2 -- failed to link ports: No such file or directory
+2026-08-10 16:55:05 [INFO] pw-link: InstrumentVocoder:out_l → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:55:05 [INFO] pw-link: InstrumentVocoder:out_r → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:55:05 [INFO] Mode2: vocoder out → SL + headphones
+2026-08-10 16:55:05 [WARNING] pw-link failed: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1 -- failed to link ports: No such file or directory
+2026-08-10 16:55:05 [WARNING] pw-link failed: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2 -- failed to link ports: No such file or directory
+2026-08-10 16:55:05 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:55:05 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:55:05 [INFO] Mode2: zyn-drums → SL + headphones (not vocoded)
+2026-08-10 16:55:05 [WARNING] pw-link failed: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL -- failed to link ports: No such file or directory
+2026-08-10 16:55:05 [WARNING] pw-link failed: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR -- failed to link ports: No such file or directory
+2026-08-10 16:55:05 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 16:55:05 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 16:55:05 [INFO] Graph Mode2 complete
+2026-08-10 16:55:05 [WARNING] pw-link failed: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_1 -- failed to link ports: No such file or directory
+2026-08-10 16:55:05 [WARNING] pw-link failed: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_2 -- failed to link ports: No such file or directory
+2026-08-10 16:55:05 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:55:05 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:55:05 [INFO] Mode3: dry mic → SL + headphones (parallel to vocoder wet path)
+2026-08-10 16:55:05 [INFO] Mode SynthAndVocoder (Mode 3)
+2026-08-10 16:55:05 [WARNING] Health: SooperLooper dead -- relaunching
+2026-08-10 16:55:05 [INFO] Launched SooperLooper pid=32747 OSC :9951
+2026-08-10 16:55:06 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:06 [DEBUG] Health: ensureHealthyGraph mode=2 rebuild=yes
+2026-08-10 16:55:06 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:06 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 16:55:06 [INFO] mic: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 16:55:06 [INFO] Vocoder: InstrumentVocoder:in_l / InstrumentVocoder:in_r mod=InstrumentVocoder:sidechain/InstrumentVocoder:sidechain2 out=InstrumentVocoder:out_l/InstrumentVocoder:out_r
+2026-08-10 16:55:06 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 16:55:06 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 16:55:06 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:06 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:06 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:55:06 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → InstrumentVocoder:in_l
+2026-08-10 16:55:06 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → InstrumentVocoder:in_r
+2026-08-10 16:55:06 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain
+2026-08-10 16:55:06 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain2
+2026-08-10 16:55:06 [INFO] Mode2: mic modulator alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain + InstrumentVocoder:sidechain2
+2026-08-10 16:55:06 [INFO] pw-link: InstrumentVocoder:out_l → sooperlooper:common_in_1
+2026-08-10 16:55:06 [INFO] pw-link: InstrumentVocoder:out_r → sooperlooper:common_in_2
+2026-08-10 16:55:06 [INFO] pw-link: InstrumentVocoder:out_l → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:55:06 [INFO] pw-link: InstrumentVocoder:out_r → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:55:06 [INFO] Mode2: vocoder out → SL + headphones
+2026-08-10 16:55:06 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 16:55:06 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 16:55:06 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:55:06 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:55:06 [INFO] Mode2: zyn-drums → SL + headphones (not vocoded)
+2026-08-10 16:55:06 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:55:06 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:55:06 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 16:55:06 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 16:55:06 [INFO] Graph Mode2 complete
+2026-08-10 16:55:06 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:06 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_1
+2026-08-10 16:55:06 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_2
+2026-08-10 16:55:06 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:55:06 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:55:06 [INFO] Mode3: dry mic → SL + headphones (parallel to vocoder wet path)
+2026-08-10 16:55:06 [INFO] Mixer master=127 dry=100 (78%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 16:55:06 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 16:55:06 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.620001 (no matching sink; recorded only)
+2026-08-10 16:55:06 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 79%
+2026-08-10 16:55:07 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:09 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:11 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:13 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:15 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:17 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:19 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:21 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:23 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:25 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:27 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:29 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:31 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:33 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:35 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:37 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:39 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:41 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:43 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:45 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:47 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:49 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:51 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:53 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:55 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:57 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:55:59 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:01 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:03 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:05 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:07 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:09 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:11 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:13 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:15 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:17 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:19 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:21 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:22 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:23 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 16:56:23 [INFO] mic: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 16:56:23 [INFO] Vocoder: InstrumentVocoder:in_l / InstrumentVocoder:in_r mod=InstrumentVocoder:sidechain/InstrumentVocoder:sidechain2 out=InstrumentVocoder:out_l/InstrumentVocoder:out_r
+2026-08-10 16:56:23 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 16:56:23 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 16:56:23 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:23 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:23 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:56:23 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → InstrumentVocoder:in_l
+2026-08-10 16:56:23 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → InstrumentVocoder:in_r
+2026-08-10 16:56:23 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain
+2026-08-10 16:56:23 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain2
+2026-08-10 16:56:23 [INFO] Mode2: mic modulator alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain + InstrumentVocoder:sidechain2
+2026-08-10 16:56:24 [WARNING] pw-link failed: InstrumentVocoder:out_l → sooperlooper:common_in_1 -- failed to link ports: Invalid argument
+2026-08-10 16:56:24 [WARNING] pw-link failed: InstrumentVocoder:out_r → sooperlooper:common_in_2 -- failed to link ports: No such file or directory
+2026-08-10 16:56:24 [INFO] pw-link: InstrumentVocoder:out_l → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:56:24 [INFO] pw-link: InstrumentVocoder:out_r → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:56:24 [INFO] Mode2: vocoder out → SL + headphones
+2026-08-10 16:56:24 [WARNING] pw-link failed: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1 -- failed to link ports: No such file or directory
+2026-08-10 16:56:24 [WARNING] pw-link failed: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2 -- failed to link ports: No such file or directory
+2026-08-10 16:56:24 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:56:24 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:56:24 [INFO] Mode2: zyn-drums → SL + headphones (not vocoded)
+2026-08-10 16:56:24 [WARNING] pw-link failed: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL -- failed to link ports: No such file or directory
+2026-08-10 16:56:24 [WARNING] pw-link failed: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR -- failed to link ports: No such file or directory
+2026-08-10 16:56:24 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 16:56:24 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 16:56:24 [INFO] Graph Mode2 complete
+2026-08-10 16:56:24 [WARNING] pw-link failed: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_1 -- failed to link ports: No such file or directory
+2026-08-10 16:56:24 [WARNING] pw-link failed: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_2 -- failed to link ports: No such file or directory
+2026-08-10 16:56:24 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:56:24 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:56:24 [INFO] Mode3: dry mic → SL + headphones (parallel to vocoder wet path)
+2026-08-10 16:56:24 [INFO] Mode SynthAndVocoder (Mode 3)
+2026-08-10 16:56:24 [WARNING] Health: SooperLooper dead -- relaunching
+2026-08-10 16:56:24 [INFO] Launched SooperLooper pid=34990 OSC :9951
+2026-08-10 16:56:24 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:24 [DEBUG] Health: ensureHealthyGraph mode=2 rebuild=yes
+2026-08-10 16:56:24 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:24 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 16:56:24 [INFO] mic: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 16:56:24 [INFO] Vocoder: InstrumentVocoder:in_l / InstrumentVocoder:in_r mod=InstrumentVocoder:sidechain/InstrumentVocoder:sidechain2 out=InstrumentVocoder:out_l/InstrumentVocoder:out_r
+2026-08-10 16:56:24 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 16:56:24 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 16:56:24 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:24 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:24 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:56:24 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → InstrumentVocoder:in_l
+2026-08-10 16:56:24 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → InstrumentVocoder:in_r
+2026-08-10 16:56:24 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain
+2026-08-10 16:56:24 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain2
+2026-08-10 16:56:24 [INFO] Mode2: mic modulator alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain + InstrumentVocoder:sidechain2
+2026-08-10 16:56:24 [INFO] pw-link: InstrumentVocoder:out_l → sooperlooper:common_in_1
+2026-08-10 16:56:24 [INFO] pw-link: InstrumentVocoder:out_r → sooperlooper:common_in_2
+2026-08-10 16:56:24 [INFO] pw-link: InstrumentVocoder:out_l → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:56:24 [INFO] pw-link: InstrumentVocoder:out_r → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:56:24 [INFO] Mode2: vocoder out → SL + headphones
+2026-08-10 16:56:24 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 16:56:24 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 16:56:24 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:56:24 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:56:24 [INFO] Mode2: zyn-drums → SL + headphones (not vocoded)
+2026-08-10 16:56:24 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:56:24 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:56:24 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 16:56:24 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 16:56:24 [INFO] Graph Mode2 complete
+2026-08-10 16:56:24 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:25 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_1
+2026-08-10 16:56:25 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_2
+2026-08-10 16:56:25 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:56:25 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:56:25 [INFO] Mode3: dry mic → SL + headphones (parallel to vocoder wet path)
+2026-08-10 16:56:25 [INFO] Mixer master=127 dry=100 (78%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 16:56:25 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 16:56:25 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.620001 (no matching sink; recorded only)
+2026-08-10 16:56:25 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 79%
+2026-08-10 16:56:26 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:28 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:30 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:32 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:34 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:36 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:38 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:40 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:42 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:44 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:46 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:47 [INFO] Mixer master=127 dry=105 (82%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 16:56:47 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 16:56:47 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.651001 (no matching sink; recorded only)
+2026-08-10 16:56:48 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 83%
+2026-08-10 16:56:48 [INFO] Dry mix 82% (105/127)
+2026-08-10 16:56:48 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:50 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:50 [INFO] Mixer master=127 dry=110 (86%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 16:56:50 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 16:56:50 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.682001 (no matching sink; recorded only)
+2026-08-10 16:56:50 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 87%
+2026-08-10 16:56:50 [INFO] Dry mix 86% (110/127)
+2026-08-10 16:56:51 [INFO] Mixer master=127 dry=115 (90%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 16:56:51 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 16:56:51 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.713001 (no matching sink; recorded only)
+2026-08-10 16:56:51 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 91%
+2026-08-10 16:56:51 [INFO] Dry mix 90% (115/127)
+2026-08-10 16:56:52 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:52 [INFO] Mixer master=127 dry=110 (86%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 16:56:52 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 16:56:52 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.682001 (no matching sink; recorded only)
+2026-08-10 16:56:52 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 87%
+2026-08-10 16:56:52 [INFO] Dry mix 86% (110/127)
+2026-08-10 16:56:53 [INFO] Mixer master=127 dry=105 (82%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 16:56:53 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 16:56:53 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.651001 (no matching sink; recorded only)
+2026-08-10 16:56:53 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 83%
+2026-08-10 16:56:53 [INFO] Dry mix 82% (105/127)
+2026-08-10 16:56:53 [INFO] Mixer master=127 dry=100 (78%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 16:56:53 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 16:56:53 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.620001 (no matching sink; recorded only)
+2026-08-10 16:56:53 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 79%
+2026-08-10 16:56:53 [INFO] Dry mix 78% (100/127)
+2026-08-10 16:56:53 [INFO] Mixer master=127 dry=105 (82%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 16:56:53 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 16:56:53 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.651001 (no matching sink; recorded only)
+2026-08-10 16:56:53 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 83%
+2026-08-10 16:56:53 [INFO] Dry mix 82% (105/127)
+2026-08-10 16:56:53 [INFO] Mixer master=127 dry=110 (86%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 16:56:53 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 16:56:54 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.682001 (no matching sink; recorded only)
+2026-08-10 16:56:54 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 87%
+2026-08-10 16:56:54 [INFO] Dry mix 86% (110/127)
+2026-08-10 16:56:54 [INFO] Mixer master=127 dry=115 (90%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 16:56:54 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 16:56:54 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.713001 (no matching sink; recorded only)
+2026-08-10 16:56:54 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 91%
+2026-08-10 16:56:54 [INFO] Dry mix 90% (115/127)
+2026-08-10 16:56:54 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:56 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:56:58 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:00 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:02 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:03 [INFO] Building Mode4 (BreathOctave) — same routing as Mode1
+2026-08-10 16:57:03 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:03 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 16:57:03 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 16:57:03 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 16:57:03 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:03 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:03 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:57:04 [WARNING] pw-link failed: zynaddsubfx_zyn-melody:out_1 → sooperlooper:common_in_1 -- failed to link ports: Invalid argument
+2026-08-10 16:57:04 [WARNING] pw-link failed: zynaddsubfx_zyn-melody:out_2 → sooperlooper:common_in_2 -- failed to link ports: No such file or directory
+2026-08-10 16:57:04 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:57:04 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:57:04 [WARNING] pw-link failed: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1 -- failed to link ports: No such file or directory
+2026-08-10 16:57:04 [WARNING] pw-link failed: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2 -- failed to link ports: No such file or directory
+2026-08-10 16:57:04 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:57:04 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:57:04 [WARNING] pw-link failed: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL -- failed to link ports: No such file or directory
+2026-08-10 16:57:04 [WARNING] pw-link failed: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR -- failed to link ports: No such file or directory
+2026-08-10 16:57:04 [INFO] Mode1: melody + drums → SL + headphones; SL → headphones
+2026-08-10 16:57:04 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 16:57:04 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 16:57:04 [INFO] Mode BreathOctave (Mode 4) — breath=octave, synth vol via buttons
+2026-08-10 16:57:04 [WARNING] Health: SooperLooper dead -- relaunching
+2026-08-10 16:57:04 [INFO] Launched SooperLooper pid=36455 OSC :9951
+2026-08-10 16:57:05 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:05 [DEBUG] Health: ensureHealthyGraph mode=3 rebuild=yes
+2026-08-10 16:57:05 [INFO] Building Mode4 (BreathOctave) — same routing as Mode1
+2026-08-10 16:57:05 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:05 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 16:57:05 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 16:57:05 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 16:57:05 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:05 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:05 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:57:05 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → sooperlooper:common_in_1
+2026-08-10 16:57:05 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → sooperlooper:common_in_2
+2026-08-10 16:57:05 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:57:05 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:57:05 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 16:57:05 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 16:57:05 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:57:05 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:57:05 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:57:05 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:57:05 [INFO] Mode1: melody + drums → SL + headphones; SL → headphones
+2026-08-10 16:57:05 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 16:57:05 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 16:57:05 [INFO] Mixer master=127 dry=115 (90%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 16:57:05 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 16:57:05 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.713001 (no matching sink; recorded only)
+2026-08-10 16:57:05 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 91%
+2026-08-10 16:57:06 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:08 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:10 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:11 [INFO] Building Mode4 (BreathOctave) — same routing as Mode1
+2026-08-10 16:57:11 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:11 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 16:57:11 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 16:57:11 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 16:57:11 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:11 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:11 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:57:11 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → sooperlooper:common_in_1
+2026-08-10 16:57:11 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → sooperlooper:common_in_2
+2026-08-10 16:57:11 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:57:11 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:57:11 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 16:57:11 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 16:57:11 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:57:11 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:57:11 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:57:11 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:57:11 [INFO] Mode1: melody + drums → SL + headphones; SL → headphones
+2026-08-10 16:57:11 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 16:57:11 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 16:57:12 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:12 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_1
+2026-08-10 16:57:12 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_2
+2026-08-10 16:57:12 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:57:12 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:57:12 [INFO] Mode5: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → SL + headphones
+2026-08-10 16:57:12 [INFO] Mixer master=127 dry=115 (90%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 16:57:12 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 16:57:12 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.713001 (no matching sink; recorded only)
+2026-08-10 16:57:12 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 91%
+2026-08-10 16:57:12 [INFO] Mode BreathOctaveMic (Mode 5) — Mode 4 + dry mic
+2026-08-10 16:57:12 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:14 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:16 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:18 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:20 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:22 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:24 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:24 [INFO] MVX2U: mirrored pure-playback preset to /home/mjr/.config/shurectl/presets/NoMic.toml
+2026-08-10 16:57:24 [INFO] MVX2U: ensure Monitor Mix = pure Playback (NoMic preset). If the jack has mic bleed: shurectl --device /dev/hidraw1 and load NoMic.
+2026-08-10 16:57:24 [INFO] reloadMelodyInstrument: stopping melody Zyn to load config/talkbox.xmz
+2026-08-10 16:57:24 [INFO] Stopping zyn-melody (pid 28583)
+2026-08-10 16:57:25 [INFO] Launched MELODY Zyn pid=37348 client='zyn-melody' file=config/talkbox.xmz
+2026-08-10 16:57:25 [INFO] Melody Zyn ports visible
+2026-08-10 16:57:25 [INFO] reloadMelodyInstrument: melody running with config/talkbox.xmz
+2026-08-10 16:57:25 [INFO] Building Mode6 (Talkbox)
+2026-08-10 16:57:25 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:25 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 16:57:25 [INFO] MVX2U: mirrored pure-playback preset to /home/mjr/.config/shurectl/presets/NoMic.toml
+2026-08-10 16:57:25 [INFO] MVX2U: ensure Monitor Mix = pure Playback (NoMic preset). If the jack has mic bleed: shurectl --device /dev/hidraw1 and load NoMic.
+2026-08-10 16:57:25 [WARNING] resolveMvx2uPlaybackPorts: using hardcoded MVX2U port names
+2026-08-10 16:57:25 [INFO] MVX2U playback ports: alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FL / alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FR
+2026-08-10 16:57:25 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:25 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FL
+2026-08-10 16:57:25 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FR
+2026-08-10 16:57:25 [INFO] Mode6: melody → MVX2U
+2026-08-10 16:57:25 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_1
+2026-08-10 16:57:25 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_2
+2026-08-10 16:57:25 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:57:25 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:57:25 [INFO] Mode6: mic alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → SL + headphones
+2026-08-10 16:57:25 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 16:57:25 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 16:57:25 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:57:25 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:57:25 [INFO] Mode6: drums → SL + headphones
+2026-08-10 16:57:25 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:57:26 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:57:26 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 16:57:26 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 16:57:26 [INFO] Graph Mode6 (Talkbox) complete
+2026-08-10 16:57:26 [INFO] Mode Talkbox (Mode 6) — sawtooth → MVX2U, mic → SL + phones
+2026-08-10 16:57:26 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:28 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:30 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:32 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:34 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:36 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:38 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:40 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:42 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:44 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:46 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:48 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:50 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:52 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:54 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:56 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:57:58 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:58:00 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:58:02 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:58:04 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:58:06 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:58:08 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:58:10 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:58:12 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:58:14 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:58:16 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:58:18 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:58:20 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:58:22 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:58:24 [INFO] Performance loop exited.
+2026-08-10 16:58:24 [INFO] Stopping vocoder (pid 28675)
+2026-08-10 16:58:24 [INFO] Stopping sooperlooper (pid 36455)
+2026-08-10 16:58:24 [INFO] Stopping zyn-drums (pid 28621)
+2026-08-10 16:58:24 [INFO] Stopping zyn-melody (pid 37348)
+2026-08-10 16:58:24 [INFO] Shutting down engine
+2026-08-10 16:58:24 [INFO] MIDI engine shut down.
+2026-08-10 16:58:24 [INFO] VialController shut down.
+2026-08-10 16:58:24 [INFO] Engine shutdown complete
+2026-08-10 16:58:24 [INFO] VialController shut down.
+2026-08-10 16:58:24 [INFO] MIDI engine shut down.
+2026-08-10 16:58:24 [INFO] Logger shutting down
+2026-08-10 16:59:39 [INFO] ========== Logger started ==========
+2026-08-10 16:59:39 [INFO] Starting engine initialization
+2026-08-10 16:59:39 [INFO] Initializing MIDI engine...
+2026-08-10 16:59:39 [INFO] MIDI ports: 'MIDI Output' (melody) and 'MIDI Drums' (drums)
+2026-08-10 16:59:39 [INFO] Initializing KeyboardManager...
+2026-08-10 16:59:39 [INFO] Initializing VialController...
+2026-08-10 16:59:40 [INFO] VialController initialized with 4 devices.
+2026-08-10 16:59:40 [INFO] === Startup sequence beginning ===
+2026-08-10 16:59:40 [INFO] Searching for ID75 keyboards...
+2026-08-10 16:59:40 [INFO] Found keyboard at /dev/input/event10
+2026-08-10 16:59:40 [INFO] Found keyboard at /dev/input/event12
+2026-08-10 16:59:40 [INFO] Found keyboard at /dev/input/event14
+2026-08-10 16:59:40 [INFO] Found keyboard at /dev/input/event16
+2026-08-10 16:59:40 [INFO] Detected 4 keyboard(s).
+2026-08-10 16:59:40 [INFO] 4 Vial RGB device(s) after rescan.
+2026-08-10 16:59:40 [INFO] Correlating keyboards to their RGB (Vial) devices...
+2026-08-10 16:59:40 [INFO] Correlated /dev/input/event10 -> Vial RGB device index 0
+2026-08-10 16:59:40 [INFO] Correlated /dev/input/event12 -> Vial RGB device index 1
+2026-08-10 16:59:40 [INFO] Correlated /dev/input/event14 -> Vial RGB device index 2
+2026-08-10 16:59:40 [INFO] Correlated /dev/input/event16 -> Vial RGB device index 3
+2026-08-10 16:59:40 [INFO] All 4 keyboards detected and correlated.
+2026-08-10 16:59:40 [INFO] Correlating keyboards to their RGB (Vial) devices...
+2026-08-10 16:59:40 [INFO] Correlated /dev/input/event10 -> Vial RGB device index 0
+2026-08-10 16:59:40 [INFO] Correlated /dev/input/event12 -> Vial RGB device index 1
+2026-08-10 16:59:40 [INFO] Correlated /dev/input/event14 -> Vial RGB device index 2
+2026-08-10 16:59:40 [INFO] Correlated /dev/input/event16 -> Vial RGB device index 3
+2026-08-10 16:59:40 [INFO] Waiting for keyboard assignment: touch any key on Bottom Right, then Top Right, then Bottom Left, then Top Left.
+2026-08-10 16:59:42 [INFO] Assigned physical keyboard 3 -> Bottom Right
+2026-08-10 16:59:43 [INFO] Assigned physical keyboard 2 -> Top Right
+2026-08-10 16:59:44 [INFO] Assigned physical keyboard 1 -> Bottom Left
+2026-08-10 16:59:44 [INFO] Assigned physical keyboard 0 -> Top Left
+2026-08-10 16:59:44 [INFO] All keyboards assigned and programmed.
+2026-08-10 16:59:45 [INFO] Checking breath controller...
+2026-08-10 16:59:45 [INFO] Initializing breath controller...
+2026-08-10 16:59:45 [INFO]   ALSA seq port seen: "Timer"
+2026-08-10 16:59:45 [INFO]   ALSA seq port seen: "Announce"
+2026-08-10 16:59:45 [INFO]   ALSA seq port seen: "Midi Through Port-0"
+2026-08-10 16:59:45 [INFO]   ALSA seq port seen: "Breath Controller 5.2-18261F3A "
+2026-08-10 16:59:45 [INFO] Breath controller connected.
+2026-08-10 16:59:45 [INFO] Breath controller connected.
+2026-08-10 16:59:46 [INFO] Checking USB microphone interface (Shure MVX2U)...
+2026-08-10 16:59:46 [INFO] Microphone interface detected:  		node.description = "Shure MVX2U Mono"
+2026-08-10 16:59:46 [INFO] Running final health check...
+2026-08-10 16:59:46 [INFO] Final health check passed.
+2026-08-10 16:59:47 [INFO] === Startup sequence complete ===
+2026-08-10 16:59:47 [INFO] Loaded configuration from config/instrument.json
+2026-08-10 16:59:47 [INFO] Loaded layout 'bottom_right' from config/layouts/bottom_right.json
+2026-08-10 16:59:47 [INFO] Loaded layout 'top_right' from config/layouts/top_right.json
+2026-08-10 16:59:47 [INFO] Loaded layout 'bottom_left' from config/layouts/bottom_left.json
+2026-08-10 16:59:47 [INFO] Loaded layout 'top_left' from config/layouts/top_left.json
+2026-08-10 16:59:47 [INFO] Layouts loaded (disk + fallbacks).
+2026-08-10 16:59:47 [INFO] Layouts loaded from JSON.
+2026-08-10 16:59:47 [INFO] Launched MELODY Zyn pid=38989 client='zyn-melody' file=config/mkb.xmz
+2026-08-10 16:59:48 [INFO] Melody Zyn ports visible
+2026-08-10 16:59:48 [INFO] Launched DRUMS Zyn pid=39027 client='zyn-drums' file=config/drums.xmz
+2026-08-10 16:59:48 [INFO] Drums Zyn ports visible
+2026-08-10 16:59:48 [INFO] Launched SooperLooper pid=39065 OSC :9951
+2026-08-10 16:59:48 [INFO] Launched Calf Vocoder host pid=39081 node=InstrumentVocoder
+2026-08-10 16:59:49 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:59:49 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 16:59:49 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 16:59:49 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 16:59:49 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:59:49 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:59:49 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:59:49 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → sooperlooper:common_in_1
+2026-08-10 16:59:49 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → sooperlooper:common_in_2
+2026-08-10 16:59:49 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:59:49 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:59:49 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 16:59:49 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 16:59:49 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:59:49 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:59:49 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 16:59:49 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 16:59:49 [INFO] Mode1: melody + drums → SL + headphones; SL → headphones
+2026-08-10 16:59:49 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 16:59:49 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 16:59:49 [INFO] Audio graph: mode=SynthOnly melody=up drums=up sl=up voc=up mic=yes links=12
+2026-08-10 16:59:49 [INFO] Shure MVX2U mic detected ALSA hw:3,0 ports=1
+2026-08-10 16:59:49 [INFO]   capture: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 16:59:49 [INFO] Engine initialization complete
+2026-08-10 16:59:49 [INFO] Entering performance loop.
+2026-08-10 16:59:49 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:59:51 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:59:53 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:59:55 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:59:57 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 16:59:59 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:01 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:03 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:05 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:05 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:00:05 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 17:00:05 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 17:00:05 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:05 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:05 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:05 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → sooperlooper:common_in_1
+2026-08-10 17:00:05 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → sooperlooper:common_in_2
+2026-08-10 17:00:05 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:05 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:05 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 17:00:05 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 17:00:05 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:05 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:05 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:05 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:05 [INFO] Mode1: melody + drums → SL + headphones; SL → headphones
+2026-08-10 17:00:05 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:00:05 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:00:05 [INFO] Mode SynthOnly (Mode 1)
+2026-08-10 17:00:05 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:06 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:06 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:00:06 [INFO] mic: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 17:00:06 [INFO] Vocoder: InstrumentVocoder:in_l / InstrumentVocoder:in_r mod=InstrumentVocoder:sidechain/InstrumentVocoder:sidechain2 out=InstrumentVocoder:out_l/InstrumentVocoder:out_r
+2026-08-10 17:00:06 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 17:00:06 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 17:00:06 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:06 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:06 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:06 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → InstrumentVocoder:in_l
+2026-08-10 17:00:06 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → InstrumentVocoder:in_r
+2026-08-10 17:00:06 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain
+2026-08-10 17:00:06 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain2
+2026-08-10 17:00:06 [INFO] Mode2: mic modulator alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain + InstrumentVocoder:sidechain2
+2026-08-10 17:00:06 [INFO] pw-link: InstrumentVocoder:out_l → sooperlooper:common_in_1
+2026-08-10 17:00:06 [INFO] pw-link: InstrumentVocoder:out_r → sooperlooper:common_in_2
+2026-08-10 17:00:06 [INFO] pw-link: InstrumentVocoder:out_l → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:06 [INFO] pw-link: InstrumentVocoder:out_r → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:06 [INFO] Mode2: vocoder out → SL + headphones
+2026-08-10 17:00:06 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 17:00:06 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 17:00:06 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:06 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:06 [INFO] Mode2: zyn-drums → SL + headphones (not vocoded)
+2026-08-10 17:00:06 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:06 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:06 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:00:06 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:00:06 [INFO] Graph Mode2 complete
+2026-08-10 17:00:06 [INFO] Mode VocoderOnly (Mode 2)
+2026-08-10 17:00:07 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:08 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:09 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:00:09 [INFO] mic: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 17:00:09 [INFO] Vocoder: InstrumentVocoder:in_l / InstrumentVocoder:in_r mod=InstrumentVocoder:sidechain/InstrumentVocoder:sidechain2 out=InstrumentVocoder:out_l/InstrumentVocoder:out_r
+2026-08-10 17:00:09 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 17:00:09 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 17:00:09 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:09 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:09 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:09 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → InstrumentVocoder:in_l
+2026-08-10 17:00:09 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → InstrumentVocoder:in_r
+2026-08-10 17:00:09 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain
+2026-08-10 17:00:09 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain2
+2026-08-10 17:00:09 [INFO] Mode2: mic modulator alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain + InstrumentVocoder:sidechain2
+2026-08-10 17:00:09 [INFO] pw-link: InstrumentVocoder:out_l → sooperlooper:common_in_1
+2026-08-10 17:00:09 [INFO] pw-link: InstrumentVocoder:out_r → sooperlooper:common_in_2
+2026-08-10 17:00:09 [INFO] pw-link: InstrumentVocoder:out_l → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:09 [INFO] pw-link: InstrumentVocoder:out_r → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:09 [INFO] Mode2: vocoder out → SL + headphones
+2026-08-10 17:00:09 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 17:00:09 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 17:00:09 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:09 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:09 [INFO] Mode2: zyn-drums → SL + headphones (not vocoded)
+2026-08-10 17:00:09 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:09 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:09 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:00:09 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:00:09 [INFO] Graph Mode2 complete
+2026-08-10 17:00:09 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:09 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_1
+2026-08-10 17:00:09 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_2
+2026-08-10 17:00:09 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:09 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:09 [INFO] Mode3: dry mic → SL + headphones (parallel to vocoder wet path)
+2026-08-10 17:00:09 [INFO] Mode SynthAndVocoder (Mode 3)
+2026-08-10 17:00:09 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:11 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:13 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:14 [INFO] Building Mode4 (BreathOctave) — same routing as Mode1
+2026-08-10 17:00:14 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:14 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:00:14 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 17:00:14 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 17:00:14 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:14 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:14 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:15 [WARNING] pw-link failed: zynaddsubfx_zyn-melody:out_1 → sooperlooper:common_in_1 -- failed to link ports: Invalid argument
+2026-08-10 17:00:15 [WARNING] pw-link failed: zynaddsubfx_zyn-melody:out_2 → sooperlooper:common_in_2 -- failed to link ports: No such file or directory
+2026-08-10 17:00:15 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:15 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:15 [WARNING] pw-link failed: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1 -- failed to link ports: No such file or directory
+2026-08-10 17:00:15 [WARNING] pw-link failed: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2 -- failed to link ports: No such file or directory
+2026-08-10 17:00:15 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:15 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:15 [WARNING] pw-link failed: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL -- failed to link ports: No such file or directory
+2026-08-10 17:00:15 [WARNING] pw-link failed: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR -- failed to link ports: No such file or directory
+2026-08-10 17:00:15 [INFO] Mode1: melody + drums → SL + headphones; SL → headphones
+2026-08-10 17:00:15 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:00:15 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:00:15 [INFO] Mode BreathOctave (Mode 4) — breath=octave, synth vol via buttons
+2026-08-10 17:00:15 [WARNING] Health: SooperLooper dead -- relaunching
+2026-08-10 17:00:15 [INFO] Launched SooperLooper pid=40737 OSC :9951
+2026-08-10 17:00:15 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:15 [DEBUG] Health: ensureHealthyGraph mode=3 rebuild=yes
+2026-08-10 17:00:15 [INFO] Building Mode4 (BreathOctave) — same routing as Mode1
+2026-08-10 17:00:15 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:16 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:00:16 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 17:00:16 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 17:00:16 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:16 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:16 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:16 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → sooperlooper:common_in_1
+2026-08-10 17:00:16 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → sooperlooper:common_in_2
+2026-08-10 17:00:16 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:16 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:16 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 17:00:16 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 17:00:16 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:16 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:16 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:16 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:16 [INFO] Mode1: melody + drums → SL + headphones; SL → headphones
+2026-08-10 17:00:16 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:00:16 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:00:16 [INFO] Mixer master=127 dry=100 (78%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 17:00:16 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 17:00:16 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.620001 (no matching sink; recorded only)
+2026-08-10 17:00:16 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 79%
+2026-08-10 17:00:17 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:19 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:20 [INFO] Building Mode4 (BreathOctave) — same routing as Mode1
+2026-08-10 17:00:20 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:20 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:00:20 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 17:00:20 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 17:00:20 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:20 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:20 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:20 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → sooperlooper:common_in_1
+2026-08-10 17:00:20 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → sooperlooper:common_in_2
+2026-08-10 17:00:20 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:20 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:20 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 17:00:20 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 17:00:20 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:20 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:20 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:20 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:20 [INFO] Mode1: melody + drums → SL + headphones; SL → headphones
+2026-08-10 17:00:21 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:00:21 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:00:21 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:21 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_1
+2026-08-10 17:00:21 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_2
+2026-08-10 17:00:21 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:21 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:21 [INFO] Mode5: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → SL + headphones
+2026-08-10 17:00:21 [INFO] Mixer master=127 dry=100 (78%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 17:00:21 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 17:00:21 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.620001 (no matching sink; recorded only)
+2026-08-10 17:00:21 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 79%
+2026-08-10 17:00:21 [INFO] Mode BreathOctaveMic (Mode 5) — Mode 4 + dry mic
+2026-08-10 17:00:21 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:23 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:25 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:27 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:29 [INFO] MVX2U: mirrored pure-playback preset to /home/mjr/.config/shurectl/presets/NoMic.toml
+2026-08-10 17:00:29 [INFO] MVX2U: ensure Monitor Mix = pure Playback (NoMic preset). If the jack has mic bleed: shurectl --device /dev/hidraw1 and load NoMic.
+2026-08-10 17:00:29 [INFO] reloadMelodyInstrument: stopping melody Zyn to load config/talkbox.xmz
+2026-08-10 17:00:29 [INFO] Stopping zyn-melody (pid 38989)
+2026-08-10 17:00:29 [INFO] Launched MELODY Zyn pid=41460 client='zyn-melody' file=config/talkbox.xmz
+2026-08-10 17:00:29 [INFO] Melody Zyn ports visible
+2026-08-10 17:00:29 [INFO] reloadMelodyInstrument: melody running with config/talkbox.xmz
+2026-08-10 17:00:29 [INFO] Building Mode6 (Talkbox)
+2026-08-10 17:00:30 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:30 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:00:30 [INFO] MVX2U: mirrored pure-playback preset to /home/mjr/.config/shurectl/presets/NoMic.toml
+2026-08-10 17:00:30 [INFO] MVX2U: ensure Monitor Mix = pure Playback (NoMic preset). If the jack has mic bleed: shurectl --device /dev/hidraw1 and load NoMic.
+2026-08-10 17:00:30 [WARNING] resolveMvx2uPlaybackPorts: using hardcoded MVX2U port names
+2026-08-10 17:00:30 [INFO] MVX2U playback ports: alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FL / alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FR
+2026-08-10 17:00:30 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:30 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FL
+2026-08-10 17:00:30 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FR
+2026-08-10 17:00:30 [INFO] Mode6: melody → MVX2U
+2026-08-10 17:00:30 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_1
+2026-08-10 17:00:30 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_2
+2026-08-10 17:00:30 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:30 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:30 [INFO] Mode6: mic alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → SL + headphones
+2026-08-10 17:00:30 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 17:00:30 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 17:00:30 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:30 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:30 [INFO] Mode6: drums → SL + headphones
+2026-08-10 17:00:30 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:00:30 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:00:30 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:00:30 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:00:30 [INFO] Graph Mode6 (Talkbox) complete
+2026-08-10 17:00:30 [INFO] Mode Talkbox (Mode 6) — sawtooth → MVX2U, mic → SL + phones
+2026-08-10 17:00:30 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:32 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:34 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:36 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:38 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:40 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:42 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:44 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:46 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:00:46 [INFO] Performance loop exited.
+2026-08-10 17:00:46 [INFO] Stopping vocoder (pid 39081)
+2026-08-10 17:00:46 [INFO] Stopping sooperlooper (pid 40737)
+2026-08-10 17:00:46 [INFO] Stopping zyn-drums (pid 39027)
+2026-08-10 17:00:46 [INFO] Stopping zyn-melody (pid 41460)
+2026-08-10 17:00:46 [INFO] Shutting down engine
+2026-08-10 17:00:46 [INFO] MIDI engine shut down.
+2026-08-10 17:00:46 [INFO] VialController shut down.
+2026-08-10 17:00:46 [INFO] Engine shutdown complete
+2026-08-10 17:00:46 [INFO] VialController shut down.
+2026-08-10 17:00:46 [INFO] MIDI engine shut down.
+2026-08-10 17:00:46 [INFO] Logger shutting down
+2026-08-10 17:12:17 [INFO] ========== Logger started ==========
+2026-08-10 17:12:17 [INFO] Starting engine initialization
+2026-08-10 17:12:17 [INFO] Initializing MIDI engine...
+2026-08-10 17:12:17 [INFO] MIDI ports: 'MIDI Output' (melody) and 'MIDI Drums' (drums)
+2026-08-10 17:12:17 [INFO] Initializing KeyboardManager...
+2026-08-10 17:12:17 [INFO] Initializing VialController...
+2026-08-10 17:12:18 [INFO] VialController initialized with 4 devices.
+2026-08-10 17:12:18 [INFO] === Startup sequence beginning ===
+2026-08-10 17:12:18 [INFO] Searching for ID75 keyboards...
+2026-08-10 17:12:18 [INFO] Found keyboard at /dev/input/event10
+2026-08-10 17:12:18 [INFO] Found keyboard at /dev/input/event12
+2026-08-10 17:12:18 [INFO] Found keyboard at /dev/input/event14
+2026-08-10 17:12:18 [INFO] Found keyboard at /dev/input/event16
+2026-08-10 17:12:18 [INFO] Detected 4 keyboard(s).
+2026-08-10 17:12:18 [INFO] 4 Vial RGB device(s) after rescan.
+2026-08-10 17:12:18 [INFO] Correlating keyboards to their RGB (Vial) devices...
+2026-08-10 17:12:18 [INFO] Correlated /dev/input/event10 -> Vial RGB device index 0
+2026-08-10 17:12:18 [INFO] Correlated /dev/input/event12 -> Vial RGB device index 1
+2026-08-10 17:12:18 [INFO] Correlated /dev/input/event14 -> Vial RGB device index 2
+2026-08-10 17:12:18 [INFO] Correlated /dev/input/event16 -> Vial RGB device index 3
+2026-08-10 17:12:18 [INFO] All 4 keyboards detected and correlated.
+2026-08-10 17:12:18 [INFO] Correlating keyboards to their RGB (Vial) devices...
+2026-08-10 17:12:18 [INFO] Correlated /dev/input/event10 -> Vial RGB device index 0
+2026-08-10 17:12:18 [INFO] Correlated /dev/input/event12 -> Vial RGB device index 1
+2026-08-10 17:12:18 [INFO] Correlated /dev/input/event14 -> Vial RGB device index 2
+2026-08-10 17:12:18 [INFO] Correlated /dev/input/event16 -> Vial RGB device index 3
+2026-08-10 17:12:18 [INFO] Waiting for keyboard assignment: touch any key on Bottom Right, then Top Right, then Bottom Left, then Top Left.
+2026-08-10 17:12:20 [INFO] Assigned physical keyboard 3 -> Bottom Right
+2026-08-10 17:12:20 [INFO] Assigned physical keyboard 2 -> Top Right
+2026-08-10 17:12:21 [INFO] Assigned physical keyboard 1 -> Bottom Left
+2026-08-10 17:12:22 [INFO] Assigned physical keyboard 0 -> Top Left
+2026-08-10 17:12:22 [INFO] All keyboards assigned and programmed.
+2026-08-10 17:12:23 [INFO] Checking breath controller...
+2026-08-10 17:12:23 [INFO] Initializing breath controller...
+2026-08-10 17:12:23 [INFO]   ALSA seq port seen: "Timer"
+2026-08-10 17:12:23 [INFO]   ALSA seq port seen: "Announce"
+2026-08-10 17:12:23 [INFO]   ALSA seq port seen: "Midi Through Port-0"
+2026-08-10 17:12:23 [INFO]   ALSA seq port seen: "Breath Controller 5.2-18261F3A "
+2026-08-10 17:12:23 [INFO] Breath controller connected.
+2026-08-10 17:12:23 [INFO] Breath controller connected.
+2026-08-10 17:12:24 [INFO] Checking USB microphone interface (Shure MVX2U)...
+2026-08-10 17:12:24 [INFO] Microphone interface detected:  		node.description = "Shure MVX2U Mono"
+2026-08-10 17:12:24 [INFO] Running final health check...
+2026-08-10 17:12:24 [INFO] Final health check passed.
+2026-08-10 17:12:25 [INFO] === Startup sequence complete ===
+2026-08-10 17:12:25 [INFO] Loaded configuration from config/instrument.json
+2026-08-10 17:12:25 [INFO] Loaded layout 'bottom_right' from config/layouts/bottom_right.json
+2026-08-10 17:12:25 [INFO] Loaded layout 'top_right' from config/layouts/top_right.json
+2026-08-10 17:12:25 [INFO] Loaded layout 'bottom_left' from config/layouts/bottom_left.json
+2026-08-10 17:12:25 [INFO] Loaded layout 'top_left' from config/layouts/top_left.json
+2026-08-10 17:12:25 [INFO] Layouts loaded (disk + fallbacks).
+2026-08-10 17:12:25 [INFO] Layouts loaded from JSON.
+2026-08-10 17:12:25 [INFO] Launched MELODY Zyn pid=43346 client='zyn-melody' file=config/mkb.xmz
+2026-08-10 17:12:26 [INFO] Melody Zyn ports visible
+2026-08-10 17:12:26 [INFO] Launched DRUMS Zyn pid=43385 client='zyn-drums' file=config/drums.xmz
+2026-08-10 17:12:26 [INFO] Drums Zyn ports visible
+2026-08-10 17:12:26 [INFO] Launched SooperLooper pid=43423 OSC :9951
+2026-08-10 17:12:26 [INFO] Launched Calf Vocoder host pid=43439 node=InstrumentVocoder
+2026-08-10 17:12:27 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:27 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:12:27 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 17:12:27 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 17:12:27 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:27 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:27 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:12:27 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → sooperlooper:common_in_1
+2026-08-10 17:12:27 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → sooperlooper:common_in_2
+2026-08-10 17:12:27 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:12:27 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:12:27 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 17:12:27 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 17:12:27 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:12:27 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:12:27 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:12:27 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:12:27 [INFO] Mode1: melody + drums → SL + headphones; SL → headphones
+2026-08-10 17:12:27 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:12:27 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:12:27 [INFO] Audio graph: mode=SynthOnly melody=up drums=up sl=up voc=up mic=yes links=12
+2026-08-10 17:12:27 [INFO] Shure MVX2U mic detected ALSA hw:3,0 ports=1
+2026-08-10 17:12:27 [INFO]   capture: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 17:12:27 [INFO] Engine initialization complete
+2026-08-10 17:12:27 [INFO] Entering performance loop.
+2026-08-10 17:12:27 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:29 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:31 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:33 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:33 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:12:33 [INFO] mic: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 17:12:33 [INFO] Vocoder: InstrumentVocoder:in_l / InstrumentVocoder:in_r mod=InstrumentVocoder:sidechain/InstrumentVocoder:sidechain2 out=InstrumentVocoder:out_l/InstrumentVocoder:out_r
+2026-08-10 17:12:33 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 17:12:33 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 17:12:33 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:33 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:33 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:12:33 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → InstrumentVocoder:in_l
+2026-08-10 17:12:33 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → InstrumentVocoder:in_r
+2026-08-10 17:12:33 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain
+2026-08-10 17:12:33 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain2
+2026-08-10 17:12:33 [INFO] Mode2: mic modulator alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain + InstrumentVocoder:sidechain2
+2026-08-10 17:12:33 [INFO] pw-link: InstrumentVocoder:out_l → sooperlooper:common_in_1
+2026-08-10 17:12:33 [INFO] pw-link: InstrumentVocoder:out_r → sooperlooper:common_in_2
+2026-08-10 17:12:33 [INFO] pw-link: InstrumentVocoder:out_l → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:12:33 [INFO] pw-link: InstrumentVocoder:out_r → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:12:33 [INFO] Mode2: vocoder out → SL + headphones
+2026-08-10 17:12:33 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 17:12:33 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 17:12:33 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:12:33 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:12:33 [INFO] Mode2: zyn-drums → SL + headphones (not vocoded)
+2026-08-10 17:12:33 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:12:33 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:12:33 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:12:33 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:12:33 [INFO] Graph Mode2 complete
+2026-08-10 17:12:33 [INFO] Mode VocoderOnly (Mode 2)
+2026-08-10 17:12:33 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:35 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:37 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:39 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:41 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:43 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:45 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:47 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:12:48 [INFO] Performance loop exited.
+2026-08-10 17:12:48 [INFO] Stopping vocoder (pid 43439)
+2026-08-10 17:12:48 [INFO] Stopping sooperlooper (pid 43423)
+2026-08-10 17:12:48 [INFO] Stopping zyn-drums (pid 43385)
+2026-08-10 17:12:48 [INFO] Stopping zyn-melody (pid 43346)
+2026-08-10 17:12:48 [INFO] Shutting down engine
+2026-08-10 17:12:48 [INFO] MIDI engine shut down.
+2026-08-10 17:12:48 [INFO] VialController shut down.
+2026-08-10 17:12:48 [INFO] Engine shutdown complete
+2026-08-10 17:12:48 [INFO] VialController shut down.
+2026-08-10 17:12:48 [INFO] MIDI engine shut down.
+2026-08-10 17:12:48 [INFO] Logger shutting down
+2026-08-10 17:16:46 [INFO] ========== Logger started ==========
+2026-08-10 17:16:46 [INFO] Starting engine initialization
+2026-08-10 17:16:46 [INFO] Initializing MIDI engine...
+2026-08-10 17:16:46 [INFO] MIDI ports: 'MIDI Output' (melody) and 'MIDI Drums' (drums)
+2026-08-10 17:16:46 [INFO] Initializing KeyboardManager...
+2026-08-10 17:16:46 [INFO] Initializing VialController...
+2026-08-10 17:16:46 [INFO] VialController initialized with 4 devices.
+2026-08-10 17:16:46 [INFO] === Startup sequence beginning ===
+2026-08-10 17:16:46 [INFO] Searching for ID75 keyboards...
+2026-08-10 17:16:46 [INFO] Found keyboard at /dev/input/event10
+2026-08-10 17:16:46 [INFO] Found keyboard at /dev/input/event12
+2026-08-10 17:16:46 [INFO] Found keyboard at /dev/input/event14
+2026-08-10 17:16:46 [INFO] Found keyboard at /dev/input/event16
+2026-08-10 17:16:46 [INFO] Detected 4 keyboard(s).
+2026-08-10 17:16:46 [INFO] 4 Vial RGB device(s) after rescan.
+2026-08-10 17:16:46 [INFO] Correlating keyboards to their RGB (Vial) devices...
+2026-08-10 17:16:46 [INFO] Correlated /dev/input/event10 -> Vial RGB device index 0
+2026-08-10 17:16:46 [INFO] Correlated /dev/input/event12 -> Vial RGB device index 1
+2026-08-10 17:16:46 [INFO] Correlated /dev/input/event14 -> Vial RGB device index 2
+2026-08-10 17:16:46 [INFO] Correlated /dev/input/event16 -> Vial RGB device index 3
+2026-08-10 17:16:46 [INFO] All 4 keyboards detected and correlated.
+2026-08-10 17:16:46 [INFO] Correlating keyboards to their RGB (Vial) devices...
+2026-08-10 17:16:46 [INFO] Correlated /dev/input/event10 -> Vial RGB device index 0
+2026-08-10 17:16:46 [INFO] Correlated /dev/input/event12 -> Vial RGB device index 1
+2026-08-10 17:16:46 [INFO] Correlated /dev/input/event14 -> Vial RGB device index 2
+2026-08-10 17:16:46 [INFO] Correlated /dev/input/event16 -> Vial RGB device index 3
+2026-08-10 17:16:46 [INFO] Waiting for keyboard assignment: touch any key on Bottom Right, then Top Right, then Bottom Left, then Top Left.
+2026-08-10 17:16:49 [INFO] Assigned physical keyboard 3 -> Bottom Right
+2026-08-10 17:16:49 [INFO] Assigned physical keyboard 2 -> Top Right
+2026-08-10 17:16:50 [INFO] Assigned physical keyboard 1 -> Bottom Left
+2026-08-10 17:16:50 [INFO] Assigned physical keyboard 0 -> Top Left
+2026-08-10 17:16:51 [INFO] All keyboards assigned and programmed.
+2026-08-10 17:16:52 [INFO] Checking breath controller...
+2026-08-10 17:16:52 [INFO] Initializing breath controller...
+2026-08-10 17:16:52 [INFO]   ALSA seq port seen: "Timer"
+2026-08-10 17:16:52 [INFO]   ALSA seq port seen: "Announce"
+2026-08-10 17:16:52 [INFO]   ALSA seq port seen: "Midi Through Port-0"
+2026-08-10 17:16:52 [INFO]   ALSA seq port seen: "Breath Controller 5.2-18261F3A "
+2026-08-10 17:16:52 [INFO] Breath controller connected.
+2026-08-10 17:16:52 [INFO] Breath controller connected.
+2026-08-10 17:16:53 [INFO] Checking USB microphone interface (Shure MVX2U)...
+2026-08-10 17:16:53 [INFO] Microphone interface detected:  		node.description = "Shure MVX2U Mono"
+2026-08-10 17:16:53 [INFO] Running final health check...
+2026-08-10 17:16:53 [INFO] Final health check passed.
+2026-08-10 17:16:54 [INFO] === Startup sequence complete ===
+2026-08-10 17:16:54 [INFO] Loaded configuration from config/instrument.json
+2026-08-10 17:16:54 [INFO] Loaded layout 'bottom_right' from config/layouts/bottom_right.json
+2026-08-10 17:16:54 [INFO] Loaded layout 'top_right' from config/layouts/top_right.json
+2026-08-10 17:16:54 [INFO] Loaded layout 'bottom_left' from config/layouts/bottom_left.json
+2026-08-10 17:16:54 [INFO] Loaded layout 'top_left' from config/layouts/top_left.json
+2026-08-10 17:16:54 [INFO] Layouts loaded (disk + fallbacks).
+2026-08-10 17:16:54 [INFO] Layouts loaded from JSON.
+2026-08-10 17:16:54 [INFO] Launched MELODY Zyn pid=45054 client='zyn-melody' file=config/mkb.xmz
+2026-08-10 17:16:54 [INFO] Melody Zyn ports visible
+2026-08-10 17:16:54 [INFO] Launched DRUMS Zyn pid=45092 client='zyn-drums' file=config/drums.xmz
+2026-08-10 17:16:54 [INFO] Drums Zyn ports visible
+2026-08-10 17:16:54 [INFO] Launched SooperLooper pid=45130 OSC :9951
+2026-08-10 17:16:55 [INFO] Launched Calf Vocoder host pid=45145 node=InstrumentVocoder
+2026-08-10 17:16:55 [INFO] MVX2U: mic capture forced live (ALSA Microphone 80% + PW unmute)
+2026-08-10 17:16:55 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:16:55 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:16:55 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 17:16:55 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 17:16:55 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:16:55 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:16:55 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:16:55 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → sooperlooper:common_in_1
+2026-08-10 17:16:55 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → sooperlooper:common_in_2
+2026-08-10 17:16:56 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:16:56 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:16:56 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 17:16:56 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 17:16:56 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:16:56 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:16:56 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:16:56 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:16:56 [INFO] Mode1: melody + drums → SL + headphones; SL → headphones
+2026-08-10 17:16:56 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:16:56 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:16:56 [INFO] Audio graph: mode=SynthOnly melody=up drums=up sl=up voc=up mic=yes links=12
+2026-08-10 17:16:56 [INFO] Shure MVX2U mic detected ALSA hw:3,0 ports=1
+2026-08-10 17:16:56 [INFO]   capture: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 17:16:56 [INFO] Engine initialization complete
+2026-08-10 17:16:56 [INFO] Entering performance loop.
+2026-08-10 17:16:56 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:16:58 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:16:59 [INFO] MVX2U: mic capture forced live (ALSA Microphone 80% + PW unmute)
+2026-08-10 17:16:59 [INFO] MVX2U: mic capture forced live (ALSA Microphone 80% + PW unmute)
+2026-08-10 17:16:59 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:16:59 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:16:59 [INFO] mic: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 17:16:59 [INFO] Vocoder: InstrumentVocoder:in_l / InstrumentVocoder:in_r mod=InstrumentVocoder:sidechain/InstrumentVocoder:sidechain2 out=InstrumentVocoder:out_l/InstrumentVocoder:out_r
+2026-08-10 17:17:00 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 17:17:00 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 17:17:00 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:00 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:00 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:17:00 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → InstrumentVocoder:in_l
+2026-08-10 17:17:00 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → InstrumentVocoder:in_r
+2026-08-10 17:17:00 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain
+2026-08-10 17:17:00 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain2
+2026-08-10 17:17:00 [INFO] Mode2: mic modulator alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain + InstrumentVocoder:sidechain2
+2026-08-10 17:17:00 [INFO] pw-link: InstrumentVocoder:out_l → sooperlooper:common_in_1
+2026-08-10 17:17:00 [INFO] pw-link: InstrumentVocoder:out_r → sooperlooper:common_in_2
+2026-08-10 17:17:00 [INFO] pw-link: InstrumentVocoder:out_l → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:17:00 [INFO] pw-link: InstrumentVocoder:out_r → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:17:00 [INFO] Mode2: vocoder out → SL + headphones
+2026-08-10 17:17:00 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 17:17:00 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 17:17:00 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:17:00 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:17:00 [INFO] Mode2: zyn-drums → SL + headphones (not vocoded)
+2026-08-10 17:17:00 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:17:00 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:17:00 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:17:00 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:17:00 [INFO] Graph Mode2 complete
+2026-08-10 17:17:00 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:00 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_1
+2026-08-10 17:17:00 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_2
+2026-08-10 17:17:00 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:17:00 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:17:00 [INFO] Mode3: dry mic → SL + headphones (parallel to vocoder wet path)
+2026-08-10 17:17:00 [INFO] Mode SynthAndVocoder (Mode 3)
+2026-08-10 17:17:00 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:02 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:02 [INFO] MVX2U: mic capture forced live (ALSA Microphone 80% + PW unmute)
+2026-08-10 17:17:02 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:02 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:17:02 [INFO] mic: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 17:17:02 [INFO] Vocoder: InstrumentVocoder:in_l / InstrumentVocoder:in_r mod=InstrumentVocoder:sidechain/InstrumentVocoder:sidechain2 out=InstrumentVocoder:out_l/InstrumentVocoder:out_r
+2026-08-10 17:17:02 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 17:17:02 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 17:17:02 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:02 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:02 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:17:02 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → InstrumentVocoder:in_l
+2026-08-10 17:17:02 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → InstrumentVocoder:in_r
+2026-08-10 17:17:02 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain
+2026-08-10 17:17:02 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain2
+2026-08-10 17:17:02 [INFO] Mode2: mic modulator alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain + InstrumentVocoder:sidechain2
+2026-08-10 17:17:02 [INFO] pw-link: InstrumentVocoder:out_l → sooperlooper:common_in_1
+2026-08-10 17:17:02 [INFO] pw-link: InstrumentVocoder:out_r → sooperlooper:common_in_2
+2026-08-10 17:17:02 [INFO] pw-link: InstrumentVocoder:out_l → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:17:02 [INFO] pw-link: InstrumentVocoder:out_r → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:17:02 [INFO] Mode2: vocoder out → SL + headphones
+2026-08-10 17:17:02 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 17:17:02 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 17:17:02 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:17:02 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:17:02 [INFO] Mode2: zyn-drums → SL + headphones (not vocoded)
+2026-08-10 17:17:02 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:17:02 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:17:02 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:17:02 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:17:02 [INFO] Graph Mode2 complete
+2026-08-10 17:17:02 [INFO] Mode VocoderOnly (Mode 2)
+2026-08-10 17:17:04 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:06 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:08 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:10 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:12 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:14 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:16 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:18 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:20 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:22 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:24 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:26 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:28 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:30 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:32 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:34 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:36 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:38 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:40 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:42 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:44 [INFO] MVX2U: mic capture forced live (ALSA Microphone 80% + PW unmute)
+2026-08-10 17:17:44 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:44 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:17:44 [INFO] mic: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 17:17:44 [INFO] Vocoder: InstrumentVocoder:in_l / InstrumentVocoder:in_r mod=InstrumentVocoder:sidechain/InstrumentVocoder:sidechain2 out=InstrumentVocoder:out_l/InstrumentVocoder:out_r
+2026-08-10 17:17:44 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 17:17:44 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 17:17:44 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:44 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:44 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:17:44 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → InstrumentVocoder:in_l
+2026-08-10 17:17:44 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → InstrumentVocoder:in_r
+2026-08-10 17:17:44 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain
+2026-08-10 17:17:44 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain2
+2026-08-10 17:17:44 [INFO] Mode2: mic modulator alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain + InstrumentVocoder:sidechain2
+2026-08-10 17:17:45 [WARNING] pw-link failed: InstrumentVocoder:out_l → sooperlooper:common_in_1 -- failed to link ports: Invalid argument
+2026-08-10 17:17:45 [WARNING] pw-link failed: InstrumentVocoder:out_r → sooperlooper:common_in_2 -- failed to link ports: No such file or directory
+2026-08-10 17:17:45 [INFO] pw-link: InstrumentVocoder:out_l → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:17:45 [INFO] pw-link: InstrumentVocoder:out_r → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:17:45 [INFO] Mode2: vocoder out → SL + headphones
+2026-08-10 17:17:45 [WARNING] pw-link failed: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1 -- failed to link ports: No such file or directory
+2026-08-10 17:17:45 [WARNING] pw-link failed: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2 -- failed to link ports: No such file or directory
+2026-08-10 17:17:45 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:17:45 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:17:45 [INFO] Mode2: zyn-drums → SL + headphones (not vocoded)
+2026-08-10 17:17:45 [WARNING] pw-link failed: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL -- failed to link ports: No such file or directory
+2026-08-10 17:17:45 [WARNING] pw-link failed: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR -- failed to link ports: No such file or directory
+2026-08-10 17:17:45 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:17:45 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:17:45 [INFO] Graph Mode2 complete
+2026-08-10 17:17:45 [INFO] Mode VocoderOnly (Mode 2)
+2026-08-10 17:17:45 [WARNING] Health: SooperLooper dead -- relaunching
+2026-08-10 17:17:45 [INFO] Launched SooperLooper pid=47245 OSC :9951
+2026-08-10 17:17:45 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:45 [DEBUG] Health: ensureHealthyGraph mode=1 rebuild=yes
+2026-08-10 17:17:45 [INFO] MVX2U: mic capture forced live (ALSA Microphone 80% + PW unmute)
+2026-08-10 17:17:45 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:46 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:17:46 [INFO] mic: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 17:17:46 [INFO] Vocoder: InstrumentVocoder:in_l / InstrumentVocoder:in_r mod=InstrumentVocoder:sidechain/InstrumentVocoder:sidechain2 out=InstrumentVocoder:out_l/InstrumentVocoder:out_r
+2026-08-10 17:17:46 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 17:17:46 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 17:17:46 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:46 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:46 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:17:46 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → InstrumentVocoder:in_l
+2026-08-10 17:17:46 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → InstrumentVocoder:in_r
+2026-08-10 17:17:46 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain
+2026-08-10 17:17:46 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain2
+2026-08-10 17:17:46 [INFO] Mode2: mic modulator alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain + InstrumentVocoder:sidechain2
+2026-08-10 17:17:46 [INFO] pw-link: InstrumentVocoder:out_l → sooperlooper:common_in_1
+2026-08-10 17:17:46 [INFO] pw-link: InstrumentVocoder:out_r → sooperlooper:common_in_2
+2026-08-10 17:17:46 [INFO] pw-link: InstrumentVocoder:out_l → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:17:46 [INFO] pw-link: InstrumentVocoder:out_r → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:17:46 [INFO] Mode2: vocoder out → SL + headphones
+2026-08-10 17:17:46 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 17:17:46 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 17:17:46 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:17:46 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:17:46 [INFO] Mode2: zyn-drums → SL + headphones (not vocoded)
+2026-08-10 17:17:46 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:17:46 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:17:46 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:17:46 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:17:46 [INFO] Graph Mode2 complete
+2026-08-10 17:17:46 [INFO] Mixer master=127 dry=100 (78%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 17:17:46 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 17:17:46 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.620001 (no matching sink; recorded only)
+2026-08-10 17:17:46 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 79%
+2026-08-10 17:17:47 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:49 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:51 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:53 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:55 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:57 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:17:59 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:01 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:03 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:05 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:07 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:09 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:11 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:13 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:15 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:17 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:19 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:21 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:23 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:25 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:27 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:29 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:31 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:33 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:35 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:37 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:39 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:41 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:43 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:45 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:47 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:49 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:51 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:53 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:55 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:57 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:18:59 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:01 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:03 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:05 [INFO] MVX2U: mirrored pure-playback preset to /home/mjr/.config/shurectl/presets/NoMic.toml
+2026-08-10 17:19:05 [INFO] MVX2U: ensure Monitor Mix = pure Playback (NoMic preset). If the jack has mic bleed: shurectl --device /dev/hidraw1 and load NoMic.
+2026-08-10 17:19:05 [INFO] reloadMelodyInstrument: stopping melody Zyn to load config/talkbox.xmz
+2026-08-10 17:19:05 [INFO] Stopping zyn-melody (pid 45054)
+2026-08-10 17:19:05 [INFO] Launched MELODY Zyn pid=49186 client='zyn-melody' file=config/talkbox.xmz
+2026-08-10 17:19:05 [INFO] Melody Zyn ports visible
+2026-08-10 17:19:05 [INFO] reloadMelodyInstrument: melody running with config/talkbox.xmz
+2026-08-10 17:19:05 [INFO] MVX2U: mic capture forced live (ALSA Microphone 80% + PW unmute)
+2026-08-10 17:19:05 [INFO] Building Mode6 (Talkbox)
+2026-08-10 17:19:05 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:06 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:19:06 [INFO] MVX2U: mirrored pure-playback preset to /home/mjr/.config/shurectl/presets/NoMic.toml
+2026-08-10 17:19:06 [INFO] MVX2U: ensure Monitor Mix = pure Playback (NoMic preset). If the jack has mic bleed: shurectl --device /dev/hidraw1 and load NoMic.
+2026-08-10 17:19:06 [WARNING] resolveMvx2uPlaybackPorts: using hardcoded MVX2U port names
+2026-08-10 17:19:06 [INFO] MVX2U playback ports: alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FL / alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FR
+2026-08-10 17:19:06 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:06 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FL
+2026-08-10 17:19:06 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FR
+2026-08-10 17:19:06 [INFO] Mode6: melody → MVX2U
+2026-08-10 17:19:07 [WARNING] pw-link failed: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_1 -- failed to link ports: Invalid argument
+2026-08-10 17:19:07 [WARNING] pw-link failed: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_2 -- failed to link ports: No such file or directory
+2026-08-10 17:19:07 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:19:07 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:19:07 [INFO] Mode6: mic alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → SL + headphones
+2026-08-10 17:19:07 [WARNING] pw-link failed: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1 -- failed to link ports: No such file or directory
+2026-08-10 17:19:07 [WARNING] pw-link failed: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2 -- failed to link ports: No such file or directory
+2026-08-10 17:19:07 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:19:07 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:19:07 [INFO] Mode6: drums → SL + headphones
+2026-08-10 17:19:07 [WARNING] pw-link failed: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL -- failed to link ports: No such file or directory
+2026-08-10 17:19:07 [WARNING] pw-link failed: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR -- failed to link ports: No such file or directory
+2026-08-10 17:19:07 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:19:07 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:19:07 [INFO] Graph Mode6 (Talkbox) complete
+2026-08-10 17:19:07 [INFO] Mode Talkbox (Mode 6) — sawtooth → MVX2U, mic → SL + phones
+2026-08-10 17:19:07 [WARNING] Health: SooperLooper dead -- relaunching
+2026-08-10 17:19:07 [INFO] Launched SooperLooper pid=49501 OSC :9951
+2026-08-10 17:19:07 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:07 [DEBUG] Health: ensureHealthyGraph mode=5 rebuild=yes
+2026-08-10 17:19:07 [INFO] MVX2U: mirrored pure-playback preset to /home/mjr/.config/shurectl/presets/NoMic.toml
+2026-08-10 17:19:07 [INFO] MVX2U: ensure Monitor Mix = pure Playback (NoMic preset). If the jack has mic bleed: shurectl --device /dev/hidraw1 and load NoMic.
+2026-08-10 17:19:07 [INFO] reloadMelodyInstrument: stopping melody Zyn to load config/talkbox.xmz
+2026-08-10 17:19:07 [INFO] Stopping zyn-melody (pid 49186)
+2026-08-10 17:19:07 [INFO] Launched MELODY Zyn pid=49531 client='zyn-melody' file=config/talkbox.xmz
+2026-08-10 17:19:07 [INFO] Melody Zyn ports visible
+2026-08-10 17:19:07 [INFO] reloadMelodyInstrument: melody running with config/talkbox.xmz
+2026-08-10 17:19:08 [INFO] MVX2U: mic capture forced live (ALSA Microphone 80% + PW unmute)
+2026-08-10 17:19:08 [INFO] Building Mode6 (Talkbox)
+2026-08-10 17:19:08 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:08 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:19:08 [INFO] MVX2U: mirrored pure-playback preset to /home/mjr/.config/shurectl/presets/NoMic.toml
+2026-08-10 17:19:08 [INFO] MVX2U: ensure Monitor Mix = pure Playback (NoMic preset). If the jack has mic bleed: shurectl --device /dev/hidraw1 and load NoMic.
+2026-08-10 17:19:08 [WARNING] resolveMvx2uPlaybackPorts: using hardcoded MVX2U port names
+2026-08-10 17:19:08 [INFO] MVX2U playback ports: alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FL / alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FR
+2026-08-10 17:19:08 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:08 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FL
+2026-08-10 17:19:08 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FR
+2026-08-10 17:19:08 [INFO] Mode6: melody → MVX2U
+2026-08-10 17:19:08 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_1
+2026-08-10 17:19:08 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_2
+2026-08-10 17:19:08 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:19:08 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:19:08 [INFO] Mode6: mic alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → SL + headphones
+2026-08-10 17:19:08 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 17:19:08 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 17:19:08 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:19:08 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:19:08 [INFO] Mode6: drums → SL + headphones
+2026-08-10 17:19:08 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:19:08 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:19:08 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:19:08 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:19:08 [INFO] Graph Mode6 (Talkbox) complete
+2026-08-10 17:19:08 [INFO] Mixer master=127 dry=100 (78%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 17:19:08 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 17:19:08 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.620001 (no matching sink; recorded only)
+2026-08-10 17:19:08 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 79%
+2026-08-10 17:19:09 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:11 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:13 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:15 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:17 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:19 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:21 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:23 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:25 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:27 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:29 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:31 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:33 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:35 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:37 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:39 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:41 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:43 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:45 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:47 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:49 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:51 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:53 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:55 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:56 [INFO] reloadMelodyInstrument: stopping melody Zyn to load config/mkb.xmz
+2026-08-10 17:19:56 [INFO] Stopping zyn-melody (pid 49531)
+2026-08-10 17:19:56 [INFO] Launched MELODY Zyn pid=50833 client='zyn-melody' file=config/mkb.xmz
+2026-08-10 17:19:56 [INFO] Melody Zyn ports visible
+2026-08-10 17:19:56 [INFO] reloadMelodyInstrument: melody running with config/mkb.xmz
+2026-08-10 17:19:56 [INFO] MVX2U: mic capture forced live (ALSA Microphone 80% + PW unmute)
+2026-08-10 17:19:56 [INFO] Building Mode4 (BreathOctave) — same routing as Mode1
+2026-08-10 17:19:56 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:57 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:19:57 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 17:19:57 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 17:19:57 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:57 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:57 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:19:57 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → sooperlooper:common_in_1
+2026-08-10 17:19:57 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → sooperlooper:common_in_2
+2026-08-10 17:19:57 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:19:57 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:19:57 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 17:19:57 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 17:19:57 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:19:57 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:19:57 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:19:57 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:19:57 [INFO] Mode1: melody + drums → SL + headphones; SL → headphones
+2026-08-10 17:19:57 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:19:57 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:19:57 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:57 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_1
+2026-08-10 17:19:57 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_2
+2026-08-10 17:19:57 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:19:57 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:19:57 [INFO] Mode5: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → SL + headphones
+2026-08-10 17:19:57 [INFO] Mixer master=127 dry=100 (78%) vocoder=100 (78%) drums=100 (78%)
+2026-08-10 17:19:57 [INFO] Master -> DEFAULT_AUDIO_SINK 1.000000
+2026-08-10 17:19:57 [DEBUG] setNodeVolume 'InstrumentVocoder' linear=0.620001 (no matching sink; recorded only)
+2026-08-10 17:19:57 [INFO] Input gain alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback -> 79%
+2026-08-10 17:19:57 [INFO] Mode BreathOctaveMic (Mode 5) — Mode 4 + dry mic
+2026-08-10 17:19:57 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:19:59 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:01 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:03 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:05 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:07 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:09 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:11 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:13 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:15 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:17 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:19 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:21 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:23 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:25 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:26 [INFO] MVX2U: mic capture forced live (ALSA Microphone 80% + PW unmute)
+2026-08-10 17:20:26 [INFO] MVX2U: mic capture forced live (ALSA Microphone 80% + PW unmute)
+2026-08-10 17:20:26 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:26 [INFO] forceDisconnectInstrumentGraph: cleared auto + owned links
+2026-08-10 17:20:26 [INFO] mic: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO
+2026-08-10 17:20:26 [INFO] Vocoder: InstrumentVocoder:in_l / InstrumentVocoder:in_r mod=InstrumentVocoder:sidechain/InstrumentVocoder:sidechain2 out=InstrumentVocoder:out_l/InstrumentVocoder:out_r
+2026-08-10 17:20:26 [INFO] Resolved melody ports: zynaddsubfx_zyn-melody:out_1 / zynaddsubfx_zyn-melody:out_2
+2026-08-10 17:20:26 [INFO] Resolved drums ports: zynaddsubfx_zyn-drums:out_1 / zynaddsubfx_zyn-drums:out_2
+2026-08-10 17:20:26 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:26 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:26 [INFO] Playback targets: alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL / alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:20:26 [INFO] pw-link: zynaddsubfx_zyn-melody:out_1 → InstrumentVocoder:in_l
+2026-08-10 17:20:26 [INFO] pw-link: zynaddsubfx_zyn-melody:out_2 → InstrumentVocoder:in_r
+2026-08-10 17:20:26 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain
+2026-08-10 17:20:26 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain2
+2026-08-10 17:20:26 [INFO] Mode2: mic modulator alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → InstrumentVocoder:sidechain + InstrumentVocoder:sidechain2
+2026-08-10 17:20:26 [INFO] pw-link: InstrumentVocoder:out_l → sooperlooper:common_in_1
+2026-08-10 17:20:26 [INFO] pw-link: InstrumentVocoder:out_r → sooperlooper:common_in_2
+2026-08-10 17:20:26 [INFO] pw-link: InstrumentVocoder:out_l → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:20:26 [INFO] pw-link: InstrumentVocoder:out_r → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:20:26 [INFO] Mode2: vocoder out → SL + headphones
+2026-08-10 17:20:26 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → sooperlooper:common_in_1
+2026-08-10 17:20:26 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → sooperlooper:common_in_2
+2026-08-10 17:20:26 [INFO] pw-link: zynaddsubfx_zyn-drums:out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:20:26 [INFO] pw-link: zynaddsubfx_zyn-drums:out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:20:26 [INFO] Mode2: zyn-drums → SL + headphones (not vocoded)
+2026-08-10 17:20:26 [INFO] pw-link: sooperlooper:common_out_1 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:20:26 [INFO] pw-link: sooperlooper:common_out_2 → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:20:26 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Output (capture) → zynaddsubfx_zyn-melody:midi_input
+2026-08-10 17:20:26 [INFO] pw-link: Midi-Bridge:Instrument_3MIDI Drums (capture) → zynaddsubfx_zyn-drums:midi_input
+2026-08-10 17:20:26 [INFO] Graph Mode2 complete
+2026-08-10 17:20:26 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:26 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_1
+2026-08-10 17:20:26 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → sooperlooper:common_in_2
+2026-08-10 17:20:26 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+2026-08-10 17:20:26 [INFO] pw-link: alsa_input.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.mono-fallback:capture_MONO → alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+2026-08-10 17:20:26 [INFO] Mode3: dry mic → SL + headphones (parallel to vocoder wet path)
+2026-08-10 17:20:26 [INFO] Mode SynthAndVocoder (Mode 3)
+2026-08-10 17:20:27 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:29 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:31 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:33 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:35 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:37 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:39 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:41 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:43 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:45 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:47 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:49 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:51 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:53 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:55 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:57 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:20:59 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:21:01 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:21:03 [INFO] SL ports in=sooperlooper:common_in_1/sooperlooper:common_in_2 out=sooperlooper:common_out_1/sooperlooper:common_out_2
+2026-08-10 17:21:05 [INFO] Performance loop exited.
+2026-08-10 17:21:05 [INFO] Stopping vocoder (pid 45145)
+2026-08-10 17:21:05 [INFO] Stopping sooperlooper (pid 49501)
+2026-08-10 17:21:05 [INFO] Stopping zyn-drums (pid 45092)
+2026-08-10 17:21:05 [INFO] Stopping zyn-melody (pid 50833)
+2026-08-10 17:21:05 [INFO] Shutting down engine
+2026-08-10 17:21:05 [INFO] MIDI engine shut down.
+2026-08-10 17:21:05 [INFO] VialController shut down.
+2026-08-10 17:21:05 [INFO] Engine shutdown complete
+2026-08-10 17:21:05 [INFO] VialController shut down.
+2026-08-10 17:21:05 [INFO] MIDI engine shut down.
+2026-08-10 17:21:05 [INFO] Logger shutting down

@@ -711,40 +711,7 @@ return;
  Logger::info("Synth volume " + std::to_string((state_->synthMix() * 100) / 127) + "% (" + std::to_string(state_->synthMix()) + "/127)");
 
 return;
-  case ActionType::TalkboxVolUp:
- state_->adjustSynthMix(mix_step_);
- {
- int v = state_->synthMix();
- for (int ch = 0; ch < 16; ++ch)
- midi_->sendControlChange(ch, breath_volume_cc_, v);
- if (audio_)
- audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(),
- state_->vocoderMix(), state_->drumMix(),
- state_->synthMix(), state_->micMix());
- // Also drive the MVX2U sink level when present (talkbox feed).
- if (audio_)
- audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(),
- state_->vocoderMix(), state_->drumMix(),
- state_->synthMix(), state_->micMix());
- Logger::info("Talkbox/synth volume " + std::to_string((v * 100) / 127) +
- "% (" + std::to_string(v) + "/127)");
- }
- return;
- case ActionType::TalkboxVolDown:
- state_->adjustSynthMix(-mix_step_);
- {
- int v = state_->synthMix();
- for (int ch = 0; ch < 16; ++ch)
- midi_->sendControlChange(ch, breath_volume_cc_, v);
- if (audio_)
- audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(),
- state_->vocoderMix(), state_->drumMix(),
- state_->synthMix(), state_->micMix());
- Logger::info("Talkbox/synth volume " + std::to_string((v * 100) / 127) +
- "% (" + std::to_string(v) + "/127)");
- }
- return;
-case ActionType::MicVolUp:
+ case ActionType::MicVolUp:
  state_->adjustMicMix(mix_step_);
  if (audio_)
  audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(),

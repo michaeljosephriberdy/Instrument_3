@@ -128,8 +128,6 @@ public:
     // force a capture-capable card profile (wpctl/pactl). Throttled.
     // Returns true if capture ports are visible after the attempt.
     bool activateMicCapturePorts();
- // Force ALSA+PipeWire mic capture live (gain/unmute). Not Monitor Mix.
- bool ensureMvx2uMicCaptureLive();
 
     // Ports whose node/port name contains any of the needles.
     std::vector<std::string> findPortsMatching(

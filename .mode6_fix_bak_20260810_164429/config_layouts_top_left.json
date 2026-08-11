@@ -289,6 +289,16 @@
   },
   {
    "row": 0,
+   "col": 10,
+   "action": "none"
+  },
+  {
+   "row": 0,
+   "col": 11,
+   "action": "none"
+  },
+  {
+   "row": 0,
    "col": 12,
    "action": "none"
   },
@@ -331,16 +341,6 @@
    "row": 1,
    "col": 10,
    "action": "mode_talkbox"
-  },
-  {
-   "row": 0,
-   "col": 10,
-   "action": "talkbox_vol_up"
-  },
-  {
-   "row": 0,
-   "col": 11,
-   "action": "talkbox_vol_down"
   }
  ]
 }

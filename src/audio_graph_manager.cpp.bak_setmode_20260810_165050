@@ -591,7 +591,6 @@ bool AudioGraphManager::startProcesses()
  started_ = ok;
  // Ensure USB mic capture ports exist in PipeWire before first mode build (called before return -- was dead code)
     activateMicCapturePorts();
- ensureMvx2uMicCaptureLive();
     return ok;
 }
 
@@ -765,7 +764,6 @@ bool AudioGraphManager::buildMode1()
 
 bool AudioGraphManager::buildMode2()
 {
- ensureMvx2uMicCaptureLive();
  // Ports/names refreshed every entry (and by ensureHealthyGraph).
 
     // Mode 2 — VocoderOnly.
@@ -929,7 +927,6 @@ bool AudioGraphManager::buildMode2()
 
 bool AudioGraphManager::buildMode3()
 {
- ensureMvx2uMicCaptureLive();
     // Mode 3 = Mode 2 + dry mic as FINAL audio (→ SL + headphones).
     if (!buildMode2())
         return false;
@@ -976,7 +973,6 @@ bool AudioGraphManager::buildMode4()
 
 bool AudioGraphManager::buildMode5()
 {
- ensureMvx2uMicCaptureLive();
  if (!buildMode4())
  return false;
 
@@ -1147,8 +1143,6 @@ bool AudioGraphManager::setMode(PerformanceMode mode) {
             return buildMode4();
         case PerformanceMode::BreathOctaveMic:
             return buildMode5();
- case PerformanceMode::Talkbox:
- return buildMode6();
     }
     return buildMode1();
 }
@@ -1168,7 +1162,8 @@ std::string AudioGraphManager::statusSummary() const
     case PerformanceMode::SynthAndVocoder: ss << "SynthAndVocoder"; break;
  case PerformanceMode::BreathOctave: ss << "BreathOctave"; break;
  case PerformanceMode::BreathOctaveMic: ss << "BreathOctaveMic"; break;
- case PerformanceMode::Talkbox: ss << "Talkbox"; break;
+ case PerformanceMode::Talkbox:
+ return buildMode6();
      }
     ss << " melody=" << (processAlive(zyn_pid_) ? "up" : "down")
        << " drums=" << (processAlive(zyn_drums_pid_) ? "up" : "down")
@@ -2155,7 +2150,6 @@ bool AudioGraphManager::resolveMvx2uPlaybackPorts(std::string& out_l,
 
 bool AudioGraphManager::buildMode6()
 {
- ensureMvx2uMicCaptureLive();
  Logger::info("Building Mode6 (Talkbox)");
  disconnectAllOwnedLinks();
  forceDisconnectInstrumentGraph();
@@ -2239,31 +2233,6 @@ bool AudioGraphManager::buildMode6()
  pwLink(midi_dru, resolveClientPort(cfg_.zyn_drums_client_name, "midi_input", true));
 
  Logger::info("Graph Mode6 (Talkbox) complete");
- return true;
-}
-
-bool AudioGraphManager::ensureMvx2uMicCaptureLive()
-{
- // Mic CAPTURE into the Pi only. Does not change Monitor Mix (jack blend)
- // or phantom power (HID / hardware preset).
- //
- // Symptom this fixes: ALSA "Microphone" Capture left at 0% so every mic
- // mode is silent even though PipeWire links look correct.
-
- // ALSA capture gain (card name and numeric fallback)
- (void)std::system("amixer -c MVX2U sset Microphone 80% unmute 2>/dev/null");
- (void)std::system("amixer -c 3 sset Microphone 80% unmute 2>/dev/null");
-
- // PipeWire source: unmute + set volume on every "Shure MVX2U" source node
- (void)std::system(
- "wpctl status 2>/dev/null | "
- "sed -n 's/.*\\([0-9][0-9]*\\)\\. Shure MVX2U.*/\\1/p' | "
- "while read -r id; do "
- "wpctl set-mute \"$id\" 0 2>/dev/null; "
- "wpctl set-volume \"$id\" 0.85 2>/dev/null; "
- "done");
-
- Logger::info("MVX2U: mic capture forced live (ALSA Microphone 80% + PW unmute)");
  return true;
 }
 

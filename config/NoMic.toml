@@ -1,0 +1,73 @@
+name = "NoMic.toml"
+gain_db = 48
+mode = "auto"
+muted = false
+hpf = "off"
+auto_position = "far"
+auto_tone = "natural"
+auto_gain = "normal"
+phantom_power = true
+monitor_mix = 0
+limiter_enabled = false
+compressor = "off"
+eq_enabled = false
+denoiser_enabled = false
+popper_stopper_enabled = true
+mute_btn_disabled = false
+tone = 0
+mv6_gain_locked = false
+playback_mix = 0
+reverb_on_output = false
+reverb_monitoring = false
+reverb_type = "plate"
+reverb_intensity = 50
+led_behavior = "live"
+led_brightness = "high"
+led_live_theme = "default"
+led_solid_theme = "shure"
+led_pulsing_theme = "shure"
+led_solid_rgb = [
+    178,
+    255,
+    51,
+]
+led_pulsing_rgb = [
+    16,
+    63,
+    251,
+]
+led_live_edge_rgb = [
+    255,
+    255,
+    255,
+]
+led_live_middle_rgb = [
+    31,
+    31,
+    31,
+]
+led_live_interior_rgb = [
+    0,
+    0,
+    0,
+]
+
+[[eq_bands]]
+enabled = false
+gain_db = 0
+
+[[eq_bands]]
+enabled = true
+gain_db = 0
+
+[[eq_bands]]
+enabled = true
+gain_db = 0
+
+[[eq_bands]]
+enabled = true
+gain_db = 0
+
+[[eq_bands]]
+enabled = true
+gain_db = 0

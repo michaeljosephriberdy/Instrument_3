@@ -41,8 +41,7 @@ enum class ActionType : uint8_t
     ModeVocoder,        // Mode 2 — vocoder
     ModeVocoderDry,
  ModeBreathOctave,
- ModeBreathOctaveMic,
- ModeTalkbox,     // Mode 3 — vocoder + dry voice
+ ModeBreathOctaveMic,     // Mode 3 — vocoder + dry voice
 
     //-----------------------
     // Mixer (Physical Layout V1 mixer row)
@@ -57,8 +56,6 @@ enum class ActionType : uint8_t
     MasterVolDown,
  SynthVolUp,
  SynthVolDown,
- TalkboxVolUp,
- TalkboxVolDown,
  MicVolUp,
  MicVolDown,
 
@@ -132,7 +129,6 @@ inline const char* actionTypeToString(ActionType t)
         case ActionType::ModeVocoderDry: return "mode_vocoder_dry";
  case ActionType::ModeBreathOctave: return "mode_breath_octave";
  case ActionType::ModeBreathOctaveMic: return "mode_breath_octave_mic";
- case ActionType::ModeTalkbox: return "mode_talkbox";
         case ActionType::DryMixUp:       return "dry_mix_up";
         case ActionType::DryMixDown:     return "dry_mix_down";
         case ActionType::VocoderMixUp:   return "vocoder_mix_up";
@@ -143,8 +139,6 @@ inline const char* actionTypeToString(ActionType t)
         case ActionType::MasterVolDown:  return "master_vol_down";
  case ActionType::SynthVolUp: return "synth_vol_up";
  case ActionType::SynthVolDown: return "synth_vol_down";
- case ActionType::TalkboxVolUp: return "talkbox_vol_up";
- case ActionType::TalkboxVolDown: return "talkbox_vol_down";
  case ActionType::MicVolUp: return "mic_vol_up";
  case ActionType::MicVolDown: return "mic_vol_down";
         case ActionType::LoopRecord:     return "loop_record";
@@ -182,7 +176,6 @@ inline ActionType stringToActionType(const std::string& s)
     if (s == "mode_vocoder_dry") return ActionType::ModeVocoderDry;
  if (s == "mode_breath_octave") return ActionType::ModeBreathOctave;
  if (s == "mode_breath_octave_mic") return ActionType::ModeBreathOctaveMic;
- if (s == "mode_talkbox") return ActionType::ModeTalkbox;
     if (s == "dry_mix_up")      return ActionType::DryMixUp;
     if (s == "dry_mix_down")    return ActionType::DryMixDown;
     if (s == "vocoder_mix_up")  return ActionType::VocoderMixUp;
@@ -193,8 +186,6 @@ inline ActionType stringToActionType(const std::string& s)
     if (s == "master_vol_down") return ActionType::MasterVolDown;
  if (s == "synth_vol_up") return ActionType::SynthVolUp;
  if (s == "synth_vol_down") return ActionType::SynthVolDown;
- if (s == "talkbox_vol_up") return ActionType::TalkboxVolUp;
- if (s == "talkbox_vol_down") return ActionType::TalkboxVolDown;
  if (s == "mic_vol_up") return ActionType::MicVolUp;
  if (s == "mic_vol_down") return ActionType::MicVolDown;
     if (s == "loop_record")     return ActionType::LoopRecord;

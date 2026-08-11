@@ -19,8 +19,7 @@ enum class PerformanceMode
     VocoderOnly,     // Mode 2
     SynthAndVocoder,
  BreathOctave,
- BreathOctaveMic,
- Talkbox  // Mode 3 — vocoder + dry voice path
+ BreathOctaveMic  // Mode 3 — vocoder + dry voice path
 };
 
 struct KeyboardAssignment
