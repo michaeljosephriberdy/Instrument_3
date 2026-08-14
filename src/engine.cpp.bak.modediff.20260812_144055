@@ -456,11 +456,10 @@ void Engine::run()
             state_->setBreath(breath_pressure);
             if (state_->mode() == PerformanceMode::SynthOnly) {
                 int scaled_volume = (breath_pressure * state_->masterVolume()) / 127;
-                if (scaled_volume != last_sent_volume || breath_vol_resync_) {
+                if (scaled_volume != last_sent_volume) {
                     for (int ch = 0; ch < 16; ++ch)
                         midi_->sendControlChange(ch, breath_volume_cc_, scaled_volume);
                     last_sent_volume = scaled_volume;
-                        breath_vol_resync_ = false;
                 }
             }
             state_->setOctave(computeOctaveFromNod(breath_->nodValue()));
@@ -823,13 +822,8 @@ if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), s
             return;
 
         case ActionType::ModeInstrument:
-            if (state_->mode() != PerformanceMode::SynthOnly) {
-                state_->setMode(PerformanceMode::SynthOnly);
-                if (audio_) audio_->setMode(PerformanceMode::SynthOnly);
-            } else if (audio_) {
-                audio_->setMode(PerformanceMode::SynthOnly);
-            }
-            breath_vol_resync_ = true;
+            state_->setMode(PerformanceMode::SynthOnly);
+            if (audio_) audio_->setMode(PerformanceMode::SynthOnly);
             Logger::info("Mode SynthOnly (Mode 1)");
             return;
         case ActionType::ModeVocoder:

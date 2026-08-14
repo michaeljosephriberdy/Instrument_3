@@ -1,0 +1,708 @@
+
+============================================================
+0. BASICS
+============================================================
+Date: Wed Aug 12 11:16:27 AM PDT 2026
+Running as: uid=1000(mjr) gid=1000(mjr) groups=1000(mjr),4(adm),24(cdrom),27(sudo),29(audio),30(dip),46(plugdev),100(users),114(lpadmin)
+Repo root (cwd): /home/mjr/Instrument_3
+Kernel: Linux mjrub 6.9.3-76060903-generic #202405300957~1736980711~24.04~978a154~dev-Ubuntu SMP PREEMPT_DY x86_64 x86_64 x86_64 GNU/Linux
+$ lsb_release -a 2>/dev/null || cat /etc/os-release
+Distributor ID:	Ubuntu
+Description:	Ubuntu 24.04.1 LTS
+Release:	24.04
+Codename:	noble
+
+
+============================================================
+1. HARDWARE (CPU / GPU / laptop model)
+============================================================
+$ cat /sys/class/dmi/id/product_name 2>/dev/null
+Pangolin
+
+$ cat /sys/class/dmi/id/sys_vendor 2>/dev/null
+System76
+
+$ lscpu | head -20
+Architecture:                         x86_64
+CPU op-mode(s):                       32-bit, 64-bit
+Address sizes:                        48 bits physical, 48 bits virtual
+Byte Order:                           Little Endian
+CPU(s):                               16
+On-line CPU(s) list:                  0-15
+Vendor ID:                            AuthenticAMD
+Model name:                           AMD Ryzen 7 7840U w/ Radeon 780M Graphics
+CPU family:                           25
+Model:                                116
+Thread(s) per core:                   2
+Core(s) per socket:                   8
+Socket(s):                            1
+Stepping:                             1
+CPU(s) scaling MHz:                   44%
+CPU max MHz:                          5132.0000
+CPU min MHz:                          400.0000
+BogoMIPS:                             6587.39
+Flags:                                fpu vme de pse tsc msr pae mce cx8 apic sep mtrr pge mca cmov pat pse36 clflush mmx fxsr sse sse2 ht syscall nx mmxext fxsr_opt pdpe1gb rdtscp lm constant_tsc rep_good amd_lbr_v2 nopl xtopology nonstop_tsc cpuid extd_apicid aperfmperf rapl pni pclmulqdq monitor ssse3 fma cx16 sse4_1 sse4_2 x2apic movbe popcnt aes xsave avx f16c rdrand lahf_lm cmp_legacy svm extapic cr8_legacy abm sse4a misalignsse 3dnowprefetch osvw ibs skinit wdt tce topoext perfctr_core perfctr_nb bpext perfctr_llc mwaitx cpb cat_l3 cdp_l3 hw_pstate ssbd mba perfmon_v2 ibrs ibpb stibp ibrs_enhanced vmmcall fsgsbase bmi1 avx2 smep bmi2 erms invpcid cqm rdt_a avx512f avx512dq rdseed adx smap avx512ifma clflushopt clwb avx512cd sha_ni avx512bw avx512vl xsaveopt xsavec xgetbv1 xsaves cqm_llc cqm_occup_llc cqm_mbm_total cqm_mbm_local user_shstk avx512_bf16 clzero irperf xsaveerptr rdpru wbnoinvd cppc arat npt lbrv svm_lock nrip_save tsc_scale vmcb_clean flushbyasid decodeassists pausefilter pfthreshold v_vmsave_vmload vgif x2avic v_spec_ctrl vnmi avx512vbmi umip pku ospke avx512_vbmi2 gfni vaes vpclmulqdq avx512_vnni avx512_bitalg avx512_vpopcntdq rdpid overflow_recov succor smca flush_l1d amd_lbr_pmc_freeze
+Virtualization:                       AMD-V
+
+$ lspci -nnk | grep -iA3 'vga\|3d\|display'
+pcilib: Error reading /sys/bus/pci/devices/0000:00:08.3/label: Operation not permitted
+04:00.0 VGA compatible controller [0300]: Advanced Micro Devices, Inc. [AMD/ATI] Phoenix1 [1002:15bf] (rev c9)
+	Subsystem: Emdoor Digital Technology Co., Ltd Phoenix1 [2782:12b3]
+	Kernel driver in use: amdgpu
+	Kernel modules: amdgpu
+
+$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:            30Gi       4.0Gi        23Gi        98Mi       3.5Gi        26Gi
+Swap:             0B          0B          0B
+
+$ uptime
+ 11:16:27 up 40 min,  1 user,  load average: 1.39, 1.08, 0.87
+
+
+============================================================
+2. SYSTEMD BOOT TARGET / DISPLAY MANAGER
+============================================================
+$ systemctl get-default
+graphical.target
+
+$ systemctl status display-manager.service --no-pager -l
+● gdm.service - GNOME Display Manager
+     Loaded: loaded (/usr/lib/systemd/system/gdm.service; static)
+     Active: active (running) since Wed 2026-08-12 10:35:58 PDT; 40min ago
+    Process: 2213 ExecStartPre=/usr/share/gdm/generate-config (code=exited, status=0/SUCCESS)
+   Main PID: 2353 (gdm3)
+      Tasks: 4 (limit: 37465)
+     Memory: 7.3M (peak: 25.5M)
+        CPU: 144ms
+     CGroup: /system.slice/gdm.service
+             └─2353 /usr/sbin/gdm3
+
+Aug 12 10:35:58 mjrub systemd[1]: Started gdm.service - GNOME Display Manager.
+Aug 12 10:35:58 mjrub gdm-launch-environment][2378]: pam_unix(gdm-launch-environment:session): session opened for user gdm(uid=120) by (uid=0)
+Aug 12 10:36:01 mjrub gdm-password][3134]: pam_succeed_if(gdm-password:auth): requirement "user = sofia" not met by user "mjr"
+Aug 12 10:36:03 mjrub gdm-password][3134]: gkr-pam: unable to locate daemon control file
+Aug 12 10:36:03 mjrub gdm-password][3134]: gkr-pam: stashed password to try later in open session
+Aug 12 10:36:03 mjrub gdm-password][3134]: pam_unix(gdm-password:session): session opened for user mjr(uid=1000) by mjr(uid=0)
+Aug 12 10:36:03 mjrub gdm-password][3134]: gkr-pam: unlocked login keyring
+Aug 12 10:36:04 mjrub gdm3[2353]: Gdm: on_display_added: assertion 'GDM_IS_REMOTE_DISPLAY (display)' failed
+Aug 12 10:36:06 mjrub gdm3[2353]: Gdm: Child process -2459 was already dead.
+Aug 12 10:36:06 mjrub gdm3[2353]: Gdm: on_display_removed: assertion 'GDM_IS_REMOTE_DISPLAY (display)' failed
+
+$ readlink -f /etc/systemd/system/display-manager.service 2>/dev/null
+/usr/lib/systemd/system/gdm.service
+
+$ cat /etc/X11/default-display-manager 2>/dev/null
+/usr/sbin/gdm3
+
+$ systemctl list-units --type=target --no-pager
+  UNIT                    LOAD   ACTIVE SUB    DESCRIPTION
+  basic.target            loaded active active Basic System
+  bluetooth.target        loaded active active Bluetooth Support
+  cryptsetup.target       loaded active active Local Encrypted Volumes
+  getty-pre.target        loaded active active Preparation for Logins
+  getty.target            loaded active active Login Prompts
+  graphical.target        loaded active active Graphical Interface
+  integritysetup.target   loaded active active Local Integrity Protected Volumes
+  local-fs-pre.target     loaded active active Preparation for Local File Systems
+  local-fs.target         loaded active active Local File Systems
+  multi-user.target       loaded active active Multi-User System
+  network-online.target   loaded active active Network is Online
+  network-pre.target      loaded active active Preparation for Network
+  network.target          loaded active active Network
+  nss-lookup.target       loaded active active Host and Network Name Lookups
+  nss-user-lookup.target  loaded active active User and Group Name Lookups
+  paths.target            loaded active active Path Units
+  remote-fs.target        loaded active active Remote File Systems
+  slices.target           loaded active active Slice Units
+  snapd.mounts-pre.target loaded active active Mounting snaps
+  snapd.mounts.target     loaded active active Mounted snaps
+  sockets.target          loaded active active Socket Units
+  sound.target            loaded active active Sound Card
+  swap.target             loaded active active Swaps
+  sysinit.target          loaded active active System Initialization
+  time-set.target         loaded active active System Time Set
+  time-sync.target        loaded active active System Time Synchronized
+  timers.target           loaded active active Timer Units
+  veritysetup.target      loaded active active Local Verity Protected Volumes
+
+Legend: LOAD   → Reflects whether the unit definition was properly loaded.
+        ACTIVE → The high-level unit activation state, i.e. generalization of SUB.
+        SUB    → The low-level unit activation state, values depend on unit type.
+
+28 loaded units listed. Pass --all to see loaded but inactive units, too.
+To show all installed unit files use 'systemctl list-unit-files'.
+
+-- What graphical.target actually pulls in (Wants=/Requires=) --
+$ systemctl show graphical.target -p Wants -p Requires -p After
+Requires=multi-user.target
+Wants=virtualbox.service systemd-update-utmp-runlevel.service power-profiles-daemon.service switcheroo-control.service accounts-daemon.service gdm.service udisks2.service gnome-remote-desktop.service
+After=udisks2.service gnome-remote-desktop.service virtualbox.service multi-user.target gdm.service rescue.target accounts-daemon.service rescue.service switcheroo-control.service
+
+-- What multi-user.target pulls in --
+$ systemctl show multi-user.target -p Wants -p Requires -p After
+Requires=basic.target
+Wants=dbus.service sysstat.service avahi-daemon.service jackd.service snap-core18-2999.mount anacron.service system76-firmware-daemon.service "snap-snap\\x2dstore-1270.mount" systemd-update-utmp-runlevel.service snap-core20-2866.mount snap-snapd-27406.mount "snap-chromium\\x2dffmpeg-118.mount" snap-firefox-8702.mount snap-core22-2411.mount snap.cups.cups-browsed.service ufw.service networking.service "snap-snap\\x2dstore-1216.mount" dmesg.service system76-driver.service snap-core18-2979.mount cups.path "snap-firmware\\x2dupdater-226.mount" chrony.service sssd.service cups.service unattended-upgrades.service snap-snapd-27591.mount snap-opera-482.mount rsyslog.service systemd-ask-password-wall.path networkd-dispatcher.service snap-core22-2339.mount ultraleap-hand-tracking-service.service snapd.autoimport.service thermald.service apport.service snap-core20-2769.mount snap-core24-1587.mount atd.service snap-core24-1643.mount com.system76.PowerDaemon.service secureboot-db.service plymouth-quit.service snap-shotcut-2308.mount "snap-firmware\\x2dupdater-224.mount" systemd-logind.service snap-vlc-3777.mount ua-reboot-cmds.service snapd.seeded.service snap-opera-480.mount NetworkManager.service grub-initrd-fallback.service systemd-oomd.service kerneloops.service "var-snap-firefox-common-host\\x2dhunspell.mount" wpa_supplicant.service systemd-user-sessions.service console-setup.service snap-cups-1238.mount "snap-gnome\\x2d46\\x2d2404-153.mount" "snap-gnome\\x2d42\\x2d2204-263.mount" snapd.recovery-chooser-trigger.service snap-cups-1235.mount lm-sensors.service snap-chromium-3491.mount ubuntu-advantage.service "snap-gnome\\x2d42\\x2d2204-247.mount" "snap-mesa\\x2d2404-1839.mount" snapd.service ModemManager.service openvpn.service snap-thunderbird-1170.mount plymouth-quit-wait.service snap.cups.cupsd.service e2scrub_reap.service snap-firefox-8664.mount snapd.apparmor.service snap-chromium-3499.mount getty.target snap-bare-5.mount "snap-gtk\\x2dcommon\\x2dthemes-1535.mount" "snap-youtube\\x2ddl-4806.mount" snap-thunderbird-1201.mount postfix.service cups-browsed.service "snap-mesa\\x2d2404-1165.mount" cron.service "snap-chromium\\x2dffmpeg-112.mount" whoopsie.path "snap-snapd\\x2ddesktop\\x2dintegration-387.mount" ssl-cert.service "snap-gnome\\x2d46\\x2d2404-145.mount" virtualbox.service remote-fs.target grub-common.service snap-shotcut-2306.mount snapd.core-fixup.service "snap-snapd\\x2ddesktop\\x2dintegration-391.mount"
+After=NetworkManager.service "snap-snapd\\x2ddesktop\\x2dintegration-391.mount" rescue.service snap.cups.cupsd.service snap.cups.cups-browsed.service systemd-oomd.service cron.service "snap-snap\\x2dstore-1270.mount" thermald.service "snap-mesa\\x2d2404-1839.mount" chrony.service cups.service "snap-firmware\\x2dupdater-224.mount" systemd-logind.service ua-reboot-cmds.service rescue.target ultraleap-hand-tracking-service.service snap-chromium-3499.mount "snap-gnome\\x2d46\\x2d2404-153.mount" atd.service "snap-gnome\\x2d46\\x2d2404-145.mount" plymouth-quit-wait.service "var-snap-firefox-common-host\\x2dhunspell.mount" "snap-youtube\\x2ddl-4806.mount" "snap-snap\\x2dstore-1216.mount" systemd-networkd.service snap-chromium-3491.mount com.system76.PowerDaemon.service snap-thunderbird-1201.mount getty.target system76-firmware-daemon.service cups.path snap-core18-2999.mount grub-common.service snap-bare-5.mount sssd.service ssl-cert.service sysstat.service rsyslog.service ModemManager.service "snap-chromium\\x2dffmpeg-112.mount" snapd.seeded.service snapd.autoimport.service snap-opera-482.mount systemd-user-sessions.service snap-core20-2769.mount "snap-gnome\\x2d42\\x2d2204-263.mount" switcheroo-control.service "snap-snapd\\x2ddesktop\\x2dintegration-387.mount" snap-opera-480.mount "snap-chromium\\x2dffmpeg-118.mount" e2scrub_reap.service avahi-daemon.service snap-core24-1643.mount snap-cups-1238.mount ubuntu-advantage.service secureboot-db.service snap-core18-2979.mount snap-cups-1235.mount jackd.service postfix.service "snap-firmware\\x2dupdater-226.mount" snapd.core-fixup.service snap-firefox-8664.mount snap-firefox-8702.mount basic.target plymouth-quit.service snapd.service openvpn.service anacron.service snap-core22-2339.mount snap-shotcut-2308.mount dmesg.service unattended-upgrades.service snap-snapd-27591.mount grub-initrd-fallback.service networkd-dispatcher.service snap-snapd-27406.mount virtualbox.service kerneloops.service "snap-gtk\\x2dcommon\\x2dthemes-1535.mount" "snap-gnome\\x2d42\\x2d2204-247.mount" snap-shotcut-2306.mount lm-sensors.service snapd.recovery-chooser-trigger.service system76-driver.service snap-core20-2866.mount snap-core22-2411.mount "snap-mesa\\x2d2404-1165.mount" snap-core24-1587.mount wpa_supplicant.service apport.service snap-vlc-3777.mount whoopsie.path cups-browsed.service snap-thunderbird-1170.mount
+
+
+============================================================
+3. CURRENTLY ENABLED SERVICES (candidates to gate off on headless path)
+============================================================
+-- All enabled unit files --
+$ systemctl list-unit-files --state=enabled --no-pager
+UNIT FILE                                      STATE   PRESET
+snap-bare-5.mount                              enabled enabled
+snap-chromium-3491.mount                       enabled enabled
+snap-chromium-3499.mount                       enabled enabled
+snap-chromium\x2dffmpeg-112.mount              enabled enabled
+snap-chromium\x2dffmpeg-118.mount              enabled enabled
+snap-core18-2979.mount                         enabled enabled
+snap-core18-2999.mount                         enabled enabled
+snap-core20-2769.mount                         enabled enabled
+snap-core20-2866.mount                         enabled enabled
+snap-core22-2339.mount                         enabled enabled
+snap-core22-2411.mount                         enabled enabled
+snap-core24-1587.mount                         enabled enabled
+snap-core24-1643.mount                         enabled enabled
+snap-cups-1235.mount                           enabled enabled
+snap-cups-1238.mount                           enabled enabled
+snap-firefox-8664.mount                        enabled enabled
+snap-firefox-8702.mount                        enabled enabled
+snap-firmware\x2dupdater-224.mount             enabled enabled
+snap-firmware\x2dupdater-226.mount             enabled enabled
+snap-gnome\x2d42\x2d2204-247.mount             enabled enabled
+snap-gnome\x2d42\x2d2204-263.mount             enabled enabled
+snap-gnome\x2d46\x2d2404-145.mount             enabled enabled
+snap-gnome\x2d46\x2d2404-153.mount             enabled enabled
+snap-gtk\x2dcommon\x2dthemes-1535.mount        enabled enabled
+snap-mesa\x2d2404-1165.mount                   enabled enabled
+snap-mesa\x2d2404-1839.mount                   enabled enabled
+snap-opera-480.mount                           enabled enabled
+snap-opera-482.mount                           enabled enabled
+snap-shotcut-2306.mount                        enabled enabled
+snap-shotcut-2308.mount                        enabled enabled
+snap-snap\x2dstore-1216.mount                  enabled enabled
+snap-snap\x2dstore-1270.mount                  enabled enabled
+snap-snapd-27406.mount                         enabled enabled
+snap-snapd-27591.mount                         enabled enabled
+snap-snapd\x2ddesktop\x2dintegration-387.mount enabled enabled
+snap-snapd\x2ddesktop\x2dintegration-391.mount enabled enabled
+snap-thunderbird-1170.mount                    enabled enabled
+snap-thunderbird-1201.mount                    enabled enabled
+snap-vlc-3777.mount                            enabled enabled
+snap-youtube\x2ddl-4806.mount                  enabled enabled
+var-snap-firefox-common-host\x2dhunspell.mount enabled enabled
+apport-autoreport.path                         enabled enabled
+cups.path                                      enabled enabled
+tpm-udev.path                                  enabled enabled
+whoopsie.path                                  enabled enabled
+accounts-daemon.service                        enabled enabled
+anacron.service                                enabled enabled
+apparmor.service                               enabled enabled
+apport.service                                 enabled enabled
+atd.service                                    enabled enabled
+avahi-daemon.service                           enabled enabled
+bluetooth.service                              enabled enabled
+chrony.service                                 enabled enabled
+cloud-config.service                           enabled enabled
+cloud-final.service                            enabled enabled
+cloud-init-local.service                       enabled enabled
+cloud-init.service                             enabled enabled
+com.system76.PowerDaemon.service               enabled enabled
+console-setup.service                          enabled enabled
+cron.service                                   enabled enabled
+cups-browsed.service                           enabled enabled
+cups.service                                   enabled enabled
+dmesg.service                                  enabled enabled
+e2scrub_reap.service                           enabled enabled
+getty@.service                                 enabled enabled
+gnome-remote-desktop.service                   enabled enabled
+gpu-manager.service                            enabled enabled
+grub-common.service                            enabled enabled
+grub-initrd-fallback.service                   enabled enabled
+jackd.service                                  enabled enabled
+kerneloops.service                             enabled enabled
+keyboard-setup.service                         enabled enabled
+lm-sensors.service                             enabled enabled
+ModemManager.service                           enabled enabled
+networkd-dispatcher.service                    enabled enabled
+networking.service                             enabled enabled
+NetworkManager-dispatcher.service              enabled enabled
+NetworkManager-wait-online.service             enabled enabled
+NetworkManager.service                         enabled enabled
+openvpn.service                                enabled enabled
+postfix.service                                enabled enabled
+rsyslog.service                                enabled enabled
+secureboot-db.service                          enabled enabled
+setvtrgb.service                               enabled enabled
+snap.cups.cups-browsed.service                 enabled enabled
+snap.cups.cupsd.service                        enabled enabled
+snapd.apparmor.service                         enabled enabled
+snapd.autoimport.service                       enabled enabled
+snapd.core-fixup.service                       enabled enabled
+snapd.recovery-chooser-trigger.service         enabled enabled
+snapd.seeded.service                           enabled enabled
+snapd.service                                  enabled enabled
+snapd.system-shutdown.service                  enabled enabled
+ssl-cert.service                               enabled enabled
+sssd.service                                   enabled enabled
+switcheroo-control.service                     enabled enabled
+sysstat.service                                enabled enabled
+system76-driver.service                        enabled enabled
+system76-firmware-daemon.service               enabled enabled
+systemd-oomd.service                           enabled enabled
+systemd-pstore.service                         enabled enabled
+systemd-resolved.service                       enabled enabled
+thermald.service                               enabled enabled
+ua-reboot-cmds.service                         enabled enabled
+ubuntu-advantage.service                       enabled enabled
+udisks2.service                                enabled enabled
+ufw.service                                    enabled enabled
+ultraleap-hand-tracking-service.service        enabled enabled
+unattended-upgrades.service                    enabled enabled
+wpa_supplicant.service                         enabled enabled
+apport-forward.socket                          enabled enabled
+avahi-daemon.socket                            enabled enabled
+cloud-init-hotplugd.socket                     enabled enabled
+cups.socket                                    enabled enabled
+snapd.socket                                   enabled enabled
+sssd-autofs.socket                             enabled enabled
+sssd-nss.socket                                enabled enabled
+sssd-pac.socket                                enabled enabled
+sssd-pam-priv.socket                           enabled enabled
+sssd-pam.socket                                enabled enabled
+sssd-ssh.socket                                enabled enabled
+sssd-sudo.socket                               enabled enabled
+systemd-oomd.socket                            enabled enabled
+uuidd.socket                                   enabled enabled
+remote-fs.target                               enabled enabled
+anacron.timer                                  enabled enabled
+apport-autoreport.timer                        enabled enabled
+apt-daily-upgrade.timer                        enabled enabled
+apt-daily.timer                                enabled enabled
+dpkg-db-backup.timer                           enabled enabled
+e2scrub_all.timer                              enabled enabled
+fstrim.timer                                   enabled enabled
+fwupd-refresh.timer                            enabled enabled
+logrotate.timer                                enabled enabled
+man-db.timer                                   enabled enabled
+motd-news.timer                                enabled enabled
+snapd.snap-repair.timer                        enabled enabled
+sysstat-collect.timer                          enabled enabled
+sysstat-summary.timer                          enabled enabled
+ua-timer.timer                                 enabled enabled
+update-notifier-download.timer                 enabled enabled
+update-notifier-motd.timer                     enabled enabled
+
+142 unit files listed.
+
+-- Currently running services, by (approx) memory --
+$ systemctl list-units --type=service --state=running --no-pager
+  UNIT                                    LOAD   ACTIVE SUB     DESCRIPTION
+  accounts-daemon.service                 loaded active running Accounts Service
+  atd.service                             loaded active running Deferred execution scheduler
+  avahi-daemon.service                    loaded active running Avahi mDNS/DNS-SD Stack
+  bluetooth.service                       loaded active running Bluetooth service
+  chrony.service                          loaded active running chrony, an NTP client/server
+  colord.service                          loaded active running Manage, Install and Generate Color Profiles
+  com.system76.PowerDaemon.service        loaded active running System76 Power Daemon
+  cron.service                            loaded active running Regular background program processing daemon
+  cups-browsed.service                    loaded active running Make remote CUPS printers available locally
+  cups.service                            loaded active running CUPS Scheduler
+  dbus.service                            loaded active running D-Bus System Message Bus
+  gdm.service                             loaded active running GNOME Display Manager
+  gnome-remote-desktop.service            loaded active running GNOME Remote Desktop
+  kerneloops.service                      loaded active running Tool to automatically collect and submit kernel crash signatures
+  ModemManager.service                    loaded active running Modem Manager
+  networkd-dispatcher.service             loaded active running Dispatcher daemon for systemd-networkd
+  NetworkManager.service                  loaded active running Network Manager
+  polkit.service                          loaded active running Authorization Manager
+  postfix@-.service                       loaded active running Postfix Mail Transport Agent (instance -)
+  rsyslog.service                         loaded active running System Logging Service
+  rtkit-daemon.service                    loaded active running RealtimeKit Scheduling Policy Service
+  snap.cups.cups-browsed.service          loaded active running Service for snap application cups.cups-browsed
+  snap.cups.cupsd.service                 loaded active running Service for snap application cups.cupsd
+  snapd.service                           loaded active running Snap Daemon
+  switcheroo-control.service              loaded active running Switcheroo Control Proxy service
+  system76-driver.service                 loaded active running System76 airplane-mode hotkey and LED support
+  system76-firmware-daemon.service        loaded active running System76 Firmware Daemon
+  systemd-journald.service                loaded active running Journal Service
+  systemd-logind.service                  loaded active running User Login Management
+  systemd-oomd.service                    loaded active running Userspace Out-Of-Memory (OOM) Killer
+  systemd-resolved.service                loaded active running Network Name Resolution
+  systemd-udevd.service                   loaded active running Rule-based Manager for Device Events and Files
+  udisks2.service                         loaded active running Disk Manager
+  ultraleap-hand-tracking-service.service loaded active running Ultraleap Tracking Service
+  unattended-upgrades.service             loaded active running Unattended Upgrades Shutdown
+  upower.service                          loaded active running Daemon for power management
+  user@1000.service                       loaded active running User Manager for UID 1000
+  wpa_supplicant.service                  loaded active running WPA supplicant
+
+Legend: LOAD   → Reflects whether the unit definition was properly loaded.
+        ACTIVE → The high-level unit activation state, i.e. generalization of SUB.
+        SUB    → The low-level unit activation state, values depend on unit type.
+
+38 loaded units listed.
+
+-- Common 'nice to kill for headless' services, individual status --
+bluetooth.service                      enabled=enabled        active=active
+ModemManager.service                   enabled=enabled        active=active
+wpa_supplicant.service                 enabled=enabled        active=active
+NetworkManager.service                 enabled=enabled        active=active
+NetworkManager-wait-online.service     enabled=enabled        active=active
+avahi-daemon.service                   enabled=enabled        active=active
+avahi-daemon.socket                    enabled=enabled        active=active
+cups.service                           enabled=enabled        active=active
+cups-browsed.service                   enabled=enabled        active=active
+snapd.service                          enabled=enabled        active=active
+snapd.socket                           enabled=enabled        active=active
+snapd.seeded.service                   enabled=enabled        active=active
+packagekit.service                     enabled=static         active=inactive
+not-found
+whoopsie.service                       enabled=static         active=inactive
+not-found
+kerneloops.service                     enabled=enabled        active=active
+apport.service                         enabled=enabled        active=active
+accounts-daemon.service                enabled=enabled        active=active
+switcheroo-control.service             enabled=enabled        active=active
+thermald.service                       enabled=enabled        active=inactive
+not-found
+power-profiles-daemon.service          enabled=not-found
+not-found active=inactive
+not-found
+system76-power.service                 enabled=alias          active=active
+system76.service                       enabled=not-found
+not-found active=inactive
+not-found
+upower.service                         enabled=disabled
+not-found active=active
+colord.service                         enabled=static         active=active
+gnome-remote-desktop.service           enabled=enabled        active=active
+fwupd.service                          enabled=static         active=failed
+not-found
+unattended-upgrades.service            enabled=enabled        active=active
+
+============================================================
+4. NETWORK INTERFACES (Wi-Fi / Bluetooth / Ethernet identification)
+============================================================
+$ ip -brief link show
+lo               UNKNOWN        00:00:00:00:00:00 <LOOPBACK,UP,LOWER_UP> 
+enp1s0           DOWN           50:a1:32:3d:41:61 <NO-CARRIER,BROADCAST,MULTICAST,UP> 
+wlp2s0           UP             c8:94:02:14:19:05 <BROADCAST,MULTICAST,UP,LOWER_UP> 
+
+$ nmcli -t -f DEVICE,TYPE,STATE device status 2>/dev/null
+wlp2s0:wifi:connected
+lo:loopback:connected (externally)
+80\:39\:8C\:5D\:8C\:E9:bt:disconnected
+p2p-dev-wlp2s0:wifi-p2p:disconnected
+enp1s0:ethernet:unavailable
+
+$ rfkill list
+0: hci0: Bluetooth
+	Soft blocked: no
+	Hard blocked: no
+1: phy0: Wireless LAN
+	Soft blocked: no
+	Hard blocked: no
+
+-- Ethernet link state (so we know if you actually rely on it) --
+$ ip -brief addr show
+lo               UNKNOWN        127.0.0.1/8 ::1/128 
+enp1s0           DOWN           
+wlp2s0           UP             192.168.5.213/22 fd2e:c16:28a0:1:134e:bacd:812f:6638/64 fd2e:c16:28a0:1:c84b:7216:5720:355d/64 fe80::f76f:ad50:2385:e24/64 
+
+
+============================================================
+5. AUDIO: PipeWire/WirePlumber session + real port names
+============================================================
+-- Is this a user-session or system-wide PipeWire install? --
+$ systemctl --user is-enabled pipewire pipewire-pulse wireplumber 2>&1
+enabled
+enabled
+enabled
+
+$ systemctl --user is-active pipewire pipewire-pulse wireplumber 2>&1
+active
+active
+active
+
+$ systemctl is-enabled pipewire.service pipewire.socket wireplumber.service 2>&1
+not-found
+not-found
+not-found
+
+-- Current user / uid / XDG_RUNTIME_DIR (needed for the systemd unit fix) --
+$ whoami
+mjr
+
+$ id -u
+1000
+
+XDG_RUNTIME_DIR=/run/user/1000
+$ ls -ld /run/user/$(id -u) 2>/dev/null
+drwx------ 18 mjr mjr 620 Aug 12 10:37 /run/user/1000
+
+-- Is lingering already enabled for this user? --
+$ loginctl show-user $(whoami) -p Linger 2>/dev/null
+Linger=no
+
+-- wpctl / pw-link port names (for --audio-left / --audio-right) --
+$ wpctl status
+PipeWire 'pipewire-0' [1.3.81, mjr@mjrub, cookie:3749344135]
+ └─ Clients:
+        33. WirePlumber                         [1.3.81, mjr@mjrub, pid:3316]
+        34. pipewire                            [1.3.81, mjr@mjrub, pid:3311]
+        47. WirePlumber [export]                [1.3.81, mjr@mjrub, pid:3316]
+        62. gnome-shell                         [1.3.81, mjr@mjrub, pid:3804]
+        63. GNOME Shell Volume Control          [1.3.81, mjr@mjrub, pid:3804]
+        64. GNOME Volume Control Media Keys     [1.3.81, mjr@mjrub, pid:3963]
+        65. xdg-desktop-portal                  [1.3.81, mjr@mjrub, pid:4429]
+        66. Firefox                             [1.3.81, mjr@mjrub, pid:4786]
+        73. Mutter                              [1.3.81, mjr@mjrub, pid:3804]
+        81. wpctl                               [1.3.81, mjr@mjrub, pid:13687]
+
+Audio
+ ├─ Devices:
+ │      48. Rembrandt Radeon High Definition Audio Controller [alsa]
+ │      49. Family 17h/19h HD Audio Controller  [alsa]
+ │  
+ ├─ Sinks:
+ │  *   53. Family 17h/19h HD Audio Controller Headphones [vol: 0.79]
+ │  
+ ├─ Sources:
+ │      54. Family 17h/19h HD Audio Controller Headphones Stereo Microphone [vol: 1.00]
+ │  *   55. Family 17h/19h HD Audio Controller Digital Microphone [vol: 0.46]
+ │  
+ ├─ Filters:
+ │  
+ └─ Streams:
+        69. Firefox                                                     
+             67. output_FL       > CX11970 Analog:playback_FL	[active]
+             74. output_FR       > CX11970 Analog:playback_FR	[active]
+        83. Firefox                                                     
+             77. output_FL       > CX11970 Analog:playback_FL	[active]
+             79. output_FR       > CX11970 Analog:playback_FR	[active]
+
+Video
+ ├─ Devices:
+ │  
+ ├─ Sinks:
+ │  
+ ├─ Sources:
+ │  
+ ├─ Filters:
+ │  
+ └─ Streams:
+
+Settings
+ └─ Default Configured Devices:
+         0. Audio/Sink    alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink
+         1. Audio/Source  bluez_input.34:09:C9:EB:70:39
+
+$ pw-link -i
+Midi-Bridge:Midi Through Port-0 (playback)
+alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL
+alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR
+bluez_midi.server:in
+
+$ pw-link -o
+Midi-Bridge:Midi Through Port-0 (capture)
+alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:monitor_FL
+alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:monitor_FR
+alsa_input.pci-0000_04_00.6.HiFi__Mic2__source:capture_FL
+alsa_input.pci-0000_04_00.6.HiFi__Mic2__source:capture_FR
+alsa_input.pci-0000_04_00.6.HiFi__Mic1__source:capture_FL
+alsa_input.pci-0000_04_00.6.HiFi__Mic1__source:capture_FR
+bluez_midi.server:out
+Firefox:output_FL
+Firefox:output_FR
+Firefox:output_FL
+Firefox:output_FR
+
+-- ALSA cards (kernel level) --
+$ cat /proc/asound/cards 2>/dev/null
+ 0 [Generic        ]: HDA-Intel - HD-Audio Generic
+                      HD-Audio Generic at 0xfcbc8000 irq 73
+ 1 [Generic_1      ]: HDA-Intel - HD-Audio Generic
+                      HD-Audio Generic at 0xfcbc0000 irq 74
+ 2 [acp63          ]: acp63 - acp63
+                      System76-Pangolin-pang14
+
+$ aplay -l
+**** List of PLAYBACK Hardware Devices ****
+card 0: Generic [HD-Audio Generic], device 3: HDMI 0 [HDMI 0]
+  Subdevices: 1/1
+  Subdevice #0: subdevice #0
+card 1: Generic_1 [HD-Audio Generic], device 0: CX11970 Analog [CX11970 Analog]
+  Subdevices: 0/1
+  Subdevice #0: subdevice #0
+
+
+============================================================
+6. USB HARDWARE FOR THE INSTRUMENT (keyboards / breath controller / mic)
+============================================================
+$ lsusb
+Bus 001 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 001 Device 002: ID 2808:9348 Focal-systems.Corp FT9201Fingerprint.̚
+Bus 001 Device 003: ID 0e8d:0608 MediaTek Inc. Wireless_Device
+Bus 002 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 003 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 004 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 005 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 006 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+Bus 007 Device 001: ID 1d6b:0002 Linux Foundation 2.0 root hub
+Bus 008 Device 001: ID 1d6b:0003 Linux Foundation 3.0 root hub
+
+-- Looking specifically for ID75 boards (idVendor 6964 / idProduct 0075) --
+$ lsusb -d 6964:0075
+
+-- Looking for the Shure MVX2U --
+$ lsusb | grep -i shure
+
+-- Existing udev rule from a prior run, if any --
+$ cat /etc/udev/rules.d/99-microtonal-instrument.rules 2>/dev/null
+
+-- hidraw device nodes + permissions --
+$ ls -l /dev/hidraw* 2>/dev/null
+crw-rw---- 1 root plugdev 241, 0 Aug 12 10:35 /dev/hidraw0
+
+
+============================================================
+7. IS THE HEADLESS-BOOT INSTALL ALREADY PARTIALLY PRESENT?
+============================================================
+$ systemctl list-unit-files | grep -i microtonal
+
+$ systemctl status microtonal-instrument.service --no-pager -l 2>&1
+Unit microtonal-instrument.service could not be found.
+
+$ systemctl status microtonal-bootmenu.service --no-pager -l 2>&1
+Unit microtonal-bootmenu.service could not be found.
+
+$ cat /etc/systemd/system/microtonal-instrument.service 2>/dev/null
+
+$ cat /etc/systemd/system/microtonal-bootmenu.service 2>/dev/null
+
+$ cat /usr/local/bin/microtonal-bootmenu.sh 2>/dev/null
+
+$ ls -la build/ 2>/dev/null
+total 680
+drwxrwxr-x  4 mjr mjr   4096 Aug 10 17:16 .
+drwxrwxr-x 16 mjr mjr   4096 Aug 12 11:16 ..
+-rw-rw-r--  1 mjr mjr  21578 Aug  6 11:49 CMakeCache.txt
+drwxrwxr-x  5 mjr mjr   4096 Aug 10 17:16 CMakeFiles
+-rw-rw-r--  1 mjr mjr   1801 Aug  6 11:49 cmake_install.cmake
+-rw-rw-r--  1 mjr mjr   7305 Aug  6 14:20 compile_commands.json
+drwxrwxr-x  5 mjr mjr   4096 Aug  6 11:48 _deps
+-rw-rw-r--  1 mjr mjr  19980 Aug  6 14:20 Makefile
+-rwxrwxr-x  1 mjr mjr 618704 Aug 10 17:16 microtonal_instrument
+
+$ ls -la build/microtonal_instrument 2>/dev/null
+-rwxrwxr-x 1 mjr mjr 618704 Aug 10 17:16 build/microtonal_instrument
+
+
+============================================================
+8. DISK / BOOT SAFETY CHECKS (making sure nothing here is fragile)
+============================================================
+-- Is the root filesystem encrypted (LUKS)? Relevant because tty1 --
+   changes happen AFTER any disk-unlock prompt, but good to confirm. --
+$ lsblk -f
+NAME        FSTYPE   FSVER LABEL UUID                                 FSAVAIL FSUSE% MOUNTPOINTS
+loop0       squashfs 4.0                                                    0   100% /snap/bare/5
+loop1       squashfs 4.0                                                    0   100% /snap/chromium/3491
+loop2       squashfs 4.0                                                    0   100% /snap/chromium/3499
+loop3       squashfs 4.0                                                    0   100% /snap/chromium-ffmpeg/118
+loop4       squashfs 4.0                                                    0   100% /snap/chromium-ffmpeg/112
+loop5       squashfs 4.0                                                    0   100% /snap/core18/2979
+loop6       squashfs 4.0                                                    0   100% /snap/core18/2999
+loop7       squashfs 4.0                                                    0   100% /snap/core20/2769
+loop8       squashfs 4.0                                                    0   100% /snap/core20/2866
+loop9       squashfs 4.0                                                    0   100% /snap/core22/2339
+loop10      squashfs 4.0                                                    0   100% /snap/core22/2411
+loop11      squashfs 4.0                                                    0   100% /snap/core24/1587
+loop12      squashfs 4.0                                                    0   100% /snap/core24/1643
+loop13      squashfs 4.0                                                    0   100% /snap/cups/1235
+loop14      squashfs 4.0                                                    0   100% /snap/cups/1238
+loop15      squashfs 4.0                                                    0   100% /snap/firefox/8664
+loop16      squashfs 4.0                                                    0   100% /snap/firefox/8702
+loop17      squashfs 4.0                                                    0   100% /snap/firmware-updater/224
+loop18      squashfs 4.0                                                    0   100% /snap/firmware-updater/226
+loop19      squashfs 4.0                                                    0   100% /snap/gnome-42-2204/247
+loop20      squashfs 4.0                                                    0   100% /snap/gnome-42-2204/263
+loop21      squashfs 4.0                                                    0   100% /snap/gnome-46-2404/145
+loop22      squashfs 4.0                                                    0   100% /snap/gnome-46-2404/153
+loop23      squashfs 4.0                                                    0   100% /snap/gtk-common-themes/1535
+loop24      squashfs 4.0                                                    0   100% /snap/mesa-2404/1165
+loop25      squashfs 4.0                                                    0   100% /snap/mesa-2404/1839
+loop26      squashfs 4.0                                                    0   100% /snap/opera/480
+loop27      squashfs 4.0                                                    0   100% /snap/opera/482
+loop28      squashfs 4.0                                                    0   100% /snap/shotcut/2306
+loop29      squashfs 4.0                                                    0   100% /snap/shotcut/2308
+loop30      squashfs 4.0                                                    0   100% /snap/snap-store/1216
+loop31      squashfs 4.0                                                    0   100% /snap/snap-store/1270
+loop32      squashfs 4.0                                                    0   100% /snap/snapd/27406
+loop33      squashfs 4.0                                                    0   100% /snap/snapd/27591
+loop34      squashfs 4.0                                                    0   100% /snap/snapd-desktop-integration/387
+loop35      squashfs 4.0                                                    0   100% /snap/snapd-desktop-integration/391
+loop36      squashfs 4.0                                                    0   100% /snap/thunderbird/1170
+loop37      squashfs 4.0                                                    0   100% /snap/thunderbird/1201
+loop38      squashfs 4.0                                                    0   100% /snap/vlc/3777
+loop39                                                                      0   100% /snap/youtube-dl/4806
+nvme0n1                                                                              
+├─nvme0n1p1 vfat     FAT32       71DB-3687                             893.8M     8% /boot/efi
+├─nvme0n1p2 ext4     1.0         4f432bbe-ae58-4a2e-a3a0-c3a60ae9f964  557.9G    25% /var/snap/firefox/common/host-hunspell
+│                                                                                    /
+├─nvme0n1p3                                                                          
+├─nvme0n1p4 ntfs                 7432C17332C13B3E                                    
+└─nvme0n1p5 ntfs                 BE8E1CE58E1C984B                                    
+
+$ cat /proc/cmdline
+BOOT_IMAGE=/boot/vmlinuz-6.9.3-76060903-generic root=UUID=4f432bbe-ae58-4a2e-a3a0-c3a60ae9f964 ro quiet splash vt.handoff=7
+
+-- Secure Boot state (informational only) --
+$ mokutil --sb-state
+SecureBoot disabled
+
+-- GRUB default entry / timeout (confirming we are NOT touching this) --
+$ grep -E '^GRUB_DEFAULT|^GRUB_TIMEOUT' /etc/default/grub 2>/dev/null
+GRUB_DEFAULT=0
+GRUB_TIMEOUT_STYLE=hidden
+GRUB_TIMEOUT=0
+
+
+============================================================
+9. PACKAGE / BUILD SANITY
+============================================================
+$ cmake --version
+cmake version 3.28.3
+
+CMake suite maintained and supported by Kitware (kitware.com/cmake).
+
+$ gcc --version | head -1
+gcc (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0
+
+$ pkg-config --modversion alsa 2>&1
+1.2.11
+
+$ pkg-config --modversion hidapi-hidraw 2>&1
+0.14.0
+
+pipewire: installed
+pipewire-bin: installed
+pipewire-jack: installed
+pipewire-pulse: installed
+wireplumber: installed
+pulseaudio-utils: installed
+alsa-utils: installed
+rfkill: installed
+zynaddsubfx: installed
+sooperlooper: installed
+calf-plugins: installed
+jalv: installed
+lv2-utils: NOT installed
+liblo-tools: installed
+gdm3: installed
+
+============================================================
+DONE -- copy everything above (or the redirected file) back to me
+============================================================

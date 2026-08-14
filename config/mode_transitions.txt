@@ -1,0 +1,182 @@
+# mode_transitions.txt — from→to sever/create/keep
+
+=== 1_SynthOnly → 1_SynthOnly ===
+sever:  (none)
+create: (none)
+keep:   DRUM_HP, DRUM_SL, MEL_HP, MEL_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 1_SynthOnly → 2_VocoderOnly ===
+sever:  MEL_HP, MEL_SL
+create: MEL_VOC, MIC_SIDE, VOC_HP, VOC_SL
+keep:   DRUM_HP, DRUM_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 1_SynthOnly → 3_SynthAndVocoder ===
+sever:  MEL_HP, MEL_SL
+create: MEL_VOC, MIC_HP, MIC_SIDE, MIC_SL, VOC_HP, VOC_SL
+keep:   DRUM_HP, DRUM_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 1_SynthOnly → 4_BreathOctave ===
+sever:  (none)
+create: (none)
+keep:   DRUM_HP, DRUM_SL, MEL_HP, MEL_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 1_SynthOnly → 5_BreathOctaveMic ===
+sever:  (none)
+create: MIC_HP, MIC_SL
+keep:   DRUM_HP, DRUM_SL, MEL_HP, MEL_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 1_SynthOnly → 6_Talkbox ===
+sever:  MEL_HP, MEL_SL
+create: MEL_MVX, MIC_HP, MIC_SL
+keep:   DRUM_HP, DRUM_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 2_VocoderOnly → 1_SynthOnly ===
+sever:  MEL_VOC, MIC_SIDE, VOC_HP, VOC_SL
+create: MEL_HP, MEL_SL
+keep:   DRUM_HP, DRUM_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 2_VocoderOnly → 2_VocoderOnly ===
+sever:  (none)
+create: (none)
+keep:   DRUM_HP, DRUM_SL, MEL_VOC, MIC_SIDE, MIDI_DRU, MIDI_MEL, SL_HP, VOC_HP, VOC_SL
+
+=== 2_VocoderOnly → 3_SynthAndVocoder ===
+sever:  (none)
+create: MIC_HP, MIC_SL
+keep:   DRUM_HP, DRUM_SL, MEL_VOC, MIC_SIDE, MIDI_DRU, MIDI_MEL, SL_HP, VOC_HP, VOC_SL
+
+=== 2_VocoderOnly → 4_BreathOctave ===
+sever:  MEL_VOC, MIC_SIDE, VOC_HP, VOC_SL
+create: MEL_HP, MEL_SL
+keep:   DRUM_HP, DRUM_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 2_VocoderOnly → 5_BreathOctaveMic ===
+sever:  MEL_VOC, MIC_SIDE, VOC_HP, VOC_SL
+create: MEL_HP, MEL_SL, MIC_HP, MIC_SL
+keep:   DRUM_HP, DRUM_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 2_VocoderOnly → 6_Talkbox ===
+sever:  MEL_VOC, MIC_SIDE, VOC_HP, VOC_SL
+create: MEL_MVX, MIC_HP, MIC_SL
+keep:   DRUM_HP, DRUM_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 3_SynthAndVocoder → 1_SynthOnly ===
+sever:  MEL_VOC, MIC_HP, MIC_SIDE, MIC_SL, VOC_HP, VOC_SL
+create: MEL_HP, MEL_SL
+keep:   DRUM_HP, DRUM_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 3_SynthAndVocoder → 2_VocoderOnly ===
+sever:  MIC_HP, MIC_SL
+create: (none)
+keep:   DRUM_HP, DRUM_SL, MEL_VOC, MIC_SIDE, MIDI_DRU, MIDI_MEL, SL_HP, VOC_HP, VOC_SL
+
+=== 3_SynthAndVocoder → 3_SynthAndVocoder ===
+sever:  (none)
+create: (none)
+keep:   DRUM_HP, DRUM_SL, MEL_VOC, MIC_HP, MIC_SIDE, MIC_SL, MIDI_DRU, MIDI_MEL, SL_HP, VOC_HP, VOC_SL
+
+=== 3_SynthAndVocoder → 4_BreathOctave ===
+sever:  MEL_VOC, MIC_HP, MIC_SIDE, MIC_SL, VOC_HP, VOC_SL
+create: MEL_HP, MEL_SL
+keep:   DRUM_HP, DRUM_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 3_SynthAndVocoder → 5_BreathOctaveMic ===
+sever:  MEL_VOC, MIC_SIDE, VOC_HP, VOC_SL
+create: MEL_HP, MEL_SL
+keep:   DRUM_HP, DRUM_SL, MIC_HP, MIC_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 3_SynthAndVocoder → 6_Talkbox ===
+sever:  MEL_VOC, MIC_SIDE, VOC_HP, VOC_SL
+create: MEL_MVX
+keep:   DRUM_HP, DRUM_SL, MIC_HP, MIC_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 4_BreathOctave → 1_SynthOnly ===
+sever:  (none)
+create: (none)
+keep:   DRUM_HP, DRUM_SL, MEL_HP, MEL_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 4_BreathOctave → 2_VocoderOnly ===
+sever:  MEL_HP, MEL_SL
+create: MEL_VOC, MIC_SIDE, VOC_HP, VOC_SL
+keep:   DRUM_HP, DRUM_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 4_BreathOctave → 3_SynthAndVocoder ===
+sever:  MEL_HP, MEL_SL
+create: MEL_VOC, MIC_HP, MIC_SIDE, MIC_SL, VOC_HP, VOC_SL
+keep:   DRUM_HP, DRUM_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 4_BreathOctave → 4_BreathOctave ===
+sever:  (none)
+create: (none)
+keep:   DRUM_HP, DRUM_SL, MEL_HP, MEL_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 4_BreathOctave → 5_BreathOctaveMic ===
+sever:  (none)
+create: MIC_HP, MIC_SL
+keep:   DRUM_HP, DRUM_SL, MEL_HP, MEL_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 4_BreathOctave → 6_Talkbox ===
+sever:  MEL_HP, MEL_SL
+create: MEL_MVX, MIC_HP, MIC_SL
+keep:   DRUM_HP, DRUM_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 5_BreathOctaveMic → 1_SynthOnly ===
+sever:  MIC_HP, MIC_SL
+create: (none)
+keep:   DRUM_HP, DRUM_SL, MEL_HP, MEL_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 5_BreathOctaveMic → 2_VocoderOnly ===
+sever:  MEL_HP, MEL_SL, MIC_HP, MIC_SL
+create: MEL_VOC, MIC_SIDE, VOC_HP, VOC_SL
+keep:   DRUM_HP, DRUM_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 5_BreathOctaveMic → 3_SynthAndVocoder ===
+sever:  MEL_HP, MEL_SL
+create: MEL_VOC, MIC_SIDE, VOC_HP, VOC_SL
+keep:   DRUM_HP, DRUM_SL, MIC_HP, MIC_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 5_BreathOctaveMic → 4_BreathOctave ===
+sever:  MIC_HP, MIC_SL
+create: (none)
+keep:   DRUM_HP, DRUM_SL, MEL_HP, MEL_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 5_BreathOctaveMic → 5_BreathOctaveMic ===
+sever:  (none)
+create: (none)
+keep:   DRUM_HP, DRUM_SL, MEL_HP, MEL_SL, MIC_HP, MIC_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 5_BreathOctaveMic → 6_Talkbox ===
+sever:  MEL_HP, MEL_SL
+create: MEL_MVX
+keep:   DRUM_HP, DRUM_SL, MIC_HP, MIC_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 6_Talkbox → 1_SynthOnly ===
+sever:  MEL_MVX, MIC_HP, MIC_SL
+create: MEL_HP, MEL_SL
+keep:   DRUM_HP, DRUM_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 6_Talkbox → 2_VocoderOnly ===
+sever:  MEL_MVX, MIC_HP, MIC_SL
+create: MEL_VOC, MIC_SIDE, VOC_HP, VOC_SL
+keep:   DRUM_HP, DRUM_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 6_Talkbox → 3_SynthAndVocoder ===
+sever:  MEL_MVX
+create: MEL_VOC, MIC_SIDE, VOC_HP, VOC_SL
+keep:   DRUM_HP, DRUM_SL, MIC_HP, MIC_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 6_Talkbox → 4_BreathOctave ===
+sever:  MEL_MVX, MIC_HP, MIC_SL
+create: MEL_HP, MEL_SL
+keep:   DRUM_HP, DRUM_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 6_Talkbox → 5_BreathOctaveMic ===
+sever:  MEL_MVX
+create: MEL_HP, MEL_SL
+keep:   DRUM_HP, DRUM_SL, MIC_HP, MIC_SL, MIDI_DRU, MIDI_MEL, SL_HP
+
+=== 6_Talkbox → 6_Talkbox ===
+sever:  (none)
+create: (none)
+keep:   DRUM_HP, DRUM_SL, MEL_MVX, MIC_HP, MIC_SL, MIDI_DRU, MIDI_MEL, SL_HP
+

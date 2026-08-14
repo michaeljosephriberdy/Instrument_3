@@ -430,70 +430,6 @@ bool AudioGraphManager::launchZynDrums()
 
 
 
-bool AudioGraphManager::recoverAudioStack(const char* reason)
-{
-    // Cooldown: never restart PipeWire more than once per 90 s.
-    static std::chrono::steady_clock::time_point last_recovery{};
-    auto now = std::chrono::steady_clock::now();
-    if (last_recovery.time_since_epoch().count() != 0 &&
-        (now - last_recovery) < std::chrono::seconds(90)) {
-        Logger::warning(std::string("Audio recovery suppressed (90s cooldown): ") +
-                        (reason ? reason : ""));
-        return false;
-    }
-    last_recovery = now;
-
-    Logger::warning(std::string("AUDIO RECOVERY: ") +
-                    (reason ? reason : "unspecified") +
-                    " -- stopping clients, restarting user PipeWire, relaunching");
-
-    // Stop our children cleanly so we do not leave zombies across the
-    // PipeWire restart.
-    killPid(sl_pid_, "sooperlooper");
-    killPid(voc_pid_, "vocoder");
-    killPid(zyn_drums_pid_, "zyn-drums");
-    killPid(zyn_pid_, "zyn-melody");
-    sl_pid_ = -1;
-    voc_pid_ = -1;
-    zyn_drums_pid_ = -1;
-    zyn_pid_ = -1;
-
-    // User-session restart — works headless, no root required.
-    // pipewire-pulse + wireplumber keep the session coherent.
-    int rc = std::system("systemctl --user restart pipewire pipewire-pulse wireplumber >/dev/null 2>&1");
-    if (rc != 0) {
-        Logger::error("systemctl --user restart pipewire... failed (rc=" +
-                      std::to_string(rc) + ")");
-        // Still try to bring our clients back on the existing session.
-    } else {
-        Logger::info("User PipeWire stack restarted");
-    }
-    std::this_thread::sleep_for(std::chrono::milliseconds(2500));
-
-    // Relaunch in a safe order: SL first (stable when it owns the graph
-    // before the Zyns register), then the rest via normal start path.
-    bool ok = launchSooperLooper();
-    ok = launchZyn() && ok;
-    ok = launchZynDrums() && ok;
-    // Vocoder is mode-dependent; ensureHealthyGraph / setMode will start it
-    // when needed. Still try once so Mode 2/3 recover quickly.
-    (void)launchVocoder();
-
-    // Rebuild links for the current mode.
-    if (!setMode(mode_)) {
-        Logger::warning("recoverAudioStack: setMode returned false");
-        ok = false;
-    }
-
-    if (ok) {
-        Logger::info("AUDIO RECOVERY complete — graph rebuilt for current mode");
-    } else {
-        Logger::warning("AUDIO RECOVERY finished with some failures "
-                        "(see earlier warnings; health will keep trying)");
-    }
-    return ok;
-}
-
 bool AudioGraphManager::launchSooperLooper()
 {
     if (processAlive(sl_pid_))
@@ -508,14 +444,14 @@ bool AudioGraphManager::launchSooperLooper()
         return false;
     }
 
-    // Rate-limit relaunches so we never recreate the restart storm that
-    // corrupts PipeWire/JACK. First launch of a session is never delayed.
+    // Rate-limit only the *relaunch* path so a flapping process cannot
+    // produce a continuous restart storm. First launch is never delayed.
     static std::chrono::steady_clock::time_point last_launch{};
     auto now = std::chrono::steady_clock::now();
     if (last_launch.time_since_epoch().count() != 0 &&
         (now - last_launch) < std::chrono::seconds(12)) {
         Logger::warning("SooperLooper relaunch suppressed (rate limit 12s) "
-                        "-- required in every mode; will retry next health tick");
+                        "-- process is required; will retry next health tick");
         return false;
     }
 
@@ -525,7 +461,11 @@ bool AudioGraphManager::launchSooperLooper()
         return false;
     }
     if (pid == 0) {
+        // Own session so parent signals / process-group noise do not
+        // immediately kill the looper.
         setsid();
+
+        // Capture all output so the real exit reason is visible next time.
         int fd = open("/tmp/sooperlooper_engine.log",
                       O_WRONLY | O_CREAT | O_APPEND, 0644);
         if (fd >= 0) {
@@ -533,6 +473,7 @@ bool AudioGraphManager::launchSooperLooper()
             dup2(fd, STDERR_FILENO);
             close(fd);
         }
+
         std::string port = std::to_string(cfg_.sooperlooper_osc_port);
         std::string pwjack = which("pw-jack");
         if (!pwjack.empty()) {
@@ -541,12 +482,14 @@ bool AudioGraphManager::launchSooperLooper()
                    "-p", port.c_str(),
                    "-l", "4",
                    "-c", "2",
+                   "-q",
                    static_cast<char*>(nullptr));
         }
         execlp(bin.c_str(), bin.c_str(),
                "-p", port.c_str(),
                "-l", "4",
                "-c", "2",
+               "-q",
                static_cast<char*>(nullptr));
         _exit(127);
     }
@@ -557,9 +500,10 @@ bool AudioGraphManager::launchSooperLooper()
                  " OSC :" + std::to_string(cfg_.sooperlooper_osc_port) +
                  " (log: /tmp/sooperlooper_engine.log)");
 
-    // Hard settle: process must stay alive AND ports must appear.
+    // Strict settle: ports must appear AND the process must still be
+    // alive afterwards. SL is required in every mode.
     bool ports_ok = false;
-    for (int i = 0; i < 30; ++i) {
+    for (int i = 0; i < 25; ++i) {          // up to ~5 s
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
         if (!processAlive(sl_pid_)) {
             Logger::warning("SooperLooper exited during settle "
@@ -571,7 +515,9 @@ bool AudioGraphManager::launchSooperLooper()
             {"sooperlooper", "SooperLooper", "common_out"}, false);
         if (!outs.empty()) {
             ports_ok = true;
-            std::this_thread::sleep_for(std::chrono::milliseconds(800));
+            // Extra settle after ports appear so JACK activation finishes
+            // before any links are attempted.
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
             if (!processAlive(sl_pid_)) {
                 Logger::warning("SooperLooper died right after ports appeared "
                                 "(see /tmp/sooperlooper_engine.log)");
@@ -583,12 +529,9 @@ bool AudioGraphManager::launchSooperLooper()
     }
     if (!ports_ok) {
         Logger::warning("SooperLooper ports never appeared (pid still alive)");
-    } else {
-        Logger::info("SL ports settled");
     }
     return processAlive(sl_pid_);
 }
-
 
 
 bool AudioGraphManager::launchVocoder()
@@ -1162,26 +1105,18 @@ void AudioGraphManager::ensureHealthyGraph() {
         need_rebuild = true;
     }
     if (!processAlive(sl_pid_)) {
-            static int sl_fail_streak = 0;
             static std::chrono::steady_clock::time_point last_sl_warn{};
-            auto nowh = std::chrono::steady_clock::now();
+            auto now = std::chrono::steady_clock::now();
             bool should_log = (last_sl_warn.time_since_epoch().count() == 0) ||
-                              (nowh - last_sl_warn) > std::chrono::seconds(8);
+                              (now - last_sl_warn) > std::chrono::seconds(8);
             if (should_log) {
                 Logger::warning("Health: SooperLooper dead -- relaunching "
                                 "(required in every mode; rate-limited)");
-                last_sl_warn = nowh;
+                last_sl_warn = now;
             }
-            ++sl_fail_streak;
-            bool launched = launchSooperLooper();
-            if (launched) {
-                need_rebuild = true;
-                sl_fail_streak = 0;
-            } else if (sl_fail_streak >= 3) {
-                if (recoverAudioStack("repeated SooperLooper launch failure")) {
-                    need_rebuild = true;
-                    sl_fail_streak = 0;
-                }
+            // launchSooperLooper itself rate-limits to 12 s.
+            if (launchSooperLooper()) {
+                need_rebuild = true;   // SL is mandatory; always rebuild
             }
         }
     if (!processAlive(voc_pid_)) {

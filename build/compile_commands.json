@@ -1,91 +1,91 @@
 [
 {
   "directory": "/home/mjr/Instrument_3/build",
-  "command": "/usr/bin/c++  -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/main.cpp.o -c /home/mjr/Instrument_3/src/main.cpp",
+  "command": "/usr/bin/c++ -DPI_AUDIO_LEFT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL\\\" -DPI_AUDIO_RIGHT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR\\\" -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/main.cpp.o -c /home/mjr/Instrument_3/src/main.cpp",
   "file": "/home/mjr/Instrument_3/src/main.cpp",
   "output": "CMakeFiles/microtonal_instrument.dir/src/main.cpp.o"
 },
 {
   "directory": "/home/mjr/Instrument_3/build",
-  "command": "/usr/bin/c++  -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/engine.cpp.o -c /home/mjr/Instrument_3/src/engine.cpp",
+  "command": "/usr/bin/c++ -DPI_AUDIO_LEFT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL\\\" -DPI_AUDIO_RIGHT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR\\\" -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/engine.cpp.o -c /home/mjr/Instrument_3/src/engine.cpp",
   "file": "/home/mjr/Instrument_3/src/engine.cpp",
   "output": "CMakeFiles/microtonal_instrument.dir/src/engine.cpp.o"
 },
 {
   "directory": "/home/mjr/Instrument_3/build",
-  "command": "/usr/bin/c++  -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/logger.cpp.o -c /home/mjr/Instrument_3/src/logger.cpp",
+  "command": "/usr/bin/c++ -DPI_AUDIO_LEFT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL\\\" -DPI_AUDIO_RIGHT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR\\\" -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/logger.cpp.o -c /home/mjr/Instrument_3/src/logger.cpp",
   "file": "/home/mjr/Instrument_3/src/logger.cpp",
   "output": "CMakeFiles/microtonal_instrument.dir/src/logger.cpp.o"
 },
 {
   "directory": "/home/mjr/Instrument_3/build",
-  "command": "/usr/bin/c++  -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/instrument_state.cpp.o -c /home/mjr/Instrument_3/src/instrument_state.cpp",
+  "command": "/usr/bin/c++ -DPI_AUDIO_LEFT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL\\\" -DPI_AUDIO_RIGHT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR\\\" -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/instrument_state.cpp.o -c /home/mjr/Instrument_3/src/instrument_state.cpp",
   "file": "/home/mjr/Instrument_3/src/instrument_state.cpp",
   "output": "CMakeFiles/microtonal_instrument.dir/src/instrument_state.cpp.o"
 },
 {
   "directory": "/home/mjr/Instrument_3/build",
-  "command": "/usr/bin/c++  -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/keyboard_manager.cpp.o -c /home/mjr/Instrument_3/src/keyboard_manager.cpp",
+  "command": "/usr/bin/c++ -DPI_AUDIO_LEFT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL\\\" -DPI_AUDIO_RIGHT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR\\\" -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/keyboard_manager.cpp.o -c /home/mjr/Instrument_3/src/keyboard_manager.cpp",
   "file": "/home/mjr/Instrument_3/src/keyboard_manager.cpp",
   "output": "CMakeFiles/microtonal_instrument.dir/src/keyboard_manager.cpp.o"
 },
 {
   "directory": "/home/mjr/Instrument_3/build",
-  "command": "/usr/bin/c++  -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/keyboard_discovery.cpp.o -c /home/mjr/Instrument_3/src/keyboard_discovery.cpp",
+  "command": "/usr/bin/c++ -DPI_AUDIO_LEFT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL\\\" -DPI_AUDIO_RIGHT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR\\\" -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/keyboard_discovery.cpp.o -c /home/mjr/Instrument_3/src/keyboard_discovery.cpp",
   "file": "/home/mjr/Instrument_3/src/keyboard_discovery.cpp",
   "output": "CMakeFiles/microtonal_instrument.dir/src/keyboard_discovery.cpp.o"
 },
 {
   "directory": "/home/mjr/Instrument_3/build",
-  "command": "/usr/bin/c++  -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/keyboard_assignment.cpp.o -c /home/mjr/Instrument_3/src/keyboard_assignment.cpp",
+  "command": "/usr/bin/c++ -DPI_AUDIO_LEFT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL\\\" -DPI_AUDIO_RIGHT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR\\\" -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/keyboard_assignment.cpp.o -c /home/mjr/Instrument_3/src/keyboard_assignment.cpp",
   "file": "/home/mjr/Instrument_3/src/keyboard_assignment.cpp",
   "output": "CMakeFiles/microtonal_instrument.dir/src/keyboard_assignment.cpp.o"
 },
 {
   "directory": "/home/mjr/Instrument_3/build",
-  "command": "/usr/bin/c++  -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/breath_controller.cpp.o -c /home/mjr/Instrument_3/src/breath_controller.cpp",
+  "command": "/usr/bin/c++ -DPI_AUDIO_LEFT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL\\\" -DPI_AUDIO_RIGHT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR\\\" -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/breath_controller.cpp.o -c /home/mjr/Instrument_3/src/breath_controller.cpp",
   "file": "/home/mjr/Instrument_3/src/breath_controller.cpp",
   "output": "CMakeFiles/microtonal_instrument.dir/src/breath_controller.cpp.o"
 },
 {
   "directory": "/home/mjr/Instrument_3/build",
-  "command": "/usr/bin/c++  -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/midi_engine.cpp.o -c /home/mjr/Instrument_3/src/midi_engine.cpp",
+  "command": "/usr/bin/c++ -DPI_AUDIO_LEFT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL\\\" -DPI_AUDIO_RIGHT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR\\\" -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/midi_engine.cpp.o -c /home/mjr/Instrument_3/src/midi_engine.cpp",
   "file": "/home/mjr/Instrument_3/src/midi_engine.cpp",
   "output": "CMakeFiles/microtonal_instrument.dir/src/midi_engine.cpp.o"
 },
 {
   "directory": "/home/mjr/Instrument_3/build",
-  "command": "/usr/bin/c++  -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/vial_controller.cpp.o -c /home/mjr/Instrument_3/src/vial_controller.cpp",
+  "command": "/usr/bin/c++ -DPI_AUDIO_LEFT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL\\\" -DPI_AUDIO_RIGHT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR\\\" -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/vial_controller.cpp.o -c /home/mjr/Instrument_3/src/vial_controller.cpp",
   "file": "/home/mjr/Instrument_3/src/vial_controller.cpp",
   "output": "CMakeFiles/microtonal_instrument.dir/src/vial_controller.cpp.o"
 },
 {
   "directory": "/home/mjr/Instrument_3/build",
-  "command": "/usr/bin/c++  -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/startup_manager.cpp.o -c /home/mjr/Instrument_3/src/startup_manager.cpp",
+  "command": "/usr/bin/c++ -DPI_AUDIO_LEFT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL\\\" -DPI_AUDIO_RIGHT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR\\\" -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/startup_manager.cpp.o -c /home/mjr/Instrument_3/src/startup_manager.cpp",
   "file": "/home/mjr/Instrument_3/src/startup_manager.cpp",
   "output": "CMakeFiles/microtonal_instrument.dir/src/startup_manager.cpp.o"
 },
 {
   "directory": "/home/mjr/Instrument_3/build",
-  "command": "/usr/bin/c++  -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/usb_topology.cpp.o -c /home/mjr/Instrument_3/src/usb_topology.cpp",
+  "command": "/usr/bin/c++ -DPI_AUDIO_LEFT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL\\\" -DPI_AUDIO_RIGHT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR\\\" -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/usb_topology.cpp.o -c /home/mjr/Instrument_3/src/usb_topology.cpp",
   "file": "/home/mjr/Instrument_3/src/usb_topology.cpp",
   "output": "CMakeFiles/microtonal_instrument.dir/src/usb_topology.cpp.o"
 },
 {
   "directory": "/home/mjr/Instrument_3/build",
-  "command": "/usr/bin/c++  -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/config_manager.cpp.o -c /home/mjr/Instrument_3/src/config_manager.cpp",
+  "command": "/usr/bin/c++ -DPI_AUDIO_LEFT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL\\\" -DPI_AUDIO_RIGHT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR\\\" -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/config_manager.cpp.o -c /home/mjr/Instrument_3/src/config_manager.cpp",
   "file": "/home/mjr/Instrument_3/src/config_manager.cpp",
   "output": "CMakeFiles/microtonal_instrument.dir/src/config_manager.cpp.o"
 },
 {
   "directory": "/home/mjr/Instrument_3/build",
-  "command": "/usr/bin/c++  -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/layout_manager.cpp.o -c /home/mjr/Instrument_3/src/layout_manager.cpp",
+  "command": "/usr/bin/c++ -DPI_AUDIO_LEFT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL\\\" -DPI_AUDIO_RIGHT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR\\\" -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/layout_manager.cpp.o -c /home/mjr/Instrument_3/src/layout_manager.cpp",
   "file": "/home/mjr/Instrument_3/src/layout_manager.cpp",
   "output": "CMakeFiles/microtonal_instrument.dir/src/layout_manager.cpp.o"
 },
 {
   "directory": "/home/mjr/Instrument_3/build",
-  "command": "/usr/bin/c++  -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/audio_graph_manager.cpp.o -c /home/mjr/Instrument_3/src/audio_graph_manager.cpp",
+  "command": "/usr/bin/c++ -DPI_AUDIO_LEFT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL\\\" -DPI_AUDIO_RIGHT_SINK=\\\"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR\\\" -I/home/mjr/Instrument_3/include -I/usr/include/hidapi -I/home/mjr/Instrument_3/build/_deps/json-src/include -O3 -DNDEBUG -std=c++20 -Wall -Wextra -Wpedantic -o CMakeFiles/microtonal_instrument.dir/src/audio_graph_manager.cpp.o -c /home/mjr/Instrument_3/src/audio_graph_manager.cpp",
   "file": "/home/mjr/Instrument_3/src/audio_graph_manager.cpp",
   "output": "CMakeFiles/microtonal_instrument.dir/src/audio_graph_manager.cpp.o"
 }

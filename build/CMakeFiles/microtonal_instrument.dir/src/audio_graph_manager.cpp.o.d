@@ -177,7 +177,13 @@ CMakeFiles/microtonal_instrument.dir/src/audio_graph_manager.cpp.o: \
  /usr/include/x86_64-linux-gnu/bits/stdio.h \
  /usr/include/x86_64-linux-gnu/bits/stdio2.h \
  /usr/include/c++/13/bits/charconv.h \
- /usr/include/c++/13/bits/basic_string.tcc /usr/include/c++/13/regex \
+ /usr/include/c++/13/bits/basic_string.tcc /usr/include/c++/13/array \
+ /usr/include/fcntl.h /usr/include/x86_64-linux-gnu/bits/fcntl.h \
+ /usr/include/x86_64-linux-gnu/bits/fcntl-linux.h \
+ /usr/include/x86_64-linux-gnu/bits/types/struct_iovec.h \
+ /usr/include/linux/falloc.h /usr/include/x86_64-linux-gnu/bits/stat.h \
+ /usr/include/x86_64-linux-gnu/bits/struct_stat.h \
+ /usr/include/x86_64-linux-gnu/bits/fcntl2.h /usr/include/c++/13/regex \
  /usr/include/c++/13/bitset /usr/include/c++/13/locale \
  /usr/include/c++/13/bits/locale_classes.h \
  /usr/include/c++/13/ext/atomicity.h \
@@ -270,8 +276,7 @@ CMakeFiles/microtonal_instrument.dir/src/audio_graph_manager.cpp.o: \
  /usr/include/c++/13/bits/unique_lock.h /usr/include/c++/13/chrono \
  /usr/include/c++/13/bits/chrono_io.h /usr/include/c++/13/iomanip \
  /usr/include/c++/13/bits/quoted_string.h /usr/include/c++/13/format \
- /usr/include/c++/13/array /usr/include/c++/13/charconv \
- /usr/include/c++/13/optional \
+ /usr/include/c++/13/charconv /usr/include/c++/13/optional \
  /usr/include/c++/13/bits/enable_special_members.h \
  /usr/include/c++/13/span /usr/include/c++/13/variant \
  /usr/include/c++/13/bits/ranges_algobase.h /usr/include/c++/13/cstring \

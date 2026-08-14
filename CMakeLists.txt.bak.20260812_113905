@@ -82,11 +82,3 @@ target_compile_options(microtonal_instrument PRIVATE
     -Wpedantic
 
 )
-
-# --- Pi headless audio sink overrides (added by build.sh --headless-boot) ---
-if(DEFINED PI_AUDIO_LEFT_SINK)
-  target_compile_definitions(microtonal_instrument PRIVATE PI_AUDIO_LEFT_SINK="${PI_AUDIO_LEFT_SINK}")
-endif()
-if(DEFINED PI_AUDIO_RIGHT_SINK)
-  target_compile_definitions(microtonal_instrument PRIVATE PI_AUDIO_RIGHT_SINK="${PI_AUDIO_RIGHT_SINK}")
-endif()

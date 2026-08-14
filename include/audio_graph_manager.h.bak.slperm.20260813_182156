@@ -208,9 +208,6 @@ private:
     bool pwUnlink(const std::string& src, const std::string& dst);
     void disconnectAllOwnedLinks();
     void forceDisconnectInstrumentGraph();
-    // Restart user PipeWire + relaunch audio clients after
-    // repeated SooperLooper / graph failures (headless-safe).
-    bool recoverAudioStack(const char* reason);
     // Differential mode graph (no full-graph sever on every switch)
     enum class LinkRole {
         MelSl, MelHp, MelVoc, MelMvx,

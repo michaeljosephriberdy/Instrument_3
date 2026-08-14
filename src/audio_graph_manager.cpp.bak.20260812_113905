@@ -1,6 +1,4 @@
 #include "audio_graph_manager.h"
-#include <fcntl.h>
-#include <unistd.h>
 #include <regex>
 #include <map>
 #include <cmath>
@@ -20,14 +18,6 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <unistd.h>
-
-#ifndef PI_AUDIO_LEFT_SINK
-#define PI_AUDIO_LEFT_SINK PI_AUDIO_LEFT_SINK
-#endif
-#ifndef PI_AUDIO_RIGHT_SINK
-#define PI_AUDIO_RIGHT_SINK PI_AUDIO_RIGHT_SINK
-#endif
-
 
 namespace
 {
@@ -347,9 +337,9 @@ bool AudioGraphManager::launchZyn()
         std::string play_l = defaultPlaybackPort(true);
         std::string play_r = defaultPlaybackPort(false);
         if (play_l.empty())
-            play_l = PI_AUDIO_LEFT_SINK;
+            play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
         if (play_r.empty())
-            play_r = PI_AUDIO_RIGHT_SINK;
+            play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
         std::string ol = resolveClientPort(cfg_.zyn_client_name, "out_1", false);
         std::string or_ = resolveClientPort(cfg_.zyn_client_name, "out_2", false);
         if (ol.empty()) ol = "zynaddsubfx_zyn-melody:out_1";
@@ -411,9 +401,9 @@ bool AudioGraphManager::launchZynDrums()
         std::string play_l = defaultPlaybackPort(true);
         std::string play_r = defaultPlaybackPort(false);
         if (play_l.empty())
-            play_l = PI_AUDIO_LEFT_SINK;
+            play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
         if (play_r.empty())
-            play_r = PI_AUDIO_RIGHT_SINK;
+            play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
         std::string ol = resolveClientPort(cfg_.zyn_drums_client_name, "out_1", false);
         std::string or_ = resolveClientPort(cfg_.zyn_drums_client_name, "out_2", false);
         if (ol.empty()) ol = "zynaddsubfx_zyn-drums:out_1";
@@ -430,165 +420,65 @@ bool AudioGraphManager::launchZynDrums()
 
 
 
-bool AudioGraphManager::recoverAudioStack(const char* reason)
-{
-    // Cooldown: never restart PipeWire more than once per 90 s.
-    static std::chrono::steady_clock::time_point last_recovery{};
-    auto now = std::chrono::steady_clock::now();
-    if (last_recovery.time_since_epoch().count() != 0 &&
-        (now - last_recovery) < std::chrono::seconds(90)) {
-        Logger::warning(std::string("Audio recovery suppressed (90s cooldown): ") +
-                        (reason ? reason : ""));
-        return false;
-    }
-    last_recovery = now;
-
-    Logger::warning(std::string("AUDIO RECOVERY: ") +
-                    (reason ? reason : "unspecified") +
-                    " -- stopping clients, restarting user PipeWire, relaunching");
-
-    // Stop our children cleanly so we do not leave zombies across the
-    // PipeWire restart.
-    killPid(sl_pid_, "sooperlooper");
-    killPid(voc_pid_, "vocoder");
-    killPid(zyn_drums_pid_, "zyn-drums");
-    killPid(zyn_pid_, "zyn-melody");
-    sl_pid_ = -1;
-    voc_pid_ = -1;
-    zyn_drums_pid_ = -1;
-    zyn_pid_ = -1;
-
-    // User-session restart — works headless, no root required.
-    // pipewire-pulse + wireplumber keep the session coherent.
-    int rc = std::system("systemctl --user restart pipewire pipewire-pulse wireplumber >/dev/null 2>&1");
-    if (rc != 0) {
-        Logger::error("systemctl --user restart pipewire... failed (rc=" +
-                      std::to_string(rc) + ")");
-        // Still try to bring our clients back on the existing session.
-    } else {
-        Logger::info("User PipeWire stack restarted");
-    }
-    std::this_thread::sleep_for(std::chrono::milliseconds(2500));
-
-    // Relaunch in a safe order: SL first (stable when it owns the graph
-    // before the Zyns register), then the rest via normal start path.
-    bool ok = launchSooperLooper();
-    ok = launchZyn() && ok;
-    ok = launchZynDrums() && ok;
-    // Vocoder is mode-dependent; ensureHealthyGraph / setMode will start it
-    // when needed. Still try once so Mode 2/3 recover quickly.
-    (void)launchVocoder();
-
-    // Rebuild links for the current mode.
-    if (!setMode(mode_)) {
-        Logger::warning("recoverAudioStack: setMode returned false");
-        ok = false;
-    }
-
-    if (ok) {
-        Logger::info("AUDIO RECOVERY complete — graph rebuilt for current mode");
-    } else {
-        Logger::warning("AUDIO RECOVERY finished with some failures "
-                        "(see earlier warnings; health will keep trying)");
-    }
-    return ok;
-}
-
 bool AudioGraphManager::launchSooperLooper()
 {
     if (processAlive(sl_pid_))
         return true;
 
     std::string bin = which(cfg_.sooperlooper_binary.empty()
-                            ? "sooperlooper"
-                            : cfg_.sooperlooper_binary);
-    if (bin.empty()) {
-        Logger::warning("sooperlooper not found -- install package 'sooperlooper'; "
+                                ? "sooperlooper"
+                                : cfg_.sooperlooper_binary);
+    if (bin.empty())
+    {
+        Logger::warning("sooperlooper not found — install package 'sooperlooper'; "
                         "loop keys will log only");
         return false;
     }
 
-    // Rate-limit relaunches so we never recreate the restart storm that
-    // corrupts PipeWire/JACK. First launch of a session is never delayed.
-    static std::chrono::steady_clock::time_point last_launch{};
-    auto now = std::chrono::steady_clock::now();
-    if (last_launch.time_since_epoch().count() != 0 &&
-        (now - last_launch) < std::chrono::seconds(12)) {
-        Logger::warning("SooperLooper relaunch suppressed (rate limit 12s) "
-                        "-- required in every mode; will retry next health tick");
-        return false;
-    }
-
     pid_t pid = fork();
-    if (pid < 0) {
+    if (pid < 0)
+    {
         Logger::error("fork() failed for SooperLooper");
         return false;
     }
-    if (pid == 0) {
-        setsid();
-        int fd = open("/tmp/sooperlooper_engine.log",
-                      O_WRONLY | O_CREAT | O_APPEND, 0644);
-        if (fd >= 0) {
-            dup2(fd, STDOUT_FILENO);
-            dup2(fd, STDERR_FILENO);
-            close(fd);
-        }
+
+    if (pid == 0)
+    {
+        // Headless: -p OSC port, -l 4 four independent loops, -c 2 stereo channels.
+        // Do not pass -j (JACK name) in a way that breaks PipeWire.
         std::string port = std::to_string(cfg_.sooperlooper_osc_port);
         std::string pwjack = which("pw-jack");
-        if (!pwjack.empty()) {
+        if (!pwjack.empty())
+        {
             execlp("pw-jack", "pw-jack",
                    bin.c_str(),
                    "-p", port.c_str(),
-                   "-l", "4",
-                   "-c", "2",
-                   static_cast<char*>(nullptr));
-        }
-        execlp(bin.c_str(), bin.c_str(),
-               "-p", port.c_str(),
-               "-l", "4",
-               "-c", "2",
-               static_cast<char*>(nullptr));
+ "-l", "4",
+ "-c", "2",
+ static_cast<char*>(nullptr));
+ }
+ execlp(bin.c_str(), bin.c_str(),
+ "-p", port.c_str(),
+ "-l", "4",
+ "-c", "2",
+ static_cast<char*>(nullptr));
         _exit(127);
     }
 
     sl_pid_ = pid;
-    last_launch = now;
     Logger::info("Launched SooperLooper pid=" + std::to_string(pid) +
-                 " OSC :" + std::to_string(cfg_.sooperlooper_osc_port) +
-                 " (log: /tmp/sooperlooper_engine.log)");
+                 " OSC :" + std::to_string(cfg_.sooperlooper_osc_port));
 
-    // Hard settle: process must stay alive AND ports must appear.
-    bool ports_ok = false;
-    for (int i = 0; i < 30; ++i) {
+    // Wait for PipeWire ports to appear.
+    for (int i = 0; i < 15; ++i)
+    {
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
-        if (!processAlive(sl_pid_)) {
-            Logger::warning("SooperLooper exited during settle "
-                            "(see /tmp/sooperlooper_engine.log)");
-            sl_pid_ = -1;
-            return false;
-        }
-        auto outs = findPortsMatching(
-            {"sooperlooper", "SooperLooper", "common_out"}, false);
-        if (!outs.empty()) {
-            ports_ok = true;
-            std::this_thread::sleep_for(std::chrono::milliseconds(800));
-            if (!processAlive(sl_pid_)) {
-                Logger::warning("SooperLooper died right after ports appeared "
-                                "(see /tmp/sooperlooper_engine.log)");
-                sl_pid_ = -1;
-                return false;
-            }
+        auto outs = findPortsMatching({"sooperlooper", "SooperLooper", "common_out"}, false);
+        if (!outs.empty())
             break;
-        }
     }
-    if (!ports_ok) {
-        Logger::warning("SooperLooper ports never appeared (pid still alive)");
-    } else {
-        Logger::info("SL ports settled");
-    }
-    return processAlive(sl_pid_);
+    return true;
 }
-
 
 
 bool AudioGraphManager::launchVocoder()
@@ -629,41 +519,31 @@ bool AudioGraphManager::launchVocoder()
         return false;
     }
 
-    if (pid == 0) {
-        // Log jalv stdout/stderr so Mode 2/3 failures are diagnosable.
+    if (pid == 0)
+    {
+        // -n sets JACK/PipeWire node name prefix when supported.
+        // [vocoder-diag] Without this, a launch failure (missing jalv,
+        // wrong LV2 URI, plugin load error, etc.) vanishes into
+        // whatever launched the instrument process, and Mode 2/3
+        // just silently fall back to un-vocoded audio with no clue
+        // why. Capture it so it's actually visible.
         (void)freopen("/tmp/instrument_vocoder.log", "w", stdout);
         (void)freopen("/tmp/instrument_vocoder.log", "a", stderr);
-
-        // VOCODER_STDIN_KEEPALIVE
-        // jalv reads an interactive command stream from stdin and exits
-        // cleanly (status 0) on EOF. Under systemd the forked child has
-        // stdin already closed/at EOF, so jalv prints control ports and
-        // quits within milliseconds -- the headless "Vocoder host exited
-        // immediately" loop. Hold a pipe write end open across exec so
-        // stdin never EOFs.
-        int keep_stdin[2] = {-1, -1};
-        if (pipe(keep_stdin) == 0) {
-            (void)dup2(keep_stdin[0], STDIN_FILENO);
-            (void)close(keep_stdin[0]);
-            // keep_stdin[1] intentionally left open (no FD_CLOEXEC)
-        }
-
+        std::string pwjack = which("pw-jack");
+        if (!pwjack.empty())
         {
-            std::string pwjack = which("pw-jack");
-            if (!pwjack.empty()) {
-                execlp("pw-jack", "pw-jack",
-                       jalv.c_str(),
-                       "-n", "InstrumentVocoder",
-                       "-l", "config/calfvocoderpreset/state.ttl",
-                       cfg_.calf_vocoder_uri.c_str(),
-                       static_cast<char*>(nullptr));
-            }
-            execlp(jalv.c_str(), jalv.c_str(),
+            execlp("pw-jack", "pw-jack",
+                   jalv.c_str(),
                    "-n", "InstrumentVocoder",
                    "-l", "config/calfvocoderpreset/state.ttl",
                    cfg_.calf_vocoder_uri.c_str(),
                    static_cast<char*>(nullptr));
         }
+        execlp(jalv.c_str(), jalv.c_str(),
+               "-n", "InstrumentVocoder",
+               "-l", "config/calfvocoderpreset/state.ttl",
+               cfg_.calf_vocoder_uri.c_str(),
+               static_cast<char*>(nullptr));
         _exit(127);
     }
 
@@ -766,9 +646,9 @@ void AudioGraphManager::forceDisconnectInstrumentGraph()
     std::string play_l = defaultPlaybackPort(true);
     std::string play_r = defaultPlaybackPort(false);
     if (play_l.empty())
-        play_l = PI_AUDIO_LEFT_SINK;
+        play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
     if (play_r.empty())
-        play_r = PI_AUDIO_RIGHT_SINK;
+        play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
 
     const std::string vin_l  = "InstrumentVocoder:in_l";
     const std::string vin_r  = "InstrumentVocoder:in_r";
@@ -848,9 +728,9 @@ bool AudioGraphManager::buildMode1()
     std::string play_l = defaultPlaybackPort(true);
     std::string play_r = defaultPlaybackPort(false);
     if (play_l.empty())
-        play_l = PI_AUDIO_LEFT_SINK;
+        play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
     if (play_r.empty())
-        play_r = PI_AUDIO_RIGHT_SINK;
+        play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
     Logger::info("Playback targets: " + play_l + " / " + play_r);
 
     // melody (final) → SL + headphones
@@ -991,9 +871,9 @@ bool AudioGraphManager::buildMode2()
     std::string play_l = defaultPlaybackPort(true);
     std::string play_r = defaultPlaybackPort(false);
     if (play_l.empty())
-        play_l = PI_AUDIO_LEFT_SINK;
+        play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
     if (play_r.empty())
-        play_r = PI_AUDIO_RIGHT_SINK;
+        play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
     Logger::info("Playback targets: " + play_l + " / " + play_r);
 
     bool voc_ok = processAlive(voc_pid_);
@@ -1069,9 +949,9 @@ bool AudioGraphManager::buildMode3()
     std::string play_l = defaultPlaybackPort(true);
     std::string play_r = defaultPlaybackPort(false);
     if (play_l.empty())
-        play_l = PI_AUDIO_LEFT_SINK;
+        play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
     if (play_r.empty())
-        play_r = PI_AUDIO_RIGHT_SINK;
+        play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
 
     // FINAL: dry mic → SL + headphones (parallel to vocoded wet path)
     const std::string& mic_p = mic.capture_ports[0];
@@ -1118,9 +998,9 @@ bool AudioGraphManager::buildMode5()
  std::string play_l = defaultPlaybackPort(true);
  std::string play_r = defaultPlaybackPort(false);
  if (play_l.empty())
- play_l = PI_AUDIO_LEFT_SINK;
+ play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
  if (play_r.empty())
- play_r = PI_AUDIO_RIGHT_SINK;
+ play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
 
  for (const auto& mic_p : mic.capture_ports) {
  pwLink(mic_p, sl_in_l);
@@ -1143,9 +1023,9 @@ void AudioGraphManager::ensureHealthyGraph() {
     std::string play_l = defaultPlaybackPort(true);
     std::string play_r = defaultPlaybackPort(false);
     if (play_l.empty())
-        play_l = PI_AUDIO_LEFT_SINK;
+        play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
     if (play_r.empty())
-        play_r = PI_AUDIO_RIGHT_SINK;
+        play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
 
     // ------------------------------------------------------------------
     // 2) Ensure processes exist (relaunch only if dead -- never kill healthy)
@@ -1162,28 +1042,10 @@ void AudioGraphManager::ensureHealthyGraph() {
         need_rebuild = true;
     }
     if (!processAlive(sl_pid_)) {
-            static int sl_fail_streak = 0;
-            static std::chrono::steady_clock::time_point last_sl_warn{};
-            auto nowh = std::chrono::steady_clock::now();
-            bool should_log = (last_sl_warn.time_since_epoch().count() == 0) ||
-                              (nowh - last_sl_warn) > std::chrono::seconds(8);
-            if (should_log) {
-                Logger::warning("Health: SooperLooper dead -- relaunching "
-                                "(required in every mode; rate-limited)");
-                last_sl_warn = nowh;
-            }
-            ++sl_fail_streak;
-            bool launched = launchSooperLooper();
-            if (launched) {
-                need_rebuild = true;
-                sl_fail_streak = 0;
-            } else if (sl_fail_streak >= 3) {
-                if (recoverAudioStack("repeated SooperLooper launch failure")) {
-                    need_rebuild = true;
-                    sl_fail_streak = 0;
-                }
-            }
-        }
+        Logger::warning("Health: SooperLooper dead -- relaunching");
+        launchSooperLooper();
+        need_rebuild = true;
+    }
     if (!processAlive(voc_pid_)) {
         Logger::warning("Health: Vocoder host dead -- relaunching");
         launchVocoder();
@@ -1250,466 +1112,52 @@ void AudioGraphManager::ensureHealthyGraph() {
 
 
 
-
-// ===== Differential mode graph (modediff) ================================
-std::vector<AudioGraphManager::LinkRole>
-AudioGraphManager::desiredRoles(PerformanceMode mode)
-{
-    using R = LinkRole;
-    switch (mode) {
-    case PerformanceMode::SynthOnly:
-    case PerformanceMode::BreathOctave:
-        return {R::MelSl, R::MelHp, R::DrumSl, R::DrumHp, R::SlHp,
-                R::MidiMel, R::MidiDru};
-    case PerformanceMode::VocoderOnly:
-        return {R::MelVoc, R::MicSide, R::VocSl, R::VocHp,
-                R::DrumSl, R::DrumHp, R::SlHp, R::MidiMel, R::MidiDru};
-    case PerformanceMode::SynthAndVocoder:
-        return {R::MelVoc, R::MicSide, R::VocSl, R::VocHp,
-                R::MicSl, R::MicHp,
-                R::DrumSl, R::DrumHp, R::SlHp, R::MidiMel, R::MidiDru};
-    case PerformanceMode::BreathOctaveMic:
-        return {R::MelSl, R::MelHp, R::DrumSl, R::DrumHp, R::SlHp,
-                R::MicSl, R::MicHp, R::MidiMel, R::MidiDru};
-    case PerformanceMode::Talkbox:
-        return {R::MelMvx, R::MicSl, R::MicHp,
-                R::DrumSl, R::DrumHp, R::SlHp, R::MidiMel, R::MidiDru};
-    }
-    return {R::MelSl, R::MelHp, R::DrumSl, R::DrumHp, R::SlHp,
-            R::MidiMel, R::MidiDru};
-}
-
-std::vector<std::pair<std::string,std::string>>
-AudioGraphManager::resolveRole(LinkRole role)
-{
-    std::vector<std::pair<std::string,std::string>> out;
-
-    auto mel_l = resolveClientPort(cfg_.zyn_client_name, "out_1", false);
-    auto mel_r = resolveClientPort(cfg_.zyn_client_name, "out_2", false);
-    auto dr_l  = resolveClientPort(cfg_.zyn_drums_client_name, "out_1", false);
-    auto dr_r  = resolveClientPort(cfg_.zyn_drums_client_name, "out_2", false);
-    if (mel_l.empty()) mel_l = "zynaddsubfx_zyn-melody:out_1";
-    if (mel_r.empty()) mel_r = "zynaddsubfx_zyn-melody:out_2";
-    if (dr_l.empty())  dr_l  = "zynaddsubfx_zyn-drums:out_1";
-    if (dr_r.empty())  dr_r  = "zynaddsubfx_zyn-drums:out_2";
-
-    std::string sl_in_l, sl_in_r, sl_out_l, sl_out_r;
-    if (!resolveLooperPorts(sl_in_l, sl_in_r, sl_out_l, sl_out_r)) {
-        sl_in_l = "sooperlooper:common_in_1";
-        sl_in_r = "sooperlooper:common_in_2";
-        sl_out_l = "sooperlooper:common_out_1";
-        sl_out_r = "sooperlooper:common_out_2";
-    }
-
-    std::string play_l = defaultPlaybackPort(true);
-    std::string play_r = defaultPlaybackPort(false);
-    if (play_l.empty() || play_l.find("MVX2U") != std::string::npos)
-        play_l = PI_AUDIO_LEFT_SINK;
-    if (play_r.empty() || play_r.find("MVX2U") != std::string::npos)
-        play_r = PI_AUDIO_RIGHT_SINK;
-
-    const std::string vin_l = "InstrumentVocoder:in_l";
-    const std::string vin_r = "InstrumentVocoder:in_r";
-    const std::string vside = "InstrumentVocoder:sidechain";
-    const std::string vside2 = "InstrumentVocoder:sidechain2";
-    const std::string vout_l = "InstrumentVocoder:out_l";
-    const std::string vout_r = "InstrumentVocoder:out_r";
-
-    MicInfo mic = queryMic();
-    std::string mvx_l, mvx_r;
-    (void)resolveMvx2uPlaybackPorts(mvx_l, mvx_r);
-
-    auto add2 = [&](const std::string& a, const std::string& b,
-                    const std::string& c, const std::string& d) {
-        if (!a.empty() && !c.empty()) out.emplace_back(a, c);
-        if (!b.empty() && !d.empty()) out.emplace_back(b, d);
-    };
-
-    switch (role) {
-    case LinkRole::MelSl:  add2(mel_l, mel_r, sl_in_l, sl_in_r); break;
-    case LinkRole::MelHp:  add2(mel_l, mel_r, play_l, play_r); break;
-    case LinkRole::MelVoc: add2(mel_l, mel_r, vin_l, vin_r); break;
-    case LinkRole::MelMvx:
-        if (!mvx_l.empty() && !mvx_r.empty())
-            add2(mel_l, mel_r, mvx_l, mvx_r);
-        break;
-    case LinkRole::DrumSl:
-        if (processAlive(zyn_drums_pid_))
-            add2(dr_l, dr_r, sl_in_l, sl_in_r);
-        break;
-    case LinkRole::DrumHp:
-        if (processAlive(zyn_drums_pid_))
-            add2(dr_l, dr_r, play_l, play_r);
-        break;
-    case LinkRole::VocSl:  add2(vout_l, vout_r, sl_in_l, sl_in_r); break;
-    case LinkRole::VocHp:  add2(vout_l, vout_r, play_l, play_r); break;
-    case LinkRole::MicSide:
-        for (const auto& p : mic.capture_ports) {
-            if (!p.empty()) {
-                out.emplace_back(p, vside);
-                out.emplace_back(p, vside2);
-            }
-        }
-        break;
-    case LinkRole::MicSl:
-        for (const auto& p : mic.capture_ports) {
-            if (!p.empty()) {
-                out.emplace_back(p, sl_in_l);
-                out.emplace_back(p, sl_in_r);
-            }
-        }
-        break;
-    case LinkRole::MicHp:
-        for (const auto& p : mic.capture_ports) {
-            if (!p.empty()) {
-                out.emplace_back(p, play_l);
-                out.emplace_back(p, play_r);
-            }
-        }
-        break;
-    case LinkRole::SlHp:
-        add2(sl_out_l, sl_out_r, play_l, play_r);
-        break;
-    case LinkRole::MidiMel: {
-        std::string midi = findEngineMidiPort();
-        std::string dst = resolveClientPort(cfg_.zyn_client_name, "midi_input", true);
-        if (!midi.empty() && !dst.empty())
-            out.emplace_back(midi, dst);
-        break;
-    }
-    case LinkRole::MidiDru: {
-        std::string midi = findEngineDrumsMidiPort();
-        std::string dst = resolveClientPort(cfg_.zyn_drums_client_name, "midi_input", true);
-        if (!midi.empty() && !dst.empty() && processAlive(zyn_drums_pid_))
-            out.emplace_back(midi, dst);
-        break;
-    }
-    }
-    return out;
-}
-
-
-// ===== modespeed: port cache + pre-computed link sets =====================
-void AudioGraphManager::invalidatePortCache()
-{
-    port_cache_.valid = false;
-    for (auto& v : mode_link_cache_valid_) v = false;
-}
-
-void AudioGraphManager::refreshPortCache()
-{
-    PortCache& c = port_cache_;
-    c = PortCache{};                         // zero
-
-    c.mel_l = resolveClientPort(cfg_.zyn_client_name, "out_1", false);
-    c.mel_r = resolveClientPort(cfg_.zyn_client_name, "out_2", false);
-    c.dr_l  = resolveClientPort(cfg_.zyn_drums_client_name, "out_1", false);
-    c.dr_r  = resolveClientPort(cfg_.zyn_drums_client_name, "out_2", false);
-    if (c.mel_l.empty()) c.mel_l = "zynaddsubfx_zyn-melody:out_1";
-    if (c.mel_r.empty()) c.mel_r = "zynaddsubfx_zyn-melody:out_2";
-    if (c.dr_l.empty())  c.dr_l  = "zynaddsubfx_zyn-drums:out_1";
-    if (c.dr_r.empty())  c.dr_r  = "zynaddsubfx_zyn-drums:out_2";
-
-    if (!resolveLooperPorts(c.sl_in_l, c.sl_in_r, c.sl_out_l, c.sl_out_r)) {
-        c.sl_in_l  = "sooperlooper:common_in_1";
-        c.sl_in_r  = "sooperlooper:common_in_2";
-        c.sl_out_l = "sooperlooper:common_out_1";
-        c.sl_out_r = "sooperlooper:common_out_2";
-    }
-
-    c.play_l = defaultPlaybackPort(true);
-    c.play_r = defaultPlaybackPort(false);
-    if (c.play_l.empty() || c.play_l.find("MVX2U") != std::string::npos)
-        c.play_l = PI_AUDIO_LEFT_SINK;
-    if (c.play_r.empty() || c.play_r.find("MVX2U") != std::string::npos)
-        c.play_r = PI_AUDIO_RIGHT_SINK;
-
-    c.vin_l  = "InstrumentVocoder:in_l";
-    c.vin_r  = "InstrumentVocoder:in_r";
-    c.vside  = "InstrumentVocoder:sidechain";
-    c.vside2 = "InstrumentVocoder:sidechain2";
-    c.vout_l = "InstrumentVocoder:out_l";
-    c.vout_r = "InstrumentVocoder:out_r";
-
-    MicInfo mic = queryMic();
-    c.mic_capture = mic.capture_ports;
-    (void)resolveMvx2uPlaybackPorts(c.mvx_l, c.mvx_r);   // may log once
-
-    c.midi_mel = findEngineMidiPort();
-    c.midi_dru = findEngineDrumsMidiPort();
-
-    c.valid = true;
-    // Logger::info("modespeed: port cache refreshed");
-}
-
-const AudioGraphManager::PortCache& AudioGraphManager::portCache()
-{
-    if (!port_cache_.valid)
-        refreshPortCache();
-    return port_cache_;
-}
-
-std::vector<std::pair<std::string,std::string>>
-AudioGraphManager::cachedLinksFor(PerformanceMode mode)
-{
-    const int idx = static_cast<int>(mode);
-    if (idx < 0 || idx >= 6) return {};
-    if (!mode_link_cache_valid_[idx])
-        ensureModeLinksCached(mode);
-    return mode_link_cache_[idx];
-}
-
-void AudioGraphManager::ensureModeLinksCached(PerformanceMode mode)
-{
-    // Build the concrete list exactly once (or after invalidate).
-    const int idx = static_cast<int>(mode);
-    if (idx < 0 || idx >= 6) return;
-    if (mode_link_cache_valid_[idx]) return;
-
-    // Make sure processes that this mode needs are alive (cheap if already up).
-    if (!processAlive(zyn_pid_))       launchZyn();
-    if (!processAlive(zyn_drums_pid_)) launchZynDrums();
-    if (!processAlive(sl_pid_))        launchSooperLooper();
-    if (mode == PerformanceMode::VocoderOnly ||
-        mode == PerformanceMode::SynthAndVocoder) {
-        if (!processAlive(voc_pid_)) launchVocoder();
-    }
-    if (mode == PerformanceMode::BreathOctaveMic ||
-        mode == PerformanceMode::Talkbox ||
-        mode == PerformanceMode::SynthAndVocoder) {
-        ensureMvx2uMicCaptureLive();
-    }
-    if (mode == PerformanceMode::Talkbox)
-        forceMvx2uPurePlayback();
-
-    // Force a fresh resolution so the cache is accurate for this mode.
-    refreshPortCache();
-    const PortCache& c = port_cache_;
-
-    std::vector<std::pair<std::string,std::string>> want;
-    auto add2 = [&](const std::string& a, const std::string& b,
-                    const std::string& d, const std::string& e) {
-        if (!a.empty() && !d.empty()) want.emplace_back(a, d);
-        if (!b.empty() && !e.empty()) want.emplace_back(b, e);
-    };
-
-    auto roles = desiredRoles(mode);
-    for (auto r : roles) {
-        switch (r) {
-        case LinkRole::MelSl:  add2(c.mel_l, c.mel_r, c.sl_in_l, c.sl_in_r); break;
-        case LinkRole::MelHp:  add2(c.mel_l, c.mel_r, c.play_l,  c.play_r);  break;
-        case LinkRole::MelVoc: add2(c.mel_l, c.mel_r, c.vin_l,   c.vin_r);   break;
-        case LinkRole::MelMvx:
-            if (!c.mvx_l.empty() && !c.mvx_r.empty())
-                add2(c.mel_l, c.mel_r, c.mvx_l, c.mvx_r);
-            break;
-        case LinkRole::DrumSl:
-            if (processAlive(zyn_drums_pid_))
-                add2(c.dr_l, c.dr_r, c.sl_in_l, c.sl_in_r);
-            break;
-        case LinkRole::DrumHp:
-            if (processAlive(zyn_drums_pid_))
-                add2(c.dr_l, c.dr_r, c.play_l, c.play_r);
-            break;
-        case LinkRole::VocSl:  add2(c.vout_l, c.vout_r, c.sl_in_l, c.sl_in_r); break;
-        case LinkRole::VocHp:  add2(c.vout_l, c.vout_r, c.play_l,  c.play_r);  break;
-        case LinkRole::MicSide:
-            for (const auto& p : c.mic_capture) {
-                if (!p.empty()) {
-                    want.emplace_back(p, c.vside);
-                    want.emplace_back(p, c.vside2);
-                    break;
-                }
-            }
-            break;
-        case LinkRole::MicSl:
-            for (const auto& p : c.mic_capture) {
-                if (!p.empty()) {
-                    want.emplace_back(p, c.sl_in_l);
-                    want.emplace_back(p, c.sl_in_r);
-                    break;
-                }
-            }
-            break;
-        case LinkRole::MicHp:
-            for (const auto& p : c.mic_capture) {
-                if (!p.empty()) {
-                    want.emplace_back(p, c.play_l);
-                    want.emplace_back(p, c.play_r);
-                    break;
-                }
-            }
-            break;
-        case LinkRole::SlHp:
-            add2(c.sl_out_l, c.sl_out_r, c.play_l, c.play_r);
-            break;
-        case LinkRole::MidiMel: {
-            std::string dst = resolveClientPort(cfg_.zyn_client_name, "midi_input", true);
-            if (!c.midi_mel.empty() && !dst.empty())
-                want.emplace_back(c.midi_mel, dst);
-            break;
-        }
-        case LinkRole::MidiDru: {
-            std::string dst = resolveClientPort(cfg_.zyn_drums_client_name, "midi_input", true);
-            if (!c.midi_dru.empty() && !dst.empty() && processAlive(zyn_drums_pid_))
-                want.emplace_back(c.midi_dru, dst);
-            break;
-        }
-        }
-    }
-
-    mode_link_cache_[idx] = std::move(want);
-    mode_link_cache_valid_[idx] = true;
-    // Logger::info("modespeed: cached " + std::to_string(mode_link_cache_[idx].size())
-    //              + " links for mode " + std::to_string(idx));
-}
-
-// Fast path used by applyModeTransition: only the delta.
-bool AudioGraphManager::ensureModeLinks(PerformanceMode mode)
-{
-    ensureModeLinksCached(mode);                 // no-op if already cached
-    const auto& want = mode_link_cache_[static_cast<int>(mode)];
-
-    // Build the universe once from the cache of *all* roles so we can
-    // sever anything that should not be present.
-    static const LinkRole kAll[] = {
-        LinkRole::MelSl, LinkRole::MelHp, LinkRole::MelVoc, LinkRole::MelMvx,
-        LinkRole::DrumSl, LinkRole::DrumHp,
-        LinkRole::VocSl, LinkRole::VocHp,
-        LinkRole::MicSide, LinkRole::MicSl, LinkRole::MicHp,
-        LinkRole::SlHp, LinkRole::MidiMel, LinkRole::MidiDru
-    };
-    // We still need a universe, but we can build it cheaply from the
-    // six cached mode sets (union).  First time we ever run we may have
-    // only one mode cached; fall back to a full resolveRole pass only then.
-    std::vector<std::pair<std::string,std::string>> universe;
-    bool any = false;
-    for (int i = 0; i < 6; ++i) {
-        if (mode_link_cache_valid_[i]) {
-            any = true;
-            universe.insert(universe.end(),
-                            mode_link_cache_[i].begin(),
-                            mode_link_cache_[i].end());
-        }
-    }
-    if (!any) {
-        // cold start – resolve the hard way once
-        for (auto r : kAll) {
-            auto pairs = resolveRole(r);
-            universe.insert(universe.end(), pairs.begin(), pairs.end());
-        }
-    }
-
-    auto is_wanted = [&](const std::string& s, const std::string& d) {
-        for (const auto& w : want)
-            if (w.first == s && w.second == d) return true;
-        return false;
-    };
-
-    // Sever only what is not wanted (quiet – no spam on "not linked")
-    for (const auto& u : universe) {
-        if (!is_wanted(u.first, u.second))
-            pwUnlink(u.first, u.second);
-    }
-    // Create only what is missing (pw-link "File exists" is now silent)
-    for (const auto& w : want)
-        pwLink(w.first, w.second);
-
-    // Logger::info("ensureModeLinks: mode graph applied (" +
-    //              std::to_string(want.size()) + " target pairs) [cached]");
-    return true;
-}
-
-bool AudioGraphManager::applyModeTransition(PerformanceMode from,
-                                            PerformanceMode to)
-{
-    // Logger::info("Mode transition " + std::to_string(static_cast<int>(from))
-    //              + " -> " + std::to_string(static_cast<int>(to)));
-
-    // Make sure both ends are cached (first time each mode is seen).
-    ensureModeLinksCached(from);
-    ensureModeLinksCached(to);
-
-    if (from == to) {
-        // Same-mode press: just verify the links are still there (cheap).
-        const auto& want = mode_link_cache_[static_cast<int>(to)];
-        for (const auto& w : want)
-            pwLink(w.first, w.second);   // silent if already present
-        return true;
-    }
-
-    const bool entering_tb = (to == PerformanceMode::Talkbox);
-    const bool leaving_tb  = (from == PerformanceMode::Talkbox && !entering_tb);
-
-    if (entering_tb) {
-        forceMvx2uPurePlayback();
-        const std::string& tb = cfg_.zyn_talkbox_instrument.empty()
-            ? std::string("config/talkbox.xmz")
-            : cfg_.zyn_talkbox_instrument;
-        reloadMelodyInstrument(tb);
-        invalidatePortCache();           // instrument change may move ports
-    } else if (leaving_tb) {
-        std::string path = cfg_.zyn_normal_instrument.empty()
-            ? std::string("config/mkb.xmz")
-            : cfg_.zyn_normal_instrument;
-        if (path.find("talkbox") != std::string::npos)
-            path = "config/mkb.xmz";
-        reloadMelodyInstrument(path);
-        invalidatePortCache();
-    }
-
-    // Pure set-difference using the two cached vectors.
-    const auto& from_links = mode_link_cache_[static_cast<int>(from)];
-    const auto& to_links   = mode_link_cache_[static_cast<int>(to)];
-
-    auto in_list = [](const std::vector<std::pair<std::string,std::string>>& L,
-                      const std::string& s, const std::string& d) {
-        for (const auto& p : L)
-            if (p.first == s && p.second == d) return true;
-        return false;
-    };
-
-    // Unlink everything that is in from but not in to
-    for (const auto& p : from_links) {
-        if (!in_list(to_links, p.first, p.second))
-            pwUnlink(p.first, p.second);
-    }
-    // Link everything that is in to but not in from
-    for (const auto& p : to_links) {
-        if (!in_list(from_links, p.first, p.second))
-            pwLink(p.first, p.second);
-    }
-
-    mode_ = to;
-    return true;
-}
-
 bool AudioGraphManager::setMode(PerformanceMode mode) {
-    const PerformanceMode from = mode_;
-    const bool ok = applyModeTransition(from, mode);
-    mode_ = mode;                       // already set inside apply, but keep consistent
+    mode_ = mode;
+ // MODE6_SETMODE_HOOK
+ {
+ static PerformanceMode prev = PerformanceMode::SynthOnly;
+ const bool entering = (mode == PerformanceMode::Talkbox);
+ const bool leaving  = (prev == PerformanceMode::Talkbox && !entering);
+ if (entering) {
+ forceMvx2uPurePlayback();
+ const std::string& tb = cfg_.zyn_talkbox_instrument.empty()
+ ? std::string("config/talkbox.xmz")
+ : cfg_.zyn_talkbox_instrument;
+ reloadMelodyInstrument(tb);
+ } else if (leaving) {
+ std::string path = cfg_.zyn_normal_instrument.empty()
+ ? std::string("config/mkb.xmz")
+ : cfg_.zyn_normal_instrument;
+ if (path.find("talkbox") != std::string::npos)
+ path = "config/mkb.xmz";
+ reloadMelodyInstrument(path);
+ }
+ prev = mode;
+ }
+
     switch (mode) {
-    case PerformanceMode::SynthOnly:
-        Logger::info("Mode SynthOnly (Mode 1) [fast]");
-        break;
-    case PerformanceMode::VocoderOnly:
-        Logger::info("Mode VocoderOnly (Mode 2) [fast]");
-        break;
-    case PerformanceMode::SynthAndVocoder:
-        Logger::info("Mode SynthAndVocoder (Mode 3) [fast]");
-        break;
-    case PerformanceMode::BreathOctave:
-        Logger::info("Mode BreathOctave (Mode 4) [fast]");
-        break;
-    case PerformanceMode::BreathOctaveMic:
-        Logger::info("Mode BreathOctaveMic (Mode 5) [fast]");
-        break;
-    case PerformanceMode::Talkbox:
-        Logger::info("Mode Talkbox (Mode 6) [fast]");
-        break;
+        case PerformanceMode::SynthOnly:
+            return buildMode1();
+        case PerformanceMode::VocoderOnly:
+            return buildMode2();
+        case PerformanceMode::SynthAndVocoder:
+            return buildMode3();
+        case PerformanceMode::BreathOctave:
+            return buildMode4();
+        case PerformanceMode::BreathOctaveMic:
+            return buildMode5();
+ case PerformanceMode::Talkbox:
+ return buildMode6();
     }
-    return ok;
+    return buildMode1();
 }
+
+
+
+
+
+
 std::string AudioGraphManager::statusSummary() const
 {
     std::ostringstream ss;
@@ -2413,11 +1861,11 @@ void AudioGraphManager::connectLooperGraph()
     std::string play_l = defaultPlaybackPort(true);
     std::string play_r = defaultPlaybackPort(false);
     if (play_l.empty()) {
-        play_l = PI_AUDIO_LEFT_SINK;
+        play_l = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
         Logger::warning("defaultPlaybackPort(L) empty; using Headphones fallback");
     }
     if (play_r.empty()) {
-        play_r = PI_AUDIO_RIGHT_SINK;
+        play_r = "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
         Logger::warning("defaultPlaybackPort(R) empty; using Headphones fallback");
     }
     Logger::info("Playback targets: " + play_l + " / " + play_r);
@@ -2699,8 +2147,7 @@ bool AudioGraphManager::resolveMvx2uPlaybackPorts(std::string& out_l,
  if (out_l.empty() || out_r.empty()) {
  out_l = "alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FL";
  out_r = "alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FR";
- static bool once = false;
-    if (!once) { once = true; Logger::warning("resolveMvx2uPlaybackPorts: using hardcoded MVX2U port names (further silenced)"); }
+ Logger::warning("resolveMvx2uPlaybackPorts: using hardcoded MVX2U port names");
  }
  Logger::info("MVX2U playback ports: " + out_l + " / " + out_r);
  return !out_l.empty() && !out_r.empty();
@@ -2748,9 +2195,9 @@ bool AudioGraphManager::buildMode6()
  std::string play_l = defaultPlaybackPort(true);
  std::string play_r = defaultPlaybackPort(false);
  const std::string pci_l =
- PI_AUDIO_LEFT_SINK;
+ "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL";
  const std::string pci_r =
- PI_AUDIO_RIGHT_SINK;
+ "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR";
  if (play_l.empty() || play_l.find("MVX2U") != std::string::npos)
  play_l = pci_l;
  if (play_r.empty() || play_r.find("MVX2U") != std::string::npos)
