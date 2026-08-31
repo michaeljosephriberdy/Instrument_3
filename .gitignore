@@ -1,0 +1,9 @@
+build/
+*.bak
+*.bak.*
+*_bak
+*_bak_*
+.mode6_bak_*/
+.mode6_fix_bak_*/
+.phase3_integration_bak/
+instrument.log

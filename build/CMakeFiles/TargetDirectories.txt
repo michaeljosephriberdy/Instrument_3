@@ -1,5 +1,0 @@
-/home/mjr/Instrument_3/build/CMakeFiles/microtonal_instrument.dir
-/home/mjr/Instrument_3/build/CMakeFiles/edit_cache.dir
-/home/mjr/Instrument_3/build/CMakeFiles/rebuild_cache.dir
-/home/mjr/Instrument_3/build/_deps/json-build/CMakeFiles/edit_cache.dir
-/home/mjr/Instrument_3/build/_deps/json-build/CMakeFiles/rebuild_cache.dir
