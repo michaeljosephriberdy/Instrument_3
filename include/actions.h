@@ -61,6 +61,8 @@ enum class ActionType : uint8_t
  TalkboxVolDown,
  MicVolUp,
  MicVolDown,
+ BreathMaxUp,   // [fix_all] ceiling for breath-driven melodic volume
+ BreathMaxDown,
 
     //-----------------------
     // Looper (top board loop row) — Engine logs; real OSC/MIDI in Phase 4
@@ -147,6 +149,8 @@ inline const char* actionTypeToString(ActionType t)
  case ActionType::TalkboxVolDown: return "talkbox_vol_down";
  case ActionType::MicVolUp: return "mic_vol_up";
  case ActionType::MicVolDown: return "mic_vol_down";
+ case ActionType::BreathMaxUp: return "breath_max_up";
+ case ActionType::BreathMaxDown: return "breath_max_down";
         case ActionType::LoopRecord:     return "loop_record";
         case ActionType::LoopPlay:       return "loop_play";
         case ActionType::LoopStop:       return "loop_stop";
@@ -197,6 +201,8 @@ inline ActionType stringToActionType(const std::string& s)
  if (s == "talkbox_vol_down") return ActionType::TalkboxVolDown;
  if (s == "mic_vol_up") return ActionType::MicVolUp;
  if (s == "mic_vol_down") return ActionType::MicVolDown;
+ if (s == "breath_max_up") return ActionType::BreathMaxUp;
+ if (s == "breath_max_down") return ActionType::BreathMaxDown;
     if (s == "loop_record")     return ActionType::LoopRecord;
     if (s == "loop_play")       return ActionType::LoopPlay;
     if (s == "loop_stop")       return ActionType::LoopStop;

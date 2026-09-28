@@ -3,6 +3,7 @@
 #include "instrument_state.h"  // PerformanceMode
 
 #include <atomic>
+#include <thread>
 #include <cstdint>
 #include <string>
 #include <sys/types.h>
@@ -92,6 +93,8 @@ public:
 
     // True if an input port matching mic_name_hint is visible to PipeWire/ALSA.
     bool micPresent() const;
+    // [breath_vol_node] Mode-1 breath volume: 0.0..1.0 on the zyn-volume-node sink.
+    void setBreathVolume(float linear);
 
     // Human-readable status for logs / diagnostics.
     std::string statusSummary() const;
@@ -199,6 +202,12 @@ private:
     bool launchZynDrums();
     bool launchSooperLooper();
     bool launchVocoder();
+    // [breath_vol_node] dedicated PipeWire volume node (pw-loopback child)
+    bool launchVolumeNode();
+    void volumeWorkerLoop();
+    void stopVolumeWorker();
+    void resolveVolumeNodePorts(std::string& in_l, std::string& in_r,
+                                std::string& out_l, std::string& out_r) const;
 
     void killPid(pid_t& pid, const char* label);
     bool processAlive(pid_t pid) const;
@@ -218,7 +227,8 @@ private:
         VocSl, VocHp,
         MicSide, MicSl, MicHp,
         SlHp,
-        MidiMel, MidiDru
+        MidiMel, MidiDru,
+        MelVol, VolSl, VolHp
     };
     static std::vector<LinkRole> desiredRoles(PerformanceMode mode);
     // Resolve role → concrete (src,dst) pairs using live port discovery.
@@ -235,6 +245,7 @@ private:
         std::string play_l, play_r;
         std::string vin_l, vin_r, vside, vside2, vout_l, vout_r;
         std::string mvx_l, mvx_r;
+        std::string vol_in_l, vol_in_r, vol_out_l, vol_out_r;
         std::string midi_mel, midi_dru;
         std::vector<std::string> mic_capture;
         bool valid = false;
@@ -288,6 +299,13 @@ private:
     std::vector<std::pair<std::string, std::string>> owned_links_;
 
     std::atomic<bool> started_{false};
+    // [breath_vol_node]
+    pid_t vol_pid_ = -1;
+    bool vol_unavailable_ = false;
+    std::thread vol_thread_;
+    std::atomic<bool> vol_stop_{false};
+    std::atomic<int> vol_target_pct_{100};
+    std::atomic<int> vol_applied_pct_{-1};
 
     PortCache port_cache_;
     std::array<std::vector<std::pair<std::string,std::string>>, 6> mode_link_cache_{};

@@ -7,3 +7,6 @@ build/
 .mode6_fix_bak_*/
 .phase3_integration_bak/
 instrument.log
+.build_platform
+.fix_all_bak_*/
+build_fix_all.log

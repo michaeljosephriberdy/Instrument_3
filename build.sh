@@ -1,401 +1,223 @@
 #!/usr/bin/env bash
-# build.sh
+# build.sh -- builds the instrument for the laptop or the Pi.
 #
-# Normal use -- unchanged from today:
-#   ./build.sh
-#   Just configures + builds the project. Touches nothing else.
+#   ./build.sh                        # remembered platform (asks the first time)
+#   ./build.sh --platform laptop      # built-in headphones ports, never autostarts
+#   ./build.sh --platform pi          # Shure MVX2U output; also asks about start-at-boot
+#   ./build.sh --platform pi --autostart yes|no
+#   ./build.sh --platform pi --audio-left "alsa_output.XXXX:playback_FL" \
+#                            --audio-right "alsa_output.XXXX:playback_FR"
+#   ./build.sh --reset-platform       # forget the remembered answers
+#   ./build.sh --skip-package-check   # don't check/install apt packages
 #
-# Field-deploy use -- run once per machine, after running
-# pi_audio_diagnose.sh to get your real port names:
-#   sudo ./build.sh --headless-boot \
-#     --audio-left  "alsa_output.XXXX:playback_FL" \
-#     --audio-right "alsa_output.XXXX:playback_FR" \
-#     [--timeout 4]
-#
-#   This will:
-#     1. One-time codemod (idempotent, safe to run again): turns the
-#        hardcoded Ubuntu-desktop fallback sink names in
-#        audio_graph_manager.cpp into CMake-overridable macros
-#        (PI_AUDIO_LEFT_SINK / PI_AUDIO_RIGHT_SINK), and adds the
-#        override block to CMakeLists.txt. A plain ./build.sh with no
-#        flags is unaffected by this -- the macros default back to the
-#        original Ubuntu fallback string when not overridden.
-#     2. Configures + builds with your real Pi port names baked in via
-#        -DPI_AUDIO_LEFT_SINK=... -DPI_AUDIO_RIGHT_SINK=...
-#     3. Installs udev rules (HID/input access without a desktop session).
-#     4. Installs the instrument as a systemd service (not auto-enabled --
-#        only the boot menu below starts it).
-#     5. Installs a boot-time console menu:
-#          - Every boot: short countdown ("booting headless in 4s...").
-#          - No input (typical on-the-road boot, nothing attached):
-#            Wi-Fi/Bluetooth blocked via rfkill, instrument auto-starts.
-#          - Esc pressed during countdown (monitor+keyboard attached
-#            for debugging): boots the normal OS -- Wi-Fi/Bluetooth on,
-#            instrument NOT auto-started.
-#     Ethernet is never touched by any of this.
-#
-# Undo / factory-reset-style cleanup:
-#   sudo ./build.sh --uninstall-headless-boot
-#   Removes the boot menu + instrument service + udev rule, and
-#   unblocks Wi-Fi/Bluetooth right now. Repo/source is left as-is
-#   (the codemod is harmless and doesn't need reverting).
-#
-# Every mode (including a plain ./build.sh) checks for required apt
-# packages first and installs anything missing. Pass
-# --skip-package-check to skip this (e.g. offline, or non-apt system).
-#
-# Package list last reconciled against src/audio_graph_manager.cpp on
-# 2026-08-10: added pipewire-jack (provides `pw-jack`, which launchZyn()/
-# launchZynDrums()/launchSooperLooper() shell out to so those processes
-# show up as JACK clients in the PipeWire graph -- this is what lets
-# Mode 6 (Talkbox)'s forceMvx2uPurePlayback()/resolveMvx2uPlaybackPorts()/
-# buildMode6() actually pw-link the talkbox voice out to the Shure MVX2U's
-# playback ports instead of the onboard headphone jack) and lv2-utils
-# (provides `lv2ls`, used to confirm the Calf Vocoder LV2 URI before
-# hosting it under jalv). Both were referenced in docs/phase4_packages.md
-# but were missing from this script's actual install list.
-
+# There is one boot behaviour only: on the Pi, optionally "start the instrument
+# at boot". There is no headless/normal boot menu any more.
 set -euo pipefail
 
-HEADLESS_BOOT=0
-UNINSTALL=0
+PLATFORM=""
 AUDIO_LEFT=""
 AUDIO_RIGHT=""
-TIMEOUT=4
-SKIP_PACKAGE_CHECK=0
-
+AUTOSTART=""
+SKIP_PKG=0
+RESET=0
 while [[ $# -gt 0 ]]; do
-  case "$1" in
-    --headless-boot) HEADLESS_BOOT=1; shift ;;
-    --uninstall-headless-boot) UNINSTALL=1; shift ;;
-    --audio-left) AUDIO_LEFT="$2"; shift 2 ;;
-    --audio-right) AUDIO_RIGHT="$2"; shift 2 ;;
-    --timeout) TIMEOUT="$2"; shift 2 ;;
-    --skip-package-check) SKIP_PACKAGE_CHECK=1; shift ;;
-    *) echo "Unknown argument: $1" >&2; exit 1 ;;
-  esac
+    case "$1" in
+        --platform)    PLATFORM="${2:-}"; shift 2 ;;
+        --audio-left)  AUDIO_LEFT="${2:-}"; shift 2 ;;
+        --audio-right) AUDIO_RIGHT="${2:-}"; shift 2 ;;
+        --autostart)   AUTOSTART="${2:-}"; shift 2 ;;
+        --skip-package-check) SKIP_PKG=1; shift ;;
+        --reset-platform) RESET=1; shift ;;
+        *) echo "Unknown argument: $1" >&2; exit 1 ;;
+    esac
 done
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-REPO="$SCRIPT_DIR"
-CMAKE_FILE="$REPO/CMakeLists.txt"
-SRC_FILE="$REPO/src/audio_graph_manager.cpp"
-TARGET_NAME="microtonal_instrument"
+REPO="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+BUILD_DIR="$REPO/build"
+STATE_FILE="$REPO/.build_platform"
+LAPTOP_LEFT="alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL"
+LAPTOP_RIGHT="alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR"
+UNIT_NAME="microtonal-instrument.service"
+UNIT_DIR="$HOME/.config/systemd/user"
 
-# ------------------------------------------------------------------
-# Package check + install (runs before everything except --uninstall)
-# ------------------------------------------------------------------
-check_and_install_packages() {
-  if [[ "$SKIP_PACKAGE_CHECK" -eq 1 ]]; then
-    return
-  fi
+[[ $RESET -eq 1 ]] && rm -f "$STATE_FILE"
 
-  if ! command -v apt-get >/dev/null 2>&1; then
-    echo "=== Package check: apt-get not found, skipping (not a Debian/Ubuntu system?) ==="
-    return
-  fi
-
-  echo "=== Package check ==="
-
-  # Needed to configure/compile the project.
-  local build_pkgs=(build-essential cmake pkg-config git libasound2-dev libhidapi-dev)
-
-  # Core PipeWire graph tooling the code shells out to: pw-link/pw-cli
-  # (pipewire-bin), pw-jack (pipewire-jack -- required so ZynAddSubFX,
-  # SooperLooper, and jalv show up as JACK clients in the PipeWire graph;
-  # without it Mode 6 (Talkbox) cannot pw-link the talkbox voice out to
-  # the MVX2U), wpctl (wireplumber), pactl (pulseaudio-utils, against the
-  # pipewire-pulse compat socket), plus amixer/aplay/arecord (alsa-utils)
-  # and rfkill.
-  local pipewire_pkgs=(pipewire pipewire-bin pipewire-jack \
-    pipewire-audio-client-libraries pipewire-pulse wireplumber \
-    pulseaudio-utils alsa-utils rfkill)
-
-  # The actual audio engines the graph launches/controls at runtime --
-  # confirmed against every which()/popen() call in audio_graph_manager.cpp
-  # and docs/phase4_packages.md: ZynAddSubFX (synth, incl. the talkbox
-  # patch used by Mode 6), SooperLooper (looper), jalv + calf-plugins
-  # (LV2 host + Calf Vocoder), lv2-utils (lv2ls, used to confirm the
-  # Vocoder URI), liblo-tools (oscsend, used to drive SooperLooper over
-  # OSC).
-  local audio_app_pkgs=(zynaddsubfx sooperlooper calf-plugins jalv \
-    lv2-utils liblo-tools)
-
-  local all_pkgs=("${build_pkgs[@]}" "${pipewire_pkgs[@]}" "${audio_app_pkgs[@]}")
-  local to_install=()
-  local unknown=()
-
-  for pkg in "${all_pkgs[@]}"; do
-    if dpkg -s "$pkg" >/dev/null 2>&1; then
-      continue
+# ---- packages ---------------------------------------------------------------
+check_packages() {
+    [[ $SKIP_PKG -eq 1 ]] && return 0
+    command -v apt-get >/dev/null 2>&1 || return 0
+    local pkgs=(build-essential cmake pkg-config git libasound2-dev libhidapi-dev
+                pipewire pipewire-bin pipewire-jack pipewire-audio-client-libraries
+                pipewire-pulse wireplumber pulseaudio-utils alsa-utils rfkill
+                zynaddsubfx sooperlooper calf-plugins jalv lv2-utils lilv-utils liblo-tools)
+    local missing=() p
+    for p in "${pkgs[@]}"; do
+        dpkg -s "$p" >/dev/null 2>&1 && continue
+        apt-cache show "$p" >/dev/null 2>&1 && missing+=("$p")
+    done
+    if [[ ${#missing[@]} -gt 0 ]]; then
+        echo "Installing missing packages: ${missing[*]}"
+        sudo apt-get update
+        sudo apt-get install -y "${missing[@]}"
     fi
-    if apt-cache show "$pkg" >/dev/null 2>&1; then
-      to_install+=("$pkg")
-    else
-      unknown+=("$pkg")
+}
+check_packages
+
+# ---- remembered answers -----------------------------------------------------
+SAVED_PLATFORM=""; SAVED_LEFT=""; SAVED_RIGHT=""; SAVED_AUTOSTART=""
+# shellcheck disable=SC1090
+[[ -f "$STATE_FILE" ]] && source "$STATE_FILE"
+if [[ -z "$PLATFORM" && -n "$SAVED_PLATFORM" ]]; then
+    PLATFORM="$SAVED_PLATFORM"
+    echo "Using remembered platform: $PLATFORM (change with --platform, or --reset-platform)"
+fi
+
+# ---- choose platform --------------------------------------------------------
+if [[ -z "$PLATFORM" ]]; then
+    if [[ -t 0 ]]; then
+        read -r -p "Build for laptop or pi? [laptop/pi] (default laptop): " PLATFORM
     fi
-  done
+    PLATFORM="${PLATFORM:-laptop}"
+fi
+PLATFORM="$(echo "$PLATFORM" | tr '[:upper:]' '[:lower:]')"
+[[ "$PLATFORM" == "laptop" || "$PLATFORM" == "pi" ]] || { echo "Platform must be 'laptop' or 'pi'." >&2; exit 1; }
 
-  if [[ ${#unknown[@]} -gt 0 ]]; then
-    echo "Note: these package names weren't found in apt on this system"
-    echo "(naming can differ by OS/version) -- check manually if needed:"
-    printf '  %s\n' "${unknown[@]}"
-  fi
+case "$PLATFORM" in
+    laptop)
+        AUDIO_LEFT="$LAPTOP_LEFT"
+        AUDIO_RIGHT="$LAPTOP_RIGHT"
+        AUTOSTART="no"
+        ;;
+    pi)
+        [[ -n "$AUDIO_LEFT"  ]] || AUDIO_LEFT="$SAVED_LEFT"
+        [[ -n "$AUDIO_RIGHT" ]] || AUDIO_RIGHT="$SAVED_RIGHT"
+        if [[ -z "$AUDIO_LEFT" || -z "$AUDIO_RIGHT" ]] && command -v pw-link >/dev/null 2>&1; then
+            # The Shure's playback ports appear as *input* ports in pw-link.
+            det_l="$(pw-link -i 2>/dev/null | sed 's/^[[:space:]]*//' | grep -i 'MVX2U' | grep 'playback_FL' | head -n1 || true)"
+            det_r="$(pw-link -i 2>/dev/null | sed 's/^[[:space:]]*//' | grep -i 'MVX2U' | grep 'playback_FR' | head -n1 || true)"
+            if [[ -n "$det_l" && -n "$det_r" ]]; then
+                AUDIO_LEFT="${AUDIO_LEFT:-$det_l}"; AUDIO_RIGHT="${AUDIO_RIGHT:-$det_r}"
+                echo "Detected Shure MVX2U playback ports:"; echo "  L: $AUDIO_LEFT"; echo "  R: $AUDIO_RIGHT"
+            fi
+        fi
+        if [[ -z "$AUDIO_LEFT" || -z "$AUDIO_RIGHT" ]] && [[ -t 0 ]]; then
+            echo "Could not auto-detect the Shure ports (plugged in? PipeWire running?)."
+            echo "Find them with:  pw-link -i | grep -i MVX2U"
+            read -r -p "Left playback port  (...:playback_FL): " AUDIO_LEFT
+            read -r -p "Right playback port (...:playback_FR): " AUDIO_RIGHT
+        fi
+        [[ -n "$AUDIO_LEFT" && -n "$AUDIO_RIGHT" ]] || {
+            echo "ERROR: pi build needs --audio-left/--audio-right (or a detectable, plugged-in MVX2U)." >&2; exit 1; }
+        if [[ -z "$AUTOSTART" ]]; then
+            if [[ -t 0 ]]; then
+                def="${SAVED_AUTOSTART:-no}"
+                read -r -p "Start the instrument automatically when this Pi boots? [yes/no] (default $def): " AUTOSTART
+                AUTOSTART="${AUTOSTART:-$def}"
+            else
+                AUTOSTART="${SAVED_AUTOSTART:-no}"
+            fi
+        fi
+        case "$(echo "$AUTOSTART" | tr '[:upper:]' '[:lower:]')" in
+            y|yes) AUTOSTART="yes" ;;
+            *)     AUTOSTART="no" ;;
+        esac
+        ;;
+esac
 
-  if [[ ${#to_install[@]} -eq 0 ]]; then
-    echo "All known required packages already installed."
-    return
-  fi
+printf 'SAVED_PLATFORM=%q\nSAVED_LEFT=%q\nSAVED_RIGHT=%q\nSAVED_AUTOSTART=%q\n' \
+    "$PLATFORM" "$AUDIO_LEFT" "$AUDIO_RIGHT" "$AUTOSTART" > "$STATE_FILE"
 
-  echo "Installing missing packages: ${to_install[*]}"
-  if [[ $EUID -eq 0 ]]; then
-    apt-get update
-    apt-get install -y "${to_install[@]}"
-  else
-    sudo apt-get update
-    sudo apt-get install -y "${to_install[@]}"
-  fi
+echo "Platform  : $PLATFORM"
+echo "Left sink : $AUDIO_LEFT"
+echo "Right sink: $AUDIO_RIGHT"
+[[ "$PLATFORM" == "pi" ]] && echo "Autostart : $AUTOSTART"
+echo
+
+# ---- configure + build (incremental: build/ is never wiped) -----------------
+if [[ -f "$BUILD_DIR/CMakeCache.txt" ]]; then
+    cached_home="$(sed -n 's/^CMAKE_HOME_DIRECTORY:INTERNAL=//p' "$BUILD_DIR/CMakeCache.txt")"
+    if [[ -n "$cached_home" && "$cached_home" != "$REPO" ]]; then
+        echo "build/ was configured for $cached_home; resetting its CMake cache."
+        rm -f "$BUILD_DIR/CMakeCache.txt"; rm -rf "$BUILD_DIR/CMakeFiles"
+    fi
+fi
+
+echo "Note: the first configure downloads nlohmann/json from GitHub, so the machine needs internet once."
+JOBS="$(nproc)"
+case "$(uname -m)" in
+    aarch64|arm*)   # C++20 compiles can run a small board out of RAM: about 1 job per GB
+        mem_gb="$(awk '/MemTotal/ {printf "%d", $2/1048576}' /proc/meminfo)"
+        [[ "$mem_gb" -lt 1 ]] && mem_gb=1
+        (( JOBS > mem_gb )) && JOBS="$mem_gb"
+        ;;
+esac
+
+cmake -S "$REPO" -B "$BUILD_DIR" \
+    -DCMAKE_BUILD_TYPE=Release \
+    -DCMAKE_EXPORT_COMPILE_COMMANDS=ON \
+    -DPI_AUDIO_LEFT_SINK="$AUDIO_LEFT" \
+    -DPI_AUDIO_RIGHT_SINK="$AUDIO_RIGHT"
+cmake --build "$BUILD_DIR" -j"$JOBS"
+echo
+echo "Build complete: $BUILD_DIR/microtonal_instrument"
+
+# ---- Pi: start at boot (systemd USER service + linger; no login needed) -----
+remove_autostart() {
+    rm -f "$UNIT_DIR/$UNIT_NAME" "$UNIT_DIR/default.target.wants/$UNIT_NAME"
+    systemctl --user daemon-reload 2>/dev/null || true
 }
 
-if [[ "$UNINSTALL" -eq 0 ]]; then
-  check_and_install_packages
-fi
-
-# ------------------------------------------------------------------
-# --uninstall-headless-boot
-# ------------------------------------------------------------------
-if [[ "$UNINSTALL" -eq 1 ]]; then
-  if [[ $EUID -ne 0 ]]; then
-    echo "Please run with sudo: sudo $0 --uninstall-headless-boot" >&2
-    exit 1
-  fi
-  systemctl disable --now microtonal-bootmenu.service 2>/dev/null || true
-  systemctl disable --now microtonal-instrument.service 2>/dev/null || true
-  rm -f /etc/systemd/system/microtonal-bootmenu.service
-  rm -f /etc/systemd/system/microtonal-instrument.service
-  rm -f /usr/local/bin/microtonal-bootmenu.sh
-  rm -f /etc/udev/rules.d/99-microtonal-instrument.rules
-  udevadm control --reload-rules 2>/dev/null || true
-  systemctl daemon-reload
-  rfkill unblock wifi 2>/dev/null || true
-  rfkill unblock bluetooth 2>/dev/null || true
-  echo "Headless boot mode removed. Wi-Fi/Bluetooth unblocked now."
-  echo "The source codemod (macro-ized sink names) was left in place --"
-  echo "it's harmless and a plain ./build.sh behaves exactly as before."
-  exit 0
-fi
-
-# ------------------------------------------------------------------
-# --headless-boot validation
-# ------------------------------------------------------------------
-if [[ "$HEADLESS_BOOT" -eq 1 ]]; then
-  if [[ $EUID -ne 0 ]]; then
-    echo "Please run with sudo: sudo $0 --headless-boot --audio-left ... --audio-right ..." >&2
-    exit 1
-  fi
-  if [[ -z "$AUDIO_LEFT" || -z "$AUDIO_RIGHT" ]]; then
-    echo "ERROR: --headless-boot requires --audio-left and --audio-right." >&2
-    echo "Run pi_audio_diagnose.sh first to find the real port names." >&2
-    exit 1
-  fi
-fi
-
-REAL_USER="${SUDO_USER:-$(logname 2>/dev/null || echo "$(id -un)")}"
-
-# ------------------------------------------------------------------
-# Step: one-time codemod (only runs with --headless-boot)
-# ------------------------------------------------------------------
-if [[ "$HEADLESS_BOOT" -eq 1 ]]; then
-  echo "=== Codemod: making the audio sink overridable ==="
-  cp "$SRC_FILE" "${SRC_FILE}.bak.$(date +%Y%m%d_%H%M%S)"
-  cp "$CMAKE_FILE" "${CMAKE_FILE}.bak.$(date +%Y%m%d_%H%M%S)"
-
-  python3 - "$SRC_FILE" <<'PYEOF'
-import sys
-path = sys.argv[1]
-with open(path) as f:
-    text = f.read()
-
-MARKER = "PI_AUDIO_LEFT_SINK"
-if MARKER not in text:
-    lines = text.split("\n")
-    include_idxs = [i for i, l in enumerate(lines) if l.strip().startswith("#include")]
-    insert_at = (max(include_idxs) + 1) if include_idxs else 0
-    block = [
-        "",
-        "#ifndef PI_AUDIO_LEFT_SINK",
-        '#define PI_AUDIO_LEFT_SINK "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL"',
-        "#endif",
-        "#ifndef PI_AUDIO_RIGHT_SINK",
-        '#define PI_AUDIO_RIGHT_SINK "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR"',
-        "#endif",
-        "",
-    ]
-    lines[insert_at:insert_at] = block
-    text = "\n".join(lines)
-    print("audio_graph_manager.cpp: inserted macro fallback block")
-else:
-    print("audio_graph_manager.cpp: macro fallback block already present")
-
-old_l = '"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL"'
-old_r = '"alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR"'
-count_l = text.count(old_l)
-count_r = text.count(old_r)
-text = text.replace(old_l, "PI_AUDIO_LEFT_SINK")
-text = text.replace(old_r, "PI_AUDIO_RIGHT_SINK")
-
-with open(path, "w") as f:
-    f.write(text)
-print(f"audio_graph_manager.cpp: replaced {count_l} LEFT / {count_r} RIGHT literal(s) with macros")
-PYEOF
-
-  python3 - "$CMAKE_FILE" "$TARGET_NAME" <<'PYEOF'
-import sys
-path, target = sys.argv[1:3]
-with open(path) as f:
-    text = f.read()
-
-MARKER = "PI_AUDIO_LEFT_SINK"
-if MARKER not in text:
-    block = f"""
-# --- Pi headless audio sink overrides (added by build.sh --headless-boot) ---
-if(DEFINED PI_AUDIO_LEFT_SINK)
-  target_compile_definitions({target} PRIVATE PI_AUDIO_LEFT_SINK="${{PI_AUDIO_LEFT_SINK}}")
-endif()
-if(DEFINED PI_AUDIO_RIGHT_SINK)
-  target_compile_definitions({target} PRIVATE PI_AUDIO_RIGHT_SINK="${{PI_AUDIO_RIGHT_SINK}}")
-endif()
-"""
-    text = text.rstrip("\n") + "\n" + block
-    with open(path, "w") as f:
-        f.write(text)
-    print("CMakeLists.txt: added override block")
-else:
-    print("CMakeLists.txt: override block already present, skipped")
-PYEOF
-  echo
-fi
-
-# ------------------------------------------------------------------
-# Step: configure + build (always runs; as the real user, not root)
-# ------------------------------------------------------------------
-echo "=== Building ==="
-CMAKE_EXTRA_ARGS=()
-if [[ "$HEADLESS_BOOT" -eq 1 ]]; then
-  CMAKE_EXTRA_ARGS+=("-DPI_AUDIO_LEFT_SINK=${AUDIO_LEFT}" "-DPI_AUDIO_RIGHT_SINK=${AUDIO_RIGHT}")
-fi
-
-BUILD_CMD="mkdir -p '$REPO/build' && cd '$REPO/build' && cmake -DCMAKE_BUILD_TYPE=Release ${CMAKE_EXTRA_ARGS[*]@Q} .. && make -j\$(nproc)"
-
-if [[ $EUID -eq 0 ]]; then
-  su "$REAL_USER" -c "$BUILD_CMD"
-else
-  bash -c "$BUILD_CMD"
-fi
-
-echo "Build complete: $REPO/build/$TARGET_NAME"
-
-if [[ "$HEADLESS_BOOT" -eq 0 ]]; then
-  exit 0
-fi
-
-# ------------------------------------------------------------------
-# Step: udev rules
-# ------------------------------------------------------------------
-echo
-echo "=== udev rules ==="
-cat > /etc/udev/rules.d/99-microtonal-instrument.rules <<'EOF'
+install_autostart() {
+    local me; me="$(id -un)"
+    echo
+    echo "=== Installing start-at-boot for user '$me' ==="
+    # Keyboard/HID access without a desktop session.
+    sudo tee /etc/udev/rules.d/99-microtonal-instrument.rules >/dev/null <<'RULES'
 SUBSYSTEM=="hidraw", ATTRS{idVendor}=="6964", ATTRS{idProduct}=="0075", MODE="0666"
 SUBSYSTEM=="input", ATTRS{idVendor}=="6964", ATTRS{idProduct}=="0075", MODE="0666"
-EOF
-udevadm control --reload-rules
-udevadm trigger
-echo "Installed 99-microtonal-instrument.rules"
+RULES
+    sudo udevadm control --reload-rules || true
+    sudo udevadm trigger || true
+    # Audio / MIDI / input device groups (only ones that exist).
+    local g
+    for g in audio plugdev input; do
+        getent group "$g" >/dev/null 2>&1 && sudo usermod -aG "$g" "$me" || true
+    done
+    # Let the user's PipeWire + this service start at boot with nobody logged in.
+    sudo loginctl enable-linger "$me"
 
-# ------------------------------------------------------------------
-# Step: instrument systemd service (installed, not enabled)
-# ------------------------------------------------------------------
-echo
-echo "=== Instrument systemd service ==="
-BIN_PATH="$REPO/build/$TARGET_NAME"
-cat > /etc/systemd/system/microtonal-instrument.service <<EOF
+    mkdir -p "$UNIT_DIR/default.target.wants"
+    cat > "$UNIT_DIR/$UNIT_NAME" <<'UNITEOF'
 [Unit]
 Description=Microtonal Instrument Engine
-After=sound.target
+After=pipewire.service wireplumber.service pipewire-pulse.service sound.target
+Wants=pipewire.service wireplumber.service pipewire-pulse.service
 
 [Service]
 Type=simple
-WorkingDirectory=$REPO
-ExecStart=$BIN_PATH
+WorkingDirectory=@REPO@
+# Wait (up to 60 s) for the CONFIGURED output (the Shure) to show up in PipeWire, then go.
+TimeoutStartSec=120
+ExecStartPre=/bin/bash -c 'for i in $$(seq 1 60); do pw-link -i 2>/dev/null | grep -qF "@LEFT@" && exit 0; sleep 1; done; exit 0'
+ExecStart=@BIN@
 Restart=on-failure
-RestartSec=2
-User=root
+RestartSec=3
 StandardOutput=journal
 StandardError=journal
 
 [Install]
-WantedBy=multi-user.target
-EOF
-systemctl daemon-reload
-echo "Installed (not enabled -- the boot menu below starts it conditionally)."
+WantedBy=default.target
+UNITEOF
+    sed -i "s|@REPO@|$REPO|g; s|@BIN@|$BUILD_DIR/microtonal_instrument|g; s|@LEFT@|$AUDIO_LEFT|g" "$UNIT_DIR/$UNIT_NAME"
+    ln -sf "../$UNIT_NAME" "$UNIT_DIR/default.target.wants/$UNIT_NAME"
+    systemctl --user daemon-reload 2>/dev/null || true
+    echo "Installed. It will start at every boot (no login, no password needed)."
+    echo "  test now : systemctl --user start $UNIT_NAME"
+    echo "  logs     : journalctl --user -u $UNIT_NAME -f     (and $REPO/instrument.log)"
+    echo "  turn off : ./build.sh --platform pi --autostart no"
+    echo "Group changes (audio/plugdev/input) apply from the next login/boot."
+}
 
-# ------------------------------------------------------------------
-# Step: boot menu (countdown + Esc-to-cancel)
-# ------------------------------------------------------------------
-echo
-echo "=== Boot menu (headless by default, Esc for normal boot) ==="
-cat > /usr/local/bin/microtonal-bootmenu.sh <<EOF
-#!/usr/bin/env bash
-set -uo pipefail
-TIMEOUT=$TIMEOUT
-echo ""
-echo "=== Microtonal Instrument ==="
-echo "Booting headless in \${TIMEOUT}s (Wi-Fi/Bluetooth off, instrument auto-starts)."
-echo "Press Esc now to boot the normal OS instead."
-KEY=""
-IFS= read -rsn1 -t "\$TIMEOUT" KEY || true
-if [[ "\$KEY" == \$'\\e' ]]; then
-  echo "Esc received -- booting normal OS."
-  echo "Wi-Fi/Bluetooth stay on; instrument NOT auto-started."
-  echo "(start it by hand: sudo systemctl start microtonal-instrument)"
-  exit 0
+if [[ "$PLATFORM" == "pi" ]]; then
+    if [[ "$AUTOSTART" == "yes" ]]; then install_autostart; else remove_autostart; fi
 fi
-echo "Starting headless mode..."
-rfkill block wifi 2>/dev/null || true
-rfkill block bluetooth 2>/dev/null || true
-systemctl stop bluetooth.service 2>/dev/null || true
-systemctl start microtonal-instrument.service
-EOF
-chmod +x /usr/local/bin/microtonal-bootmenu.sh
-
-cat > /etc/systemd/system/microtonal-bootmenu.service <<'EOF'
-[Unit]
-Description=Microtonal Instrument boot menu (headless by default, Esc for normal boot)
-After=local-fs.target
-Before=getty@tty1.service bluetooth.service hciuart.service wpa_supplicant.service NetworkManager.service microtonal-instrument.service
-Conflicts=getty@tty1.service
-
-[Service]
-Type=oneshot
-RemainAfterExit=no
-StandardInput=tty
-StandardOutput=tty
-TTYPath=/dev/tty1
-TTYReset=yes
-TTYVHangup=yes
-ExecStart=/usr/local/bin/microtonal-bootmenu.sh
-
-[Install]
-WantedBy=multi-user.target
-EOF
-systemctl daemon-reload
-systemctl enable microtonal-bootmenu.service
-echo "Installed and enabled. Countdown: ${TIMEOUT}s. Ethernet is never touched."
-
-echo
-echo "=================================================================="
-echo " Done. Reboot to test: sudo reboot"
-echo "=================================================================="
-echo "   - No input at boot        -> headless, instrument auto-starts"
-echo "   - Esc pressed during countdown -> normal OS, Wi-Fi/Bluetooth on"
-echo "   - To undo everything: sudo ./build.sh --uninstall-headless-boot"

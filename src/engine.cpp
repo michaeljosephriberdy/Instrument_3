@@ -455,10 +455,20 @@ void Engine::run()
             int breath_pressure = (breath_value < 12) ? 0 : breath_value;
             state_->setBreath(breath_pressure);
             if (state_->mode() == PerformanceMode::SynthOnly) {
-                int scaled_volume = (breath_pressure * state_->masterVolume()) / 127;
+                // [breath_cc7_linear] volume: Mode 1 -- the melodic Zyn's output volume (CC7) follows the
+                // raw breath CC linearly: 0 -> silent, 63 -> full, 64..127 stay full. "Full" is
+                // breath_max_ (keys row0/col12,13). Note velocity is never involved.
+                int breath_cc_lin = (breath_value < 0) ? 0 : ((breath_value > 63) ? 63 : breath_value);
+                int scaled_volume = (breath_cc_lin * breath_max_ + 31) / 63;
                 if (scaled_volume != last_sent_volume || breath_vol_resync_) {
+                    if (breath_vol_resync_) {  // [breath_vol_node] Zyn stays at full CC7 in Mode 1
                     for (int ch = 0; ch < 16; ++ch)
-                        midi_->sendControlChange(ch, breath_volume_cc_, scaled_volume);
+                        midi_->sendControlChange(ch, breath_volume_cc_, 127);
+                }
+                // Breath -> node volume only: 0..63 linear 0..1, 64..127 = 1 (x breath-max ceiling).
+                if (audio_)
+                    audio_->setBreathVolume((static_cast<float>(breath_cc_lin) / 63.0f) *
+                                            (static_cast<float>(breath_max_) / 127.0f));
                     last_sent_volume = scaled_volume;
                         breath_vol_resync_ = false;
                 }
@@ -597,7 +607,9 @@ void Engine::handleAction(const Action& action, int keyboard_index, int keycode,
                 if (active_keys_.count(key_id))
                     return;
 
-                midi_->sendNoteOn(channel, midi_note, 100, bend_cents);
+                midi_->sendNoteOn(channel, midi_note,
+                                  (state_->mode() == PerformanceMode::SynthOnly ? 127 : 100), // [breath_cc7_linear] velocity: Mode 1 notes are always 127; breath only moves CC7 volume
+                                  bend_cents);
                 active_keys_[key_id] = {midi_note, channel};
                 note_ref_counts_[note_id]++;
             }
@@ -763,6 +775,22 @@ return;
  Logger::info("Mic volume " + std::to_string((state_->micMix() * 100) / 127) + "% (" + std::to_string(state_->micMix()) + "/127)");
 
 return;
+ case ActionType::BreathMaxUp:
+ {
+     breath_max_ = (breath_max_ + mix_step_ > 127) ? 127 : (breath_max_ + mix_step_);
+     breath_vol_resync_ = true;
+     Logger::info("Breath max volume " + std::to_string((breath_max_ * 100) / 127) +
+                  "% (" + std::to_string(breath_max_) + "/127)");
+     return;
+ }
+ case ActionType::BreathMaxDown:
+ {
+     breath_max_ = (breath_max_ - mix_step_ < 0) ? 0 : (breath_max_ - mix_step_);
+     breath_vol_resync_ = true;
+     Logger::info("Breath max volume " + std::to_string((breath_max_ * 100) / 127) +
+                  "% (" + std::to_string(breath_max_) + "/127)");
+     return;
+ }
  case ActionType::VolumeUp:
             state_->adjustMasterVolume(mix_step_);
             if (audio_) audio_->applyMixerLevels(state_->masterVolume(), state_->dryMix(), state_->vocoderMix(), state_->drumMix());

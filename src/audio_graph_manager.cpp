@@ -22,10 +22,10 @@
 #include <unistd.h>
 
 #ifndef PI_AUDIO_LEFT_SINK
-#define PI_AUDIO_LEFT_SINK PI_AUDIO_LEFT_SINK
+#define PI_AUDIO_LEFT_SINK "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FL"
 #endif
 #ifndef PI_AUDIO_RIGHT_SINK
-#define PI_AUDIO_RIGHT_SINK PI_AUDIO_RIGHT_SINK
+#define PI_AUDIO_RIGHT_SINK "alsa_output.pci-0000_04_00.6.HiFi__Headphones__sink:playback_FR"
 #endif
 
 
@@ -73,6 +73,18 @@ namespace
 {
     // Resolve playback ports via shell. Prefer Headphones; never MVX2U/HDMI.
     const char* flfr = left ? "playback_FL" : "playback_FR";
+    // [fix_all] configured-sink-first: the sink chosen at build time (laptop
+    // headphones / Pi Shure) wins whenever it exists in the graph.
+    {
+        const std::string want_port = left ? std::string(PI_AUDIO_LEFT_SINK)
+                                           : std::string(PI_AUDIO_RIGHT_SINK);
+        std::string hit = shellCapture(std::string("pw-link -i 2>/dev/null | grep -F '") +
+                                       want_port + "' | head -n 1");
+        while (!hit.empty() && (hit.back() == '\n' || hit.back() == '\r' || hit.back() == ' '))
+            hit.pop_back();
+        if (!hit.empty())
+            return hit;
+    }
     // Try Headphones first.
     std::string cmd =
         std::string("pw-link -i 2>/dev/null | grep -i '") + flfr +
@@ -708,6 +720,7 @@ bool AudioGraphManager::startProcesses()
  launchZynDrums();
  launchSooperLooper();
  launchVocoder(); // keep host alive; Mode 1 simply leaves it unlinked
+    launchVolumeNode();  // [breath_vol_node] created once, lives for the whole run
  started_ = ok;
  // Ensure USB mic capture ports exist in PipeWire before first mode build (called before return -- was dead code)
     activateMicCapturePorts();
@@ -721,6 +734,8 @@ bool AudioGraphManager::startProcesses()
 void AudioGraphManager::stopProcesses()
 {
     disconnectAllOwnedLinks();
+    stopVolumeWorker();  // [breath_vol_node]
+    killPid(vol_pid_, "zyn-volume-node");
     killPid(voc_pid_, "vocoder");
     killPid(sl_pid_, "sooperlooper");
     killPid(zyn_drums_pid_, "zyn-drums");
@@ -1184,6 +1199,19 @@ void AudioGraphManager::ensureHealthyGraph() {
                 }
             }
         }
+    if (!vol_unavailable_ && !processAlive(vol_pid_)) {  // [breath_vol_node]
+        static auto vol_last_try = std::chrono::steady_clock::time_point{};
+        auto nowv = std::chrono::steady_clock::now();
+        if (vol_last_try.time_since_epoch().count() == 0 ||
+            nowv - vol_last_try > std::chrono::seconds(10)) {
+            vol_last_try = nowv;
+            Logger::warning("Health: zyn-volume-node dead -- relaunching");
+            if (launchVolumeNode()) {
+                invalidatePortCache();
+                need_rebuild = true;
+            }
+        }
+    }
     if (!processAlive(voc_pid_)) {
         Logger::warning("Health: Vocoder host dead -- relaunching");
         launchVocoder();
@@ -1258,6 +1286,8 @@ AudioGraphManager::desiredRoles(PerformanceMode mode)
     using R = LinkRole;
     switch (mode) {
     case PerformanceMode::SynthOnly:
+        return {R::MelVol, R::VolSl, R::VolHp, R::DrumSl, R::DrumHp, R::SlHp,
+                R::MidiMel, R::MidiDru};
     case PerformanceMode::BreathOctave:
         return {R::MelSl, R::MelHp, R::DrumSl, R::DrumHp, R::SlHp,
                 R::MidiMel, R::MidiDru};
@@ -1325,7 +1355,11 @@ AudioGraphManager::resolveRole(LinkRole role)
     };
 
     switch (role) {
-    case LinkRole::MelSl:  add2(mel_l, mel_r, sl_in_l, sl_in_r); break;
+    case LinkRole::MelVol:
+        case LinkRole::VolSl:
+        case LinkRole::VolHp:
+            break;  // [breath_vol_node] handled by the cached path
+        case LinkRole::MelSl:  add2(mel_l, mel_r, sl_in_l, sl_in_r); break;
     case LinkRole::MelHp:  add2(mel_l, mel_r, play_l, play_r); break;
     case LinkRole::MelVoc: add2(mel_l, mel_r, vin_l, vin_r); break;
     case LinkRole::MelMvx:
@@ -1434,6 +1468,7 @@ void AudioGraphManager::refreshPortCache()
     c.mic_capture = mic.capture_ports;
     (void)resolveMvx2uPlaybackPorts(c.mvx_l, c.mvx_r);   // may log once
 
+    resolveVolumeNodePorts(c.vol_in_l, c.vol_in_r, c.vol_out_l, c.vol_out_r);  // [breath_vol_node]
     c.midi_mel = findEngineMidiPort();
     c.midi_dru = findEngineDrumsMidiPort();
 
@@ -1479,6 +1514,8 @@ void AudioGraphManager::ensureModeLinksCached(PerformanceMode mode)
     }
         forceMvx2uPurePlayback();
 
+    if (mode == PerformanceMode::SynthOnly && !processAlive(vol_pid_))
+        launchVolumeNode();  // [breath_vol_node]
     // Force a fresh resolution so the cache is accurate for this mode.
     refreshPortCache();
     const PortCache& c = port_cache_;
@@ -1490,9 +1527,20 @@ void AudioGraphManager::ensureModeLinksCached(PerformanceMode mode)
         if (!b.empty() && !e.empty()) want.emplace_back(b, e);
     };
 
+    const bool vol_ok = !c.vol_in_l.empty() && !c.vol_in_r.empty() &&
+                        !c.vol_out_l.empty() && !c.vol_out_r.empty();  // [breath_vol_node]
     auto roles = desiredRoles(mode);
     for (auto r : roles) {
         switch (r) {
+        case LinkRole::MelVol:
+            if (vol_ok) add2(c.mel_l, c.mel_r, c.vol_in_l, c.vol_in_r);
+            break;
+        case LinkRole::VolSl:
+            if (vol_ok) add2(c.vol_out_l, c.vol_out_r, c.sl_in_l, c.sl_in_r);
+            break;
+        case LinkRole::VolHp:
+            if (vol_ok) add2(c.vol_out_l, c.vol_out_r, c.play_l, c.play_r);
+            break;
         case LinkRole::MelSl:  add2(c.mel_l, c.mel_r, c.sl_in_l, c.sl_in_r); break;
         case LinkRole::MelHp:  add2(c.mel_l, c.mel_r, c.play_l,  c.play_r);  break;
         case LinkRole::MelVoc: add2(c.mel_l, c.mel_r, c.vin_l,   c.vin_r);   break;
@@ -1555,6 +1603,11 @@ void AudioGraphManager::ensureModeLinksCached(PerformanceMode mode)
         }
     }
 
+    if (mode == PerformanceMode::SynthOnly && !vol_ok) {
+        Logger::warning("zyn-volume-node ports not found -- Mode 1 routing Zyn directly (no breath volume)");
+        add2(c.mel_l, c.mel_r, c.sl_in_l, c.sl_in_r);
+        add2(c.mel_l, c.mel_r, c.play_l, c.play_r);
+    }
     mode_link_cache_[idx] = std::move(want);
     mode_link_cache_valid_[idx] = true;
     // Logger::info("modespeed: cached " + std::to_string(mode_link_cache_[idx].size())
@@ -1665,6 +1718,8 @@ bool AudioGraphManager::setMode(PerformanceMode mode) {
     const PerformanceMode from = mode_;
     const bool ok = applyModeTransition(from, mode);
     mode_ = mode;                       // already set inside apply, but keep consistent
+    if (mode != PerformanceMode::SynthOnly)
+        setBreathVolume(1.0f);  // [breath_vol_node] node fixed at 100% outside Mode 1
     switch (mode) {
     case PerformanceMode::SynthOnly:
         Logger::info("Mode SynthOnly (Mode 1) [fast]");
@@ -2572,7 +2627,17 @@ void AudioGraphManager::applyMixerLevels(int master, int dry, int vocoder, int d
  " vocoder=" + std::to_string(vocoder) + " (" + std::to_string((vocoder * 100) / 127) + "%)" +
  " drums=" + std::to_string(drums) + " (" + std::to_string((drums * 100) / 127) + "%)");
 
-    std::string wpctl = which("wpctl");
+    // [fix_all] master-on-configured-sink: master volume goes to the output sink chosen
+    // at build time (laptop headphones / Pi Shure), not to "whatever the default sink is".
+    bool master_on_configured_sink = false;
+    {
+        std::string master_sink = PI_AUDIO_LEFT_SINK;
+        const auto master_colon = master_sink.rfind(':');
+        if (master_colon != std::string::npos)
+            master_sink.erase(master_colon);
+        master_on_configured_sink = setNodeVolume(master_sink, m);
+    }
+    std::string wpctl = master_on_configured_sink ? std::string() : which("wpctl");
     if (!wpctl.empty())
     {
         std::ostringstream cmd;
@@ -2702,4 +2767,123 @@ bool AudioGraphManager::ensureMvx2uMicCaptureLive()
 
  Logger::info("MVX2U: mic capture forced live (ALSA Microphone 80% + PW unmute)");
  return true;
+}
+
+
+// ===== [breath_vol_node] dedicated PipeWire volume node =====================
+// A pw-loopback child exposes a real sink ("zyn-volume-node", input side) and
+// a playback stream ("zyn-volume-out", output side, autoconnect off). In Mode 1
+// the melodic Zyn feeds the sink and the stream feeds SooperLooper + phones.
+// Breath moves ONLY the sink volume. Volume pushes happen on a small worker
+// thread (coalescing to the newest value) so the 1 ms performance loop never
+// blocks on a pactl fork.
+bool AudioGraphManager::launchVolumeNode()
+{
+    if (processAlive(vol_pid_))
+        return true;
+    if (vol_unavailable_)
+        return false;
+    const std::string bin = which("pw-loopback");
+    if (bin.empty()) {
+        vol_unavailable_ = true;
+        Logger::warning("pw-loopback not found -- no breath volume node; "
+                        "Mode 1 will route Zyn directly (no breath volume)");
+        return false;
+    }
+    pid_t pid = fork();
+    if (pid < 0)
+        return false;
+    if (pid == 0) {
+        int fd = open("/dev/null", O_WRONLY);
+        if (fd >= 0) {
+            dup2(fd, STDOUT_FILENO);
+            dup2(fd, STDERR_FILENO);
+        }
+        execlp(bin.c_str(), bin.c_str(),
+               "-n", "zyn-volume", "-c", "2", "-m", "[ FL FR ]",
+               "--capture-props=media.class=Audio/Sink node.name=zyn-volume-node "
+               "node.description=Zyn-Volume priority.session=0",
+               "--playback-props=node.name=zyn-volume-out node.description=Zyn-Volume-Out "
+               "node.autoconnect=false node.dont-reconnect=true",
+               static_cast<char*>(nullptr));
+        _exit(127);
+    }
+    vol_pid_ = pid;
+    vol_applied_pct_.store(-1);  // fresh node: worker re-applies the current target
+    Logger::info("Launched breath volume node (pw-loopback) pid=" + std::to_string(pid));
+    bool ready = false;
+    for (int i = 0; i < 25 && !ready; ++i) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        ready = !findPortsMatching({"zyn-volume-node:"}, true).empty() &&
+                !findPortsMatching({"zyn-volume-out:"}, false).empty();
+    }
+    if (ready)
+        Logger::info("Breath volume node ports visible (zyn-volume-node)");
+    else
+        Logger::warning("Breath volume node ports not visible yet");
+    if (!vol_thread_.joinable()) {
+        vol_stop_.store(false);
+        vol_thread_ = std::thread([this] { volumeWorkerLoop(); });
+    }
+    return true;
+}
+
+void AudioGraphManager::volumeWorkerLoop()
+{
+    const std::string pactl = which("pactl");
+    while (!vol_stop_.load()) {
+        const int want = vol_target_pct_.load();
+        if (!pactl.empty() && want != vol_applied_pct_.load()) {
+            const std::string cmd = pactl + " set-sink-volume zyn-volume-node " +
+                                    std::to_string(want) + "% >/dev/null 2>&1";
+            if (std::system(cmd.c_str()) == 0)
+                vol_applied_pct_.store(want);
+            else
+                std::this_thread::sleep_for(std::chrono::milliseconds(250));
+        }
+        std::this_thread::sleep_for(std::chrono::milliseconds(3));
+    }
+}
+
+void AudioGraphManager::stopVolumeWorker()
+{
+    vol_stop_.store(true);
+    if (vol_thread_.joinable())
+        vol_thread_.join();
+    vol_stop_.store(false);
+}
+
+void AudioGraphManager::setBreathVolume(float linear)
+{
+    if (linear < 0.f) linear = 0.f;
+    if (linear > 1.f) linear = 1.f;
+    vol_target_pct_.store(static_cast<int>(linear * 100.0f + 0.5f));
+}
+
+void AudioGraphManager::resolveVolumeNodePorts(std::string& in_l, std::string& in_r,
+                                               std::string& out_l, std::string& out_r) const
+{
+    in_l.clear(); in_r.clear(); out_l.clear(); out_r.clear();
+    auto lower = [](std::string s) {
+        for (char& ch : s)
+            ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
+        return s;
+    };
+    auto ends = [](const std::string& s, const char* suf) {
+        const size_t n = std::strlen(suf);
+        return s.size() >= n && s.compare(s.size() - n, n, suf) == 0;
+    };
+    auto pick = [&](const std::vector<std::string>& ports, std::string& l, std::string& r) {
+        for (const auto& p : ports) {
+            const std::string low = lower(p);
+            if (low.find("monitor") != std::string::npos)
+                continue;
+            if (l.empty() && (ends(low, "_fl") || ends(low, "_l") || ends(low, "_1")))
+                l = p;
+            else if (r.empty() && (ends(low, "_fr") || ends(low, "_r") || ends(low, "_2")))
+                r = p;
+        }
+    };
+    pick(findPortsMatching({"zyn-volume-node:"}, true), in_l, in_r);
+    pick(findPortsMatching({"zyn-volume-out:"}, false), out_l, out_r);
 }

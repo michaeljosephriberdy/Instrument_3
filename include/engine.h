@@ -65,6 +65,7 @@ private:
     int drum_channel_ = 0;
     int breath_volume_cc_ = 7; // breath-expression CC number, from config
     bool breath_vol_resync_ = true;
+    int breath_max_ = 127;   // [fix_all] CC7 ceiling for breath in Mode 1 (0..127)
 
     std::map<uint32_t, ActiveKey> active_keys_;
     std::map<uint32_t, int> note_ref_counts_;

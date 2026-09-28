@@ -1,0 +1,3 @@
+[  6%] Building CXX object CMakeFiles/microtonal_instrument.dir/src/engine.cpp.o
+[ 12%] Linking CXX executable microtonal_instrument
+[100%] Built target microtonal_instrument
