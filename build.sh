@@ -49,7 +49,7 @@ check_packages() {
     local pkgs=(build-essential cmake pkg-config git libasound2-dev libhidapi-dev
                 pipewire pipewire-bin pipewire-jack pipewire-audio-client-libraries
                 pipewire-pulse wireplumber pulseaudio-utils alsa-utils rfkill
-                zynaddsubfx sooperlooper calf-plugins jalv lv2-utils lilv-utils liblo-tools)
+                zynaddsubfx sooperlooper calf-plugins jalv lv2-utils lilv-utils liblo-tools libjack-jackd2-dev)
     local missing=() p
     for p in "${pkgs[@]}"; do
         dpkg -s "$p" >/dev/null 2>&1 && continue

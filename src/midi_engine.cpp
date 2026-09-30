@@ -43,6 +43,12 @@ bool MidiEngine::initialize()
         return false;
     }
 
+        port_volume_ = snd_seq_create_simple_port(  // [zynvol]
+        seq_, "MIDI Volume",
+        SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
+        SND_SEQ_PORT_TYPE_MIDI_GENERIC | SND_SEQ_PORT_TYPE_APPLICATION);
+    if (port_volume_ < 0)
+        Logger::warning("Could not create volume MIDI port (no breath volume in Mode 1)");
     Logger::info("MIDI ports: 'MIDI Output' (melody) and 'MIDI Drums' (drums)");
     return true;
 }
@@ -166,3 +172,27 @@ int MidiEngine::outputPort() const
     return port_;
 }
 
+// [zynvol] breath level (0..1) as a 14-bit controller pair, LSB first, to zynvol only.
+bool MidiEngine::sendBreathVolume(float x)
+{
+    if (x < 0.0f) x = 0.0f;
+    if (x > 1.0f) x = 1.0f;
+    const int v = static_cast<int>(std::lround(x * 16383.0f));
+    last_breath_code_ = v;
+    if (!seq_ || port_volume_ < 0)
+        return false;
+    snd_seq_event_t lsb;
+    snd_seq_ev_clear(&lsb);
+    snd_seq_ev_set_controller(&lsb, 0, 39, v & 127);
+    const bool ok1 = sendEventOnPort(seq_, port_volume_, lsb);
+    snd_seq_event_t msb;
+    snd_seq_ev_clear(&msb);
+    snd_seq_ev_set_controller(&msb, 0, 7, (v >> 7) & 127);
+    const bool ok2 = sendEventOnPort(seq_, port_volume_, msb);
+    return ok1 && ok2;
+}
+
+void MidiEngine::resendBreathVolume()
+{
+    sendBreathVolume(static_cast<float>(last_breath_code_) / 16383.0f);
+}

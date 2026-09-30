@@ -71,6 +71,9 @@ public:
 
 
     int outputPort() const;
+    // [zynvol] breath level 0..1 -> zynvol (14-bit CC7/CC39 on port "MIDI Volume")
+    bool sendBreathVolume(float x);
+    void resendBreathVolume();
 
 
 
@@ -80,6 +83,8 @@ private:
 
     int port_;
     int port_drums_;
+    int port_volume_ = -1;
+    int last_breath_code_ = 0;
 
 
 

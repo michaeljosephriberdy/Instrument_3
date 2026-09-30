@@ -2770,26 +2770,42 @@ bool AudioGraphManager::ensureMvx2uMicCaptureLive()
 }
 
 
-// ===== [breath_vol_node] dedicated PipeWire volume node =====================
-// A pw-loopback child exposes a real sink ("zyn-volume-node", input side) and
-// a playback stream ("zyn-volume-out", output side, autoconnect off). In Mode 1
-// the melodic Zyn feeds the sink and the stream feeds SooperLooper + phones.
-// Breath moves ONLY the sink volume. Volume pushes happen on a small worker
-// thread (coalescing to the newest value) so the 1 ms performance loop never
-// blocks on a pactl fork.
+// ===== [zynvol] MIDI-controlled volume node ================================
+// zynvol is a tiny JACK/PipeWire client ("zyn-volume-node", stereo in/out) whose gain is
+// set by MIDI from MidiEngine's "MIDI Volume" port. Same node/port names as the old
+// pw-loopback node, so all link roles and the direct-routing fallback are unchanged.
 bool AudioGraphManager::launchVolumeNode()
 {
     if (processAlive(vol_pid_))
         return true;
     if (vol_unavailable_)
         return false;
-    const std::string bin = which("pw-loopback");
+    std::string bin;
+    {
+        char self[4096];
+        const ssize_t n = readlink("/proc/self/exe", self, sizeof(self) - 1);
+        if (n > 0) {
+            self[n] = '\0';
+            const std::string exe(self);
+            const size_t slash = exe.rfind('/');
+            if (slash != std::string::npos) {
+                const std::string cand = exe.substr(0, slash + 1) + "zynvol";
+                if (access(cand.c_str(), X_OK) == 0)
+                    bin = cand;
+            }
+        }
+    }
+    if (bin.empty() && access("build/zynvol", X_OK) == 0)
+        bin = "build/zynvol";
+    if (bin.empty())
+        bin = which("zynvol");
     if (bin.empty()) {
         vol_unavailable_ = true;
-        Logger::warning("pw-loopback not found -- no breath volume node; "
+        Logger::warning("zynvol not found (was it built? needs libjack-jackd2-dev) -- "
                         "Mode 1 will route Zyn directly (no breath volume)");
         return false;
     }
+    const std::string pwjack = which("pw-jack");
     pid_t pid = fork();
     if (pid < 0)
         return false;
@@ -2799,60 +2815,41 @@ bool AudioGraphManager::launchVolumeNode()
             dup2(fd, STDOUT_FILENO);
             dup2(fd, STDERR_FILENO);
         }
-        execlp(bin.c_str(), bin.c_str(),
-               "-n", "zyn-volume", "-c", "2", "-m", "[ FL FR ]",
-               "--capture-props=media.class=Audio/Sink node.name=zyn-volume-node "
-               "node.description=Zyn-Volume priority.session=0",
-               "--playback-props=node.name=zyn-volume-out node.description=Zyn-Volume-Out "
-               "node.autoconnect=false node.dont-reconnect=true",
-               static_cast<char*>(nullptr));
+        setenv("PIPEWIRE_PROPS", "{ node.autoconnect=false }", 1);
+        if (!pwjack.empty())
+            execlp("pw-jack", "pw-jack", bin.c_str(), "--name", "zyn-volume-node",
+                   "--exponent", "3.0", static_cast<char*>(nullptr));
+        execlp(bin.c_str(), bin.c_str(), "--name", "zyn-volume-node",
+               "--exponent", "3.0", static_cast<char*>(nullptr));
         _exit(127);
     }
     vol_pid_ = pid;
-    vol_applied_pct_.store(-1);  // fresh node: worker re-applies the current target
-    Logger::info("Launched breath volume node (pw-loopback) pid=" + std::to_string(pid));
+    Logger::info("Launched zynvol (MIDI volume node) pid=" + std::to_string(pid));
     bool ready = false;
     for (int i = 0; i < 25 && !ready; ++i) {
         std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        if (!processAlive(vol_pid_))
+            break;
         ready = !findPortsMatching({"zyn-volume-node:"}, true).empty() &&
-                !findPortsMatching({"zyn-volume-out:"}, false).empty();
+                !findPortsMatching({"zyn-volume-node:"}, false).empty();
     }
     if (ready)
-        Logger::info("Breath volume node ports visible (zyn-volume-node)");
+        Logger::info("zynvol ports visible (zyn-volume-node)");
     else
-        Logger::warning("Breath volume node ports not visible yet");
-    if (!vol_thread_.joinable()) {
-        vol_stop_.store(false);
-        vol_thread_ = std::thread([this] { volumeWorkerLoop(); });
-    }
+        Logger::warning("zynvol ports not visible yet");
     return true;
 }
 
-void AudioGraphManager::volumeWorkerLoop()
-{
-    const std::string pactl = which("pactl");
-    while (!vol_stop_.load()) {
-        const int want = vol_target_pct_.load();
-        if (!pactl.empty() && want != vol_applied_pct_.load()) {
-            const std::string cmd = pactl + " set-sink-volume zyn-volume-node " +
-                                    std::to_string(want) + "% >/dev/null 2>&1";
-            if (std::system(cmd.c_str()) == 0)
-                vol_applied_pct_.store(want);
-            else
-                std::this_thread::sleep_for(std::chrono::milliseconds(250));
-        }
-        std::this_thread::sleep_for(std::chrono::milliseconds(3));
-    }
-}
+// Kept only so the header stays unchanged: there is no worker thread any more.
+void AudioGraphManager::volumeWorkerLoop() {}
 
 void AudioGraphManager::stopVolumeWorker()
 {
-    vol_stop_.store(true);
     if (vol_thread_.joinable())
         vol_thread_.join();
-    vol_stop_.store(false);
 }
 
+// Breath volume now travels as MIDI (Engine -> MidiEngine -> zynvol); nothing to do here.
 void AudioGraphManager::setBreathVolume(float linear)
 {
     if (linear < 0.f) linear = 0.f;
@@ -2885,5 +2882,5 @@ void AudioGraphManager::resolveVolumeNodePorts(std::string& in_l, std::string& i
         }
     };
     pick(findPortsMatching({"zyn-volume-node:"}, true), in_l, in_r);
-    pick(findPortsMatching({"zyn-volume-out:"}, false), out_l, out_r);
+    pick(findPortsMatching({"zyn-volume-node:"}, false), out_l, out_r);
 }

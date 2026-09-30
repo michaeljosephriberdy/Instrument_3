@@ -445,6 +445,7 @@ void Engine::run()
         if (audio_ && now >= next_graph_check) {
             next_graph_check = now + std::chrono::seconds(2);
             audio_->ensureHealthyGraph();
+            if (midi_) midi_->resendBreathVolume();  // [zynvol]
         }
         // ===== END HOTPLUG =====
 
@@ -466,9 +467,9 @@ void Engine::run()
                         midi_->sendControlChange(ch, breath_volume_cc_, 127);
                 }
                 // Breath -> node volume only: 0..63 linear 0..1, 64..127 = 1 (x breath-max ceiling).
-                if (audio_)
-                    audio_->setBreathVolume((static_cast<float>(breath_cc_lin) / 63.0f) *
-                                            (static_cast<float>(breath_max_) / 127.0f));
+                if (midi_)  // [zynvol]
+                        midi_->sendBreathVolume((static_cast<float>(breath_cc_lin) / 63.0f) *
+                                                (static_cast<float>(breath_max_) / 127.0f));
                     last_sent_volume = scaled_volume;
                         breath_vol_resync_ = false;
                 }
