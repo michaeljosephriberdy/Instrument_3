@@ -167,6 +167,11 @@ bool Engine::initialize()
         }
         acfg.mic_name_hint = "MVX2U";
         audio_->setConfig(acfg);
+        // [instrument-bus] master volume = bus gain; MidiEngine's "MIDI Bus Volume" port feeds the bus node
+        audio_->setBusVolumeSender([this](float x) {
+            if (midi_)
+                midi_->sendBusVolume(x);
+        });
     }
 
     if (!audio_->startProcesses())
@@ -188,6 +193,7 @@ bool Engine::initialize()
     else
     {
         audio_->setMode(PerformanceMode::SynthOnly);
+        if (audio_) audio_->applyMasterBus(state_->masterVolume()); // [instrument-bus] start at default_volume (127 = 100%)
         Logger::info(std::string("Audio graph: ") + audio_->statusSummary());
     }
 
@@ -446,6 +452,7 @@ void Engine::run()
             next_graph_check = now + std::chrono::seconds(2);
             audio_->ensureHealthyGraph();
             if (midi_) midi_->resendBreathVolume();  // [zynvol]
+            if (midi_) midi_->resendBusVolume(); // [instrument-bus]
         }
         // ===== END HOTPLUG =====
 
@@ -638,9 +645,9 @@ void Engine::handleAction(const Action& action, int keyboard_index, int keycode,
         {
             int channel = drum_channel_;
                 int note = action.drum_note;
-                // Drum velocity = 100 * (drumMix/127) * (masterVolume/127).
+                // Drum velocity = 100 * (drumMix/127); master volume is the bus gain, not part of velocity.
                 // Never modulated by breath or vocoder gain.
-                int velocity = (100 * state_->drumMix() * state_->masterVolume()) / (127 * 127);
+                int velocity = (100 * state_->drumMix()) / 127;
                 if (velocity < 1) velocity = 1;
                 if (velocity > 127) velocity = 127;
 

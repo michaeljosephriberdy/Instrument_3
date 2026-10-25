@@ -74,6 +74,9 @@ public:
     // [zynvol] breath level 0..1 -> zynvol (14-bit CC7/CC39 on port "MIDI Volume")
     bool sendBreathVolume(float x);
     void resendBreathVolume();
+    // [instrument-bus] master level 0..1 -> instrument-bus (14-bit CC7/CC39 on port "MIDI Bus Volume")
+    bool sendBusVolume(float x);
+    void resendBusVolume();
 
 
 
@@ -85,6 +88,8 @@ private:
     int port_drums_;
     int port_volume_ = -1;
     int last_breath_code_ = 0;
+    int port_bus_ = -1;
+    int last_bus_code_ = 16383; // 100%
 
 
 

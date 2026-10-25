@@ -10,6 +10,7 @@
 #include <vector>
 
 #include <array>
+#include <functional>
 //
 // Owns external audio processes and the PipeWire graph.
 //
@@ -18,8 +19,13 @@
 // Mode 3 (SynthAndVocoder): Mode 2 + dry mic path with independent level
 // Mode 4 (BreathOctave): Mode 1 routing; breath drives octave only
 // Mode 5 (BreathOctaveMic)
-// Mode 6 (Talkbox): sawtooth melody → MVX2U jack; mic → SL + phones: Mode 4 + dry mic → SL + headphones
-//
+// [instrument-bus] Audio topology: every audible source (Zyn melody, Zyn drums, vocoder, mic,
+// looper output, breath volume node) links ONLY to instrument-bus:in_1/in_2. The single path
+// from the instrument into the physical sink is instrument-bus:out_1/out_2 -> the configured
+// sink (PI_AUDIO_LEFT_SINK / PI_AUDIO_RIGHT_SINK: laptop headphones or the Pi's Shure).
+// Master volume is the gain of the bus only; the program never changes a device or sink
+// volume. Looper inputs come from the pre-bus sources, never from the bus output.
+// Mode 6 (Talkbox) routing has been removed.
 // Looper (SooperLooper) sits on a side chain and is controlled via OSC;
 // it is not driven by raw keyboard events.
 //
@@ -90,6 +96,11 @@ public:
     //            dry/vocoder levels are logged until real nodes exist.
     void applyMixerLevels(int master, int dry, int vocoder, int drums,
  int synth = 100, int mic = 100);
+    // [instrument-bus] Master volume = gain of instrument-bus only (x = master/127, bus applies x^exp).
+    // Engine installs a sender that forwards x to MidiEngine::sendBusVolume().
+    void setBusVolumeSender(std::function<void(float)> fn);
+    void applyMasterBus(int master);
+    bool busRunning() const;
 
     // True if an input port matching mic_name_hint is visible to PipeWire/ALSA.
     bool micPresent() const;
@@ -174,8 +185,6 @@ public:
 
 private:
 
-    // 0.0-1.0 linear gain on a PipeWire node via wpctl or pw-cli (best-effort).
-    bool setNodeVolume(const std::string& node_name_substring, float linear);
     // Same idea, but for a capture SOURCE (mic/input), not a playback sink --
     // setNodeVolume() alone can never find a USB mic, since it only queries sinks.
     bool setSourceVolume(const std::string& node_name_substring, float linear);
@@ -206,7 +215,8 @@ private:
     bool launchVolumeNode();
     void volumeWorkerLoop();
     void stopVolumeWorker();
-    void resolveVolumeNodePorts(std::string& in_l, std::string& in_r,
+    void resolveVolumeNodePorts(const std::string& client_prefix,
+                                std::string& in_l, std::string& in_r,
                                 std::string& out_l, std::string& out_r) const;
 
     void killPid(pid_t& pid, const char* label);
@@ -222,19 +232,16 @@ private:
     bool recoverAudioStack(const char* reason);
     // Differential mode graph (no full-graph sever on every switch)
     enum class LinkRole {
-        MelSl, MelHp, MelVoc, MelMvx,
+        MelSl, MelHp, MelVoc,
         DrumSl, DrumHp,
         VocSl, VocHp,
         MicSide, MicSl, MicHp,
         SlHp,
         MidiMel, MidiDru,
-        MelVol, VolSl, VolHp
+        MelVol, VolSl, VolHp,
+        BusSink
     };
     static std::vector<LinkRole> desiredRoles(PerformanceMode mode);
-    // Resolve role → concrete (src,dst) pairs using live port discovery.
-    std::vector<std::pair<std::string,std::string>> resolveRole(LinkRole role);
-    // Ensure only desired roles for mode are linked (create missing, unlink extras).
-    bool ensureModeLinks(PerformanceMode mode);
     // Stabilize current mode_ then apply delta to target (or no-op if same).
     bool applyModeTransition(PerformanceMode from, PerformanceMode to);
 
@@ -244,7 +251,9 @@ private:
         std::string sl_in_l, sl_in_r, sl_out_l, sl_out_r;
         std::string play_l, play_r;
         std::string vin_l, vin_r, vside, vside2, vout_l, vout_r;
-        std::string mvx_l, mvx_r;
+        std::string bus_in_l, bus_in_r, bus_out_l, bus_out_r; // [instrument-bus]
+        std::string final_l, final_r; // where every *Hp role lands: bus in (sink itself if the bus is down)
+        bool bus_ready = false;
         std::string vol_in_l, vol_in_r, vol_out_l, vol_out_r;
         std::string midi_mel, midi_dru;
         std::vector<std::string> mic_capture;
@@ -253,21 +262,12 @@ private:
     void invalidatePortCache();
     void refreshPortCache();                 // fills cache_ from live PW
     const PortCache& portCache();            // refresh if needed
-    // Pre-computed concrete link pairs for each mode (filled on first use).
-    std::vector<std::pair<std::string,std::string>> cachedLinksFor(PerformanceMode m);
     void ensureModeLinksCached(PerformanceMode mode);  // fill cache if empty
 
 
 
-    bool buildMode1();
-    bool buildMode2();
-    bool buildMode3();
- bool buildMode4();
- bool buildMode5();
- bool buildMode6();
  bool reloadMelodyInstrument(const std::string& xmz_path);
  bool forceMvx2uPurePlayback();
- bool resolveMvx2uPlaybackPorts(std::string& out_l, std::string& out_r);
 
     // Discover the real PipeWire name of our ALSA MIDI sequencer
     // output (MidiEngine client "Instrument_3", port "MIDI Output").
@@ -308,6 +308,17 @@ private:
     std::atomic<int> vol_applied_pct_{-1};
 
     PortCache port_cache_;
+    // [instrument-bus] second zynvol instance: instrument-bus:in_1/in_2 -> out_1/out_2
+    pid_t bus_pid_ = -1;
+    bool bus_unavailable_ = false;
+    bool last_bus_ready_ = false;
+    bool sweep_pending_ = true; // unlink our direct sources -> sink links once the bus is the only path
+    std::function<void(float)> bus_volume_sender_;
+    bool launchBusNode();
+    void sweepDirectSinkLinks();
+    bool ensureBusSinkLinks(const std::string& bus_out_l, const std::string& bus_out_r,
+                            const std::string& sink_l, const std::string& sink_r);
+    std::vector<std::pair<std::string, std::string>> listLinks() const;
     std::array<std::vector<std::pair<std::string,std::string>>, 6> mode_link_cache_{};
     std::array<bool, 6> mode_link_cache_valid_{};
 

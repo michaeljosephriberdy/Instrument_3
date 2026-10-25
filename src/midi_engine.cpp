@@ -49,6 +49,12 @@ bool MidiEngine::initialize()
         SND_SEQ_PORT_TYPE_MIDI_GENERIC | SND_SEQ_PORT_TYPE_APPLICATION);
     if (port_volume_ < 0)
         Logger::warning("Could not create volume MIDI port (no breath volume in Mode 1)");
+    port_bus_ = snd_seq_create_simple_port( // [instrument-bus]
+        seq_, "MIDI Bus Volume",
+        SND_SEQ_PORT_CAP_READ | SND_SEQ_PORT_CAP_SUBS_READ,
+        SND_SEQ_PORT_TYPE_MIDI_GENERIC | SND_SEQ_PORT_TYPE_APPLICATION);
+    if (port_bus_ < 0)
+        Logger::warning("Could not create bus volume MIDI port (no master volume)");
     Logger::info("MIDI ports: 'MIDI Output' (melody) and 'MIDI Drums' (drums)");
     return true;
 }
@@ -195,4 +201,29 @@ bool MidiEngine::sendBreathVolume(float x)
 void MidiEngine::resendBreathVolume()
 {
     sendBreathVolume(static_cast<float>(last_breath_code_) / 16383.0f);
+}
+
+// [instrument-bus] master level (0..1) as a 14-bit controller pair, LSB first, to the bus node only.
+bool MidiEngine::sendBusVolume(float x)
+{
+    if (x < 0.0f) x = 0.0f;
+    if (x > 1.0f) x = 1.0f;
+    const int v = static_cast<int>(std::lround(x * 16383.0f));
+    last_bus_code_ = v;
+    if (!seq_ || port_bus_ < 0)
+        return false;
+    snd_seq_event_t lsb;
+    snd_seq_ev_clear(&lsb);
+    snd_seq_ev_set_controller(&lsb, 0, 39, v & 127);
+    const bool ok1 = sendEventOnPort(seq_, port_bus_, lsb);
+    snd_seq_event_t msb;
+    snd_seq_ev_clear(&msb);
+    snd_seq_ev_set_controller(&msb, 0, 7, (v >> 7) & 127);
+    const bool ok2 = sendEventOnPort(seq_, port_bus_, msb);
+    return ok1 && ok2;
+}
+
+void MidiEngine::resendBusVolume()
+{
+    sendBusVolume(static_cast<float>(last_bus_code_) / 16383.0f);
 }

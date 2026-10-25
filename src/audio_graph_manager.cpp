@@ -71,7 +71,7 @@ namespace
     // First non-HDMI playback sink port matching left/right preference.
     std::string defaultPlaybackPort(bool left)
 {
-    // Resolve playback ports via shell. Prefer Headphones; never MVX2U/HDMI.
+    // Resolve playback ports via shell. Configured sink first, then Headphones; never HDMI.
     const char* flfr = left ? "playback_FL" : "playback_FR";
     // [fix_all] configured-sink-first: the sink chosen at build time (laptop
     // headphones / Pi Shure) wins whenever it exists in the graph.
@@ -88,14 +88,14 @@ namespace
     // Try Headphones first.
     std::string cmd =
         std::string("pw-link -i 2>/dev/null | grep -i '") + flfr +
-        "' | grep -vi hdmi | grep -vi mvx2u | grep -vi shure | "
+        "' | grep -vi hdmi | "
         "grep -i headphone | head -n 1";
     std::string line = shellCapture(cmd);
     if (line.empty()) {
-        // Any non-MVX2U, non-HDMI sink.
+        // Any non-HDMI sink.
         cmd =
             std::string("pw-link -i 2>/dev/null | grep -i '") + flfr +
-            "' | grep -vi hdmi | grep -vi mvx2u | grep -vi shure | head -n 1";
+            "' | grep -vi hdmi | head -n 1";
         line = shellCapture(cmd);
     }
     if (line.empty()) {
@@ -334,6 +334,8 @@ bool AudioGraphManager::launchZyn()
     if (pid == 0) {
         std::string pwjack = which("pw-jack");
         const char* name = cfg_.zyn_client_name.c_str();
+        // [instrument-bus] never let PipeWire auto-link this client to the default sink
+        setenv("PIPEWIRE_PROPS", "{ node.autoconnect=false }", 1);
         if (!pwjack.empty())
             execlp("pw-jack", "pw-jack", bin.c_str(),
                    "-U", "-N", name, "-l", cfg_.zyn_instrument.c_str(),
@@ -400,6 +402,8 @@ bool AudioGraphManager::launchZynDrums()
     if (pid == 0) {
         std::string pwjack = which("pw-jack");
         const char* name = cfg_.zyn_drums_client_name.c_str();
+        // [instrument-bus] never let PipeWire auto-link this client to the default sink
+        setenv("PIPEWIRE_PROPS", "{ node.autoconnect=false }", 1);
         if (!pwjack.empty())
             execlp("pw-jack", "pw-jack", bin.c_str(),
                    "-U", "-N", name, "-l", cfg_.zyn_drums_instrument.c_str(),
@@ -465,6 +469,7 @@ bool AudioGraphManager::recoverAudioStack(const char* reason)
     killPid(voc_pid_, "vocoder");
     killPid(zyn_drums_pid_, "zyn-drums");
     killPid(zyn_pid_, "zyn-melody");
+    killPid(bus_pid_, "instrument-bus"); // [instrument-bus]
     sl_pid_ = -1;
     voc_pid_ = -1;
     zyn_drums_pid_ = -1;
@@ -484,6 +489,11 @@ bool AudioGraphManager::recoverAudioStack(const char* reason)
 
     // Relaunch in a safe order: SL first (stable when it owns the graph
     // before the Zyns register), then the rest via normal start path.
+    // [instrument-bus] relaunch the bus BEFORE Zyn / SooperLooper / the rest
+    last_bus_ready_ = false;
+    (void)launchBusNode();
+    invalidatePortCache();
+    sweep_pending_ = true;
     bool ok = launchSooperLooper();
     ok = launchZyn() && ok;
     ok = launchZynDrums() && ok;
@@ -716,6 +726,8 @@ bool AudioGraphManager::launchVocoder()
 bool AudioGraphManager::startProcesses()
 {
  // Launch everything once at instrument boot. Mode switches only rewire.
+ // [instrument-bus] the bus goes first so every later node has somewhere to link to
+ launchBusNode();
  bool ok = launchZyn();
  launchZynDrums();
  launchSooperLooper();
@@ -740,6 +752,7 @@ void AudioGraphManager::stopProcesses()
     killPid(sl_pid_, "sooperlooper");
     killPid(zyn_drums_pid_, "zyn-drums");
     killPid(zyn_pid_, "zyn-melody");
+    killPid(bus_pid_, "instrument-bus"); // [instrument-bus]
     started_ = false;
 }
 
@@ -752,400 +765,47 @@ void AudioGraphManager::stopProcesses()
 // owned_links_, so disconnectAllOwnedLinks alone cannot clear them).
 void AudioGraphManager::forceDisconnectInstrumentGraph()
 {
+    // [instrument-bus] Remove every link this instrument cares about, including ones PipeWire
+    // auto-created when Zyn/SL/jalv started (those never landed in owned_links_): our sources ->
+    // configured sink, our sources -> bus input, the bus output -> sink, and the looper/vocoder
+    // feeds. Only ports of OUR clients are touched, never another application's links.
+    refreshPortCache();
+    const PortCache& c = port_cache_;
     auto kill = [this](const std::string& src, const std::string& dst) {
         if (!src.empty() && !dst.empty())
             pwUnlink(src, dst);
     };
-
-    // Resolve current port names (same helpers the builders use).
-    std::string mel_l = resolveClientPort(cfg_.zyn_client_name, "out_1", false);
-    std::string mel_r = resolveClientPort(cfg_.zyn_client_name, "out_2", false);
-    std::string dr_l  = resolveClientPort(cfg_.zyn_drums_client_name, "out_1", false);
-    std::string dr_r  = resolveClientPort(cfg_.zyn_drums_client_name, "out_2", false);
-    if (mel_l.empty()) mel_l = "zynaddsubfx_zyn-melody:out_1";
-    if (mel_r.empty()) mel_r = "zynaddsubfx_zyn-melody:out_2";
-    if (dr_l.empty())  dr_l  = "zynaddsubfx_zyn-drums:out_1";
-    if (dr_r.empty())  dr_r  = "zynaddsubfx_zyn-drums:out_2";
-
-    std::string sl_in_l = "sooperlooper:common_in_1";
-    std::string sl_in_r = "sooperlooper:common_in_2";
-    std::string sl_out_l = "sooperlooper:common_out_1";
-    std::string sl_out_r = "sooperlooper:common_out_2";
-    {
-        std::string a, b, c, d;
-        if (resolveLooperPorts(a, b, c, d)) {
-            sl_in_l = a; sl_in_r = b; sl_out_l = c; sl_out_r = d;
-        }
+    std::vector<std::string> srcs = {c.mel_l, c.mel_r, c.dr_l, c.dr_r, c.vout_l, c.vout_r,
+                                     c.vol_out_l, c.vol_out_r};
+    srcs.insert(srcs.end(), c.mic_capture.begin(), c.mic_capture.end());
+    for (const auto& s : srcs) {
+        kill(s, c.sl_in_l); kill(s, c.sl_in_r);
+        kill(s, c.play_l); kill(s, c.play_r);
+        kill(s, c.bus_in_l); kill(s, c.bus_in_r);
     }
-
-    std::string play_l = defaultPlaybackPort(true);
-    std::string play_r = defaultPlaybackPort(false);
-    if (play_l.empty())
-        play_l = PI_AUDIO_LEFT_SINK;
-    if (play_r.empty())
-        play_r = PI_AUDIO_RIGHT_SINK;
-
-    const std::string vin_l  = "InstrumentVocoder:in_l";
-    const std::string vin_r  = "InstrumentVocoder:in_r";
-    const std::string vside  = "InstrumentVocoder:sidechain";
-    const std::string vside2 = "InstrumentVocoder:sidechain2";
-    const std::string vout_l = "InstrumentVocoder:out_l";
-    const std::string vout_r = "InstrumentVocoder:out_r";
-
-    // melody anywhere
-    for (const auto& s : {mel_l, mel_r}) {
-        kill(s, sl_in_l); kill(s, sl_in_r);
-        kill(s, play_l);  kill(s, play_r);
-        kill(s, vin_l);   kill(s, vin_r);
+    for (const auto& s : {c.mel_l, c.mel_r}) {
+        kill(s, c.vin_l); kill(s, c.vin_r);
     }
-    // drums anywhere
-    for (const auto& s : {dr_l, dr_r}) {
-        kill(s, sl_in_l); kill(s, sl_in_r);
-        kill(s, play_l);  kill(s, play_r);
+    for (const auto& s : c.mic_capture) {
+        kill(s, c.vin_l); kill(s, c.vin_r);
+        kill(s, c.vside); kill(s, c.vside2);
     }
-    // vocoder outs anywhere
-    for (const auto& s : {vout_l, vout_r}) {
-        kill(s, sl_in_l); kill(s, sl_in_r);
-        kill(s, play_l);  kill(s, play_r);
-    }
-    // mic anywhere (capture ports)
-    MicInfo mic = queryMic();
-    for (const auto& s : mic.capture_ports) {
-        kill(s, vin_l); kill(s, vin_r);
-        kill(s, vside); kill(s, vside2);
-        kill(s, sl_in_l); kill(s, sl_in_r);
-        kill(s, play_l);  kill(s, play_r);
-    }
-    // SL → headphones
-    kill(sl_out_l, play_l);
-    kill(sl_out_r, play_r);
-
+    // looper output -> sink / bus
+    kill(c.sl_out_l, c.play_l); kill(c.sl_out_r, c.play_r);
+    kill(c.sl_out_l, c.bus_in_l); kill(c.sl_out_r, c.bus_in_r);
+    // bus output -> sink
+    kill(c.bus_out_l, c.play_l); kill(c.bus_out_r, c.play_r);
     // Also clear owned_links_ tracking so we start clean.
     owned_links_.clear();
     Logger::info("forceDisconnectInstrumentGraph: cleared auto + owned links");
 }
 
 
-bool AudioGraphManager::buildMode1()
-{
-    // Mode 1 — final audio only (melody + drums).
-    // Final rule: every final source → SL AND headphones (hear live + loop).
-    disconnectAllOwnedLinks();
-    forceDisconnectInstrumentGraph();
-
-    if (!processAlive(zyn_pid_) && !launchZyn())
-        return false;
-    launchZynDrums();
-    if (!processAlive(sl_pid_))
-        launchSooperLooper();
-
-    std::string mel_l = resolveClientPort(cfg_.zyn_client_name, "out_1", false);
-    std::string mel_r = resolveClientPort(cfg_.zyn_client_name, "out_2", false);
-    std::string dr_l  = resolveClientPort(cfg_.zyn_drums_client_name, "out_1", false);
-    std::string dr_r  = resolveClientPort(cfg_.zyn_drums_client_name, "out_2", false);
-    if (mel_l.empty()) mel_l = "zynaddsubfx_zyn-melody:out_1";
-    if (mel_r.empty()) mel_r = "zynaddsubfx_zyn-melody:out_2";
-    if (dr_l.empty())  dr_l  = "zynaddsubfx_zyn-drums:out_1";
-    if (dr_r.empty())  dr_r  = "zynaddsubfx_zyn-drums:out_2";
-    Logger::info("Resolved melody ports: " + mel_l + " / " + mel_r);
-    Logger::info("Resolved drums ports: " + dr_l + " / " + dr_r);
-
-    std::string sl_in_l, sl_in_r, sl_out_l, sl_out_r;
-    if (!resolveLooperPorts(sl_in_l, sl_in_r, sl_out_l, sl_out_r)) {
-        sl_in_l  = "sooperlooper:common_in_1";
-        sl_in_r  = "sooperlooper:common_in_2";
-        sl_out_l = "sooperlooper:common_out_1";
-        sl_out_r = "sooperlooper:common_out_2";
-    }
-    Logger::info("SL ports in=" + sl_in_l + "/" + sl_in_r +
-                 " out=" + sl_out_l + "/" + sl_out_r);
-
-    std::string play_l = defaultPlaybackPort(true);
-    std::string play_r = defaultPlaybackPort(false);
-    if (play_l.empty())
-        play_l = PI_AUDIO_LEFT_SINK;
-    if (play_r.empty())
-        play_r = PI_AUDIO_RIGHT_SINK;
-    Logger::info("Playback targets: " + play_l + " / " + play_r);
-
-    // melody (final) → SL + headphones
-    pwLink(mel_l, sl_in_l);
-    pwLink(mel_r, sl_in_r);
-    pwLink(mel_l, play_l);
-    pwLink(mel_r, play_r);
-
-    // drums (final) → SL + headphones
-    if (processAlive(zyn_drums_pid_)) {
-        pwLink(dr_l, sl_in_l);
-        pwLink(dr_r, sl_in_r);
-        pwLink(dr_l, play_l);
-        pwLink(dr_r, play_r);
-    }
-
-    // SL → headphones
-    pwLink(sl_out_l, play_l);
-    pwLink(sl_out_r, play_r);
-
-    Logger::info("Mode1: melody + drums → SL + headphones; SL → headphones");
-
-    std::string midi_mel = findEngineMidiPort();
-    std::string midi_dru = findEngineDrumsMidiPort();
-    if (!midi_mel.empty())
-        pwLink(midi_mel, resolveClientPort(cfg_.zyn_client_name, "midi_input", true));
-    if (!midi_dru.empty() && processAlive(zyn_drums_pid_))
-        pwLink(midi_dru, resolveClientPort(cfg_.zyn_drums_client_name, "midi_input", true));
-
-    return true;
-}
-
-bool AudioGraphManager::buildMode2()
-{
- ensureMvx2uMicCaptureLive();
- // Ports/names refreshed every entry (and by ensureHealthyGraph).
-
-    // Mode 2 — VocoderOnly.
-    // Intermediate: melody → vocoder carrier, mic → vocoder modulator.
-    // Final:       vocoder out + drums → SL + headphones; SL → headphones.
-    // NEVER link dry melody or dry mic to SL/headphones.
-    disconnectAllOwnedLinks();
-    forceDisconnectInstrumentGraph();
-
-    if (!processAlive(zyn_pid_) && !launchZyn())
-        return false;
-    launchZynDrums();
-    if (!processAlive(sl_pid_))
-        launchSooperLooper();
-
-    MicInfo mic = queryMic();
-    if (!mic.present || mic.capture_ports.empty()) {
-        std::string guess = shellCapture(
-            "pw-link -o 2>/dev/null | grep -i 'alsa_input.*MVX2U.*capture' | head -n1");
-        while (!guess.empty() &&
-               (guess.back() == 10 || guess.back() == 13 || guess.back() == 32))
-            guess.pop_back();
-        if (!guess.empty()) {
-            mic.present = true;
-            mic.capture_ports = {guess};
-            Logger::info("Mode2: mic fallback " + guess);
-        } else {
-            Logger::warning("Mode2: no mic — fallback Mode1");
-            return buildMode1();
-        }
-    }
-    for (const auto& p : mic.capture_ports)
-        Logger::info("mic: " + p);
-
-    if (!processAlive(voc_pid_))
-        launchVocoder();
-    for (int i = 0; i < 30; ++i) {
-        auto vin = findPortsMatching({"InstrumentVocoder"}, true);
-        if (!vin.empty())
-            break;
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
-    }
-
-    auto lower = [](std::string s) {
-        for (char& c : s)
-            c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-        return s;
-    };
-    std::string vin_l, vin_r, vside, vside2, vout_l, vout_r;
-    for (const auto& p : findPortsMatching({"InstrumentVocoder"}, true)) {
-        auto l = lower(p);
-        if (l.find("events") != std::string::npos)
-            continue;
-        if (l.find("sidechain2") != std::string::npos)
-            vside2 = p;
-        else if (l.find("sidechain") != std::string::npos)
-            vside = p;
-        else if (vin_l.empty() && l.find("in_l") != std::string::npos)
-            vin_l = p;
-        else if (vin_r.empty() && l.find("in_r") != std::string::npos)
-            vin_r = p;
-    }
-    for (const auto& p : findPortsMatching({"InstrumentVocoder"}, false)) {
-        auto l = lower(p);
-        if (l.find("events") != std::string::npos)
-            continue;
-        if (vout_l.empty() && l.find("out_l") != std::string::npos)
-            vout_l = p;
-        else if (vout_r.empty() && l.find("out_r") != std::string::npos)
-            vout_r = p;
-    }
-    if (vin_l.empty())  vin_l  = "InstrumentVocoder:in_l";
-    if (vin_r.empty())  vin_r  = "InstrumentVocoder:in_r";
-    if (vside.empty())  vside  = "InstrumentVocoder:sidechain";
-    if (vside2.empty()) vside2 = "InstrumentVocoder:sidechain2";
-    if (vout_l.empty()) vout_l = "InstrumentVocoder:out_l";
-    if (vout_r.empty()) vout_r = "InstrumentVocoder:out_r";
-    Logger::info("Vocoder: " + vin_l + " / " + vin_r +
-                 " mod=" + vside + "/" + vside2 +
-                 " out=" + vout_l + "/" + vout_r);
-
-    std::string mel_l = resolveClientPort(cfg_.zyn_client_name, "out_1", false);
-    std::string mel_r = resolveClientPort(cfg_.zyn_client_name, "out_2", false);
-    std::string dr_l  = resolveClientPort(cfg_.zyn_drums_client_name, "out_1", false);
-    std::string dr_r  = resolveClientPort(cfg_.zyn_drums_client_name, "out_2", false);
-    if (mel_l.empty()) mel_l = "zynaddsubfx_zyn-melody:out_1";
-    if (mel_r.empty()) mel_r = "zynaddsubfx_zyn-melody:out_2";
-    if (dr_l.empty())  dr_l  = "zynaddsubfx_zyn-drums:out_1";
-    if (dr_r.empty())  dr_r  = "zynaddsubfx_zyn-drums:out_2";
-    Logger::info("Resolved melody ports: " + mel_l + " / " + mel_r);
-    Logger::info("Resolved drums ports: " + dr_l + " / " + dr_r);
-
-    std::string sl_in_l, sl_in_r, sl_out_l, sl_out_r;
-    if (!resolveLooperPorts(sl_in_l, sl_in_r, sl_out_l, sl_out_r)) {
-        sl_in_l  = "sooperlooper:common_in_1";
-        sl_in_r  = "sooperlooper:common_in_2";
-        sl_out_l = "sooperlooper:common_out_1";
-        sl_out_r = "sooperlooper:common_out_2";
-    }
-    Logger::info("SL ports in=" + sl_in_l + "/" + sl_in_r +
-                 " out=" + sl_out_l + "/" + sl_out_r);
-
-    std::string play_l = defaultPlaybackPort(true);
-    std::string play_r = defaultPlaybackPort(false);
-    if (play_l.empty())
-        play_l = PI_AUDIO_LEFT_SINK;
-    if (play_r.empty())
-        play_r = PI_AUDIO_RIGHT_SINK;
-    Logger::info("Playback targets: " + play_l + " / " + play_r);
-
-    bool voc_ok = processAlive(voc_pid_);
-    if (!voc_ok) {
-        Logger::error("Mode2: Calf Vocoder host not running — "
-                      "falling back to un-vocoded Mode1 path. "
-                      "Check /tmp/instrument_vocoder.log");
-        pwLink(mel_l, sl_in_l);
-        pwLink(mel_r, sl_in_r);
-        pwLink(mel_l, play_l);
-        pwLink(mel_r, play_r);
-    } else {
-        // INTERMEDIATE: carrier = melody → vocoder in (NOT to SL/headphones)
-        pwLink(mel_l, vin_l);
-        pwLink(mel_r, vin_r);
-        // INTERMEDIATE: modulator = mic → sidechain (NOT to SL/headphones)
-        const std::string& mic_p = mic.capture_ports[0];
-        pwLink(mic_p, vside);
-        pwLink(mic_p, vside2);
-        Logger::info("Mode2: mic modulator " + mic_p +
-                     " → " + vside + " + " + vside2);
-        // FINAL: vocoder out → SL + headphones
-        pwLink(vout_l, sl_in_l);
-        pwLink(vout_r, sl_in_r);
-        pwLink(vout_l, play_l);
-        pwLink(vout_r, play_r);
-        Logger::info("Mode2: vocoder out → SL + headphones");
-    }
-
-    // FINAL: drums → SL + headphones (never vocoded)
-    if (processAlive(zyn_drums_pid_)) {
-        pwLink(dr_l, sl_in_l);
-        pwLink(dr_r, sl_in_r);
-        pwLink(dr_l, play_l);
-        pwLink(dr_r, play_r);
-        Logger::info("Mode2: zyn-drums → SL + headphones (not vocoded)");
-    }
-
-    // SL → headphones
-    pwLink(sl_out_l, play_l);
-    pwLink(sl_out_r, play_r);
-
-    std::string midi_mel = findEngineMidiPort();
-    std::string midi_dru = findEngineDrumsMidiPort();
-    if (!midi_mel.empty())
-        pwLink(midi_mel, resolveClientPort(cfg_.zyn_client_name, "midi_input", true));
-    if (!midi_dru.empty() && processAlive(zyn_drums_pid_))
-        pwLink(midi_dru, resolveClientPort(cfg_.zyn_drums_client_name, "midi_input", true));
-
-    Logger::info("Graph Mode2 complete");
-    return true;
-}
-
-bool AudioGraphManager::buildMode3()
-{
- ensureMvx2uMicCaptureLive();
-    // Mode 3 = Mode 2 + dry mic as FINAL audio (→ SL + headphones).
-    if (!buildMode2())
-        return false;
-
-    MicInfo mic = queryMic();
-    if (!mic.present || mic.capture_ports.empty()) {
-        Logger::warning("Mode3: no mic for dry path");
-        return true;
-    }
-
-    std::string sl_in_l, sl_in_r, sl_out_l, sl_out_r;
-    if (!resolveLooperPorts(sl_in_l, sl_in_r, sl_out_l, sl_out_r)) {
-        sl_in_l = "sooperlooper:common_in_1";
-        sl_in_r = "sooperlooper:common_in_2";
-    }
-
-    std::string play_l = defaultPlaybackPort(true);
-    std::string play_r = defaultPlaybackPort(false);
-    if (play_l.empty())
-        play_l = PI_AUDIO_LEFT_SINK;
-    if (play_r.empty())
-        play_r = PI_AUDIO_RIGHT_SINK;
-
-    // FINAL: dry mic → SL + headphones (parallel to vocoded wet path)
-    const std::string& mic_p = mic.capture_ports[0];
-    pwLink(mic_p, sl_in_l);
-    pwLink(mic_p, sl_in_r);
-    pwLink(mic_p, play_l);
-    pwLink(mic_p, play_r);
-    Logger::info("Mode3: dry mic → SL + headphones (parallel to vocoder wet path)");
-
-    return true;
-}
 
 
-bool AudioGraphManager::buildMode4()
-{
- // Mode 4 uses the same PipeWire routing as Mode 1.
- // Breath/volume policy is enforced in Engine (octave via nod;
- // chordal synth volume via SynthVol buttons → CC7).
- Logger::info("Building Mode4 (BreathOctave) — same routing as Mode1");
- return buildMode1();
-}
 
-bool AudioGraphManager::buildMode5()
-{
- ensureMvx2uMicCaptureLive();
- if (!buildMode4())
- return false;
 
- if (!processAlive(sl_pid_))
- launchSooperLooper();
 
- // Fresh mic lookup every Mode5 entry (addresses change after unplug/replug)
- MicInfo mic = queryMic();
- if (!mic.present || mic.capture_ports.empty()) {
- Logger::warning("Mode5: mic has no capture ports (yet)");
- return true;
- }
-
- std::string sl_in_l, sl_in_r, sl_out_l, sl_out_r;
- if (!resolveLooperPorts(sl_in_l, sl_in_r, sl_out_l, sl_out_r)) {
- sl_in_l = "sooperlooper:common_in_1";
- sl_in_r = "sooperlooper:common_in_2";
- }
- std::string play_l = defaultPlaybackPort(true);
- std::string play_r = defaultPlaybackPort(false);
- if (play_l.empty())
- play_l = PI_AUDIO_LEFT_SINK;
- if (play_r.empty())
- play_r = PI_AUDIO_RIGHT_SINK;
-
- for (const auto& mic_p : mic.capture_ports) {
- pwLink(mic_p, sl_in_l);
- pwLink(mic_p, sl_in_r);
- pwLink(mic_p, play_l);
- pwLink(mic_p, play_r);
- Logger::info("Mode5: " + mic_p + " → SL + headphones");
- }
- return true;
-}
 
 
 void AudioGraphManager::ensureHealthyGraph() {
@@ -1212,6 +872,40 @@ void AudioGraphManager::ensureHealthyGraph() {
             }
         }
     }
+    // [instrument-bus] master bus lifecycle: rate-limited relaunch like zyn-volume-node, then
+    // verify bus -> configured sink so a replugged / replaced USB sink recovers within a tick.
+    if (!bus_unavailable_ && !processAlive(bus_pid_)) {
+        static auto bus_last_try = std::chrono::steady_clock::time_point{};
+        const auto nowb = std::chrono::steady_clock::now();
+        if (bus_last_try.time_since_epoch().count() == 0 ||
+            nowb - bus_last_try > std::chrono::seconds(10)) {
+            bus_last_try = nowb;
+            Logger::warning("Health: instrument-bus dead -- relaunching");
+            if (launchBusNode()) {
+                invalidatePortCache();
+                sweep_pending_ = true;
+                need_rebuild = true;
+            }
+        }
+    }
+    {
+        bool bus_ready_now = false;
+        if (processAlive(bus_pid_)) {
+            std::string bi_l, bi_r, bo_l, bo_r;
+            resolveVolumeNodePorts("instrument-bus:", bi_l, bi_r, bo_l, bo_r);
+            bus_ready_now = !bi_l.empty() && !bi_r.empty() && !bo_l.empty() && !bo_r.empty();
+            if (bus_ready_now && last_bus_ready_)
+                ensureBusSinkLinks(bo_l, bo_r, play_l, play_r);
+        }
+        if (bus_ready_now != last_bus_ready_) {
+            Logger::info(std::string("Health: instrument-bus is now ") +
+                         (bus_ready_now ? "ready" : "gone") + " -- rebuilding routing");
+            last_bus_ready_ = bus_ready_now;
+            invalidatePortCache();
+            sweep_pending_ = true;
+            need_rebuild = true;
+        }
+    }
     if (!processAlive(voc_pid_)) {
         Logger::warning("Health: Vocoder host dead -- relaunching");
         launchVocoder();
@@ -1264,6 +958,10 @@ void AudioGraphManager::ensureHealthyGraph() {
     // an audible JACK xrun every time it fires, so it must only run
     // when need_rebuild says something real is actually wrong.
     // ------------------------------------------------------------------
+    if (need_rebuild) { // [instrument-bus] see the bus / sink as they are now, then sweep stale direct links
+        invalidatePortCache();
+        sweep_pending_ = true;
+    }
     PerformanceMode m = mode_;
     if (need_rebuild) {
         Logger::debug(
@@ -1284,142 +982,32 @@ std::vector<AudioGraphManager::LinkRole>
 AudioGraphManager::desiredRoles(PerformanceMode mode)
 {
     using R = LinkRole;
+    // [instrument-bus] BusSink (bus out -> configured sink) is in EVERY mode's list, so it
+    // never changes across a mode transition. There is no Mode 6 routing any more: a stray
+    // PerformanceMode::Talkbox value takes the default list below.
     switch (mode) {
     case PerformanceMode::SynthOnly:
-        return {R::MelVol, R::VolSl, R::VolHp, R::DrumSl, R::DrumHp, R::SlHp,
-                R::MidiMel, R::MidiDru};
+        return {R::MelVol, R::VolSl, R::VolHp, R::DrumSl, R::DrumHp, R::SlHp, R::MidiMel,
+                R::MidiDru, R::BusSink};
     case PerformanceMode::BreathOctave:
-        return {R::MelSl, R::MelHp, R::DrumSl, R::DrumHp, R::SlHp,
-                R::MidiMel, R::MidiDru};
+        return {R::MelSl, R::MelHp, R::DrumSl, R::DrumHp, R::SlHp, R::MidiMel, R::MidiDru,
+                R::BusSink};
     case PerformanceMode::VocoderOnly:
-        return {R::MelVoc, R::MicSide, R::VocSl, R::VocHp,
-                R::DrumSl, R::DrumHp, R::SlHp, R::MidiMel, R::MidiDru};
+        return {R::MelVoc, R::MicSide, R::VocSl, R::VocHp, R::DrumSl, R::DrumHp, R::SlHp,
+                R::MidiMel, R::MidiDru, R::BusSink};
     case PerformanceMode::SynthAndVocoder:
-        return {R::MelVoc, R::MicSide, R::VocSl, R::VocHp,
-                R::MicSl, R::MicHp,
-                R::DrumSl, R::DrumHp, R::SlHp, R::MidiMel, R::MidiDru};
+        return {R::MelVoc, R::MicSide, R::VocSl, R::VocHp, R::MicSl, R::MicHp, R::DrumSl,
+                R::DrumHp, R::SlHp, R::MidiMel, R::MidiDru, R::BusSink};
     case PerformanceMode::BreathOctaveMic:
-        return {R::MelSl, R::MelHp, R::DrumSl, R::DrumHp, R::SlHp,
-                R::MicSl, R::MicHp, R::MidiMel, R::MidiDru};
-        return {R::MelMvx, R::MicSl, R::MicHp,
-                R::DrumSl, R::DrumHp, R::SlHp, R::MidiMel, R::MidiDru};
+        return {R::MelSl, R::MelHp, R::DrumSl, R::DrumHp, R::SlHp, R::MicSl, R::MicHp,
+                R::MidiMel, R::MidiDru, R::BusSink};
+    default:
+        break;
     }
-    return {R::MelSl, R::MelHp, R::DrumSl, R::DrumHp, R::SlHp,
-            R::MidiMel, R::MidiDru};
+    return {R::MelSl, R::MelHp, R::DrumSl, R::DrumHp, R::SlHp, R::MidiMel, R::MidiDru,
+            R::BusSink};
 }
 
-std::vector<std::pair<std::string,std::string>>
-AudioGraphManager::resolveRole(LinkRole role)
-{
-    std::vector<std::pair<std::string,std::string>> out;
-
-    auto mel_l = resolveClientPort(cfg_.zyn_client_name, "out_1", false);
-    auto mel_r = resolveClientPort(cfg_.zyn_client_name, "out_2", false);
-    auto dr_l  = resolveClientPort(cfg_.zyn_drums_client_name, "out_1", false);
-    auto dr_r  = resolveClientPort(cfg_.zyn_drums_client_name, "out_2", false);
-    if (mel_l.empty()) mel_l = "zynaddsubfx_zyn-melody:out_1";
-    if (mel_r.empty()) mel_r = "zynaddsubfx_zyn-melody:out_2";
-    if (dr_l.empty())  dr_l  = "zynaddsubfx_zyn-drums:out_1";
-    if (dr_r.empty())  dr_r  = "zynaddsubfx_zyn-drums:out_2";
-
-    std::string sl_in_l, sl_in_r, sl_out_l, sl_out_r;
-    if (!resolveLooperPorts(sl_in_l, sl_in_r, sl_out_l, sl_out_r)) {
-        sl_in_l = "sooperlooper:common_in_1";
-        sl_in_r = "sooperlooper:common_in_2";
-        sl_out_l = "sooperlooper:common_out_1";
-        sl_out_r = "sooperlooper:common_out_2";
-    }
-
-    std::string play_l = defaultPlaybackPort(true);
-    std::string play_r = defaultPlaybackPort(false);
-    if (play_l.empty() || play_l.find("MVX2U") != std::string::npos)
-        play_l = PI_AUDIO_LEFT_SINK;
-    if (play_r.empty() || play_r.find("MVX2U") != std::string::npos)
-        play_r = PI_AUDIO_RIGHT_SINK;
-
-    const std::string vin_l = "InstrumentVocoder:in_l";
-    const std::string vin_r = "InstrumentVocoder:in_r";
-    const std::string vside = "InstrumentVocoder:sidechain";
-    const std::string vside2 = "InstrumentVocoder:sidechain2";
-    const std::string vout_l = "InstrumentVocoder:out_l";
-    const std::string vout_r = "InstrumentVocoder:out_r";
-
-    MicInfo mic = queryMic();
-    std::string mvx_l, mvx_r;
-    (void)resolveMvx2uPlaybackPorts(mvx_l, mvx_r);
-
-    auto add2 = [&](const std::string& a, const std::string& b,
-                    const std::string& c, const std::string& d) {
-        if (!a.empty() && !c.empty()) out.emplace_back(a, c);
-        if (!b.empty() && !d.empty()) out.emplace_back(b, d);
-    };
-
-    switch (role) {
-    case LinkRole::MelVol:
-        case LinkRole::VolSl:
-        case LinkRole::VolHp:
-            break;  // [breath_vol_node] handled by the cached path
-        case LinkRole::MelSl:  add2(mel_l, mel_r, sl_in_l, sl_in_r); break;
-    case LinkRole::MelHp:  add2(mel_l, mel_r, play_l, play_r); break;
-    case LinkRole::MelVoc: add2(mel_l, mel_r, vin_l, vin_r); break;
-    case LinkRole::MelMvx:
-        if (!mvx_l.empty() && !mvx_r.empty())
-            add2(mel_l, mel_r, mvx_l, mvx_r);
-        break;
-    case LinkRole::DrumSl:
-        if (processAlive(zyn_drums_pid_))
-            add2(dr_l, dr_r, sl_in_l, sl_in_r);
-        break;
-    case LinkRole::DrumHp:
-        if (processAlive(zyn_drums_pid_))
-            add2(dr_l, dr_r, play_l, play_r);
-        break;
-    case LinkRole::VocSl:  add2(vout_l, vout_r, sl_in_l, sl_in_r); break;
-    case LinkRole::VocHp:  add2(vout_l, vout_r, play_l, play_r); break;
-    case LinkRole::MicSide:
-        for (const auto& p : mic.capture_ports) {
-            if (!p.empty()) {
-                out.emplace_back(p, vside);
-                out.emplace_back(p, vside2);
-            }
-        }
-        break;
-    case LinkRole::MicSl:
-        for (const auto& p : mic.capture_ports) {
-            if (!p.empty()) {
-                out.emplace_back(p, sl_in_l);
-                out.emplace_back(p, sl_in_r);
-            }
-        }
-        break;
-    case LinkRole::MicHp:
-        for (const auto& p : mic.capture_ports) {
-            if (!p.empty()) {
-                out.emplace_back(p, play_l);
-                out.emplace_back(p, play_r);
-            }
-        }
-        break;
-    case LinkRole::SlHp:
-        add2(sl_out_l, sl_out_r, play_l, play_r);
-        break;
-    case LinkRole::MidiMel: {
-        std::string midi = findEngineMidiPort();
-        std::string dst = resolveClientPort(cfg_.zyn_client_name, "midi_input", true);
-        if (!midi.empty() && !dst.empty())
-            out.emplace_back(midi, dst);
-        break;
-    }
-    case LinkRole::MidiDru: {
-        std::string midi = findEngineDrumsMidiPort();
-        std::string dst = resolveClientPort(cfg_.zyn_drums_client_name, "midi_input", true);
-        if (!midi.empty() && !dst.empty() && processAlive(zyn_drums_pid_))
-            out.emplace_back(midi, dst);
-        break;
-    }
-    }
-    return out;
-}
 
 
 // ===== modespeed: port cache + pre-computed link sets =====================
@@ -1452,9 +1040,9 @@ void AudioGraphManager::refreshPortCache()
 
     c.play_l = defaultPlaybackPort(true);
     c.play_r = defaultPlaybackPort(false);
-    if (c.play_l.empty() || c.play_l.find("MVX2U") != std::string::npos)
+    if (c.play_l.empty())
         c.play_l = PI_AUDIO_LEFT_SINK;
-    if (c.play_r.empty() || c.play_r.find("MVX2U") != std::string::npos)
+    if (c.play_r.empty())
         c.play_r = PI_AUDIO_RIGHT_SINK;
 
     c.vin_l  = "InstrumentVocoder:in_l";
@@ -1466,9 +1054,15 @@ void AudioGraphManager::refreshPortCache()
 
     MicInfo mic = queryMic();
     c.mic_capture = mic.capture_ports;
-    (void)resolveMvx2uPlaybackPorts(c.mvx_l, c.mvx_r);   // may log once
 
-    resolveVolumeNodePorts(c.vol_in_l, c.vol_in_r, c.vol_out_l, c.vol_out_r);  // [breath_vol_node]
+    resolveVolumeNodePorts("zyn-volume-node:", c.vol_in_l, c.vol_in_r, c.vol_out_l, c.vol_out_r); // [breath_vol_node]
+    // [instrument-bus] one "final destination" for every *Hp role: the bus input when the bus is
+    // ready, the configured sink itself otherwise. play_l/play_r stay the configured sink.
+    resolveVolumeNodePorts("instrument-bus:", c.bus_in_l, c.bus_in_r, c.bus_out_l, c.bus_out_r);
+    c.bus_ready = processAlive(bus_pid_) && !c.bus_in_l.empty() && !c.bus_in_r.empty() &&
+                  !c.bus_out_l.empty() && !c.bus_out_r.empty();
+    c.final_l = c.bus_ready ? c.bus_in_l : c.play_l;
+    c.final_r = c.bus_ready ? c.bus_in_r : c.play_r;
     c.midi_mel = findEngineMidiPort();
     c.midi_dru = findEngineDrumsMidiPort();
 
@@ -1483,15 +1077,6 @@ const AudioGraphManager::PortCache& AudioGraphManager::portCache()
     return port_cache_;
 }
 
-std::vector<std::pair<std::string,std::string>>
-AudioGraphManager::cachedLinksFor(PerformanceMode mode)
-{
-    const int idx = static_cast<int>(mode);
-    if (idx < 0 || idx >= 6) return {};
-    if (!mode_link_cache_valid_[idx])
-        ensureModeLinksCached(mode);
-    return mode_link_cache_[idx];
-}
 
 void AudioGraphManager::ensureModeLinksCached(PerformanceMode mode)
 {
@@ -1539,25 +1124,21 @@ void AudioGraphManager::ensureModeLinksCached(PerformanceMode mode)
             if (vol_ok) add2(c.vol_out_l, c.vol_out_r, c.sl_in_l, c.sl_in_r);
             break;
         case LinkRole::VolHp:
-            if (vol_ok) add2(c.vol_out_l, c.vol_out_r, c.play_l, c.play_r);
+            if (vol_ok) add2(c.vol_out_l, c.vol_out_r, c.final_l, c.final_r);
             break;
         case LinkRole::MelSl:  add2(c.mel_l, c.mel_r, c.sl_in_l, c.sl_in_r); break;
-        case LinkRole::MelHp:  add2(c.mel_l, c.mel_r, c.play_l,  c.play_r);  break;
+        case LinkRole::MelHp:  add2(c.mel_l, c.mel_r, c.final_l, c.final_r);  break;
         case LinkRole::MelVoc: add2(c.mel_l, c.mel_r, c.vin_l,   c.vin_r);   break;
-        case LinkRole::MelMvx:
-            if (!c.mvx_l.empty() && !c.mvx_r.empty())
-                add2(c.mel_l, c.mel_r, c.mvx_l, c.mvx_r);
-            break;
         case LinkRole::DrumSl:
             if (processAlive(zyn_drums_pid_))
                 add2(c.dr_l, c.dr_r, c.sl_in_l, c.sl_in_r);
             break;
         case LinkRole::DrumHp:
             if (processAlive(zyn_drums_pid_))
-                add2(c.dr_l, c.dr_r, c.play_l, c.play_r);
+                add2(c.dr_l, c.dr_r, c.final_l, c.final_r);
             break;
         case LinkRole::VocSl:  add2(c.vout_l, c.vout_r, c.sl_in_l, c.sl_in_r); break;
-        case LinkRole::VocHp:  add2(c.vout_l, c.vout_r, c.play_l,  c.play_r);  break;
+        case LinkRole::VocHp:  add2(c.vout_l, c.vout_r, c.final_l, c.final_r);  break;
         case LinkRole::MicSide:
             for (const auto& p : c.mic_capture) {
                 if (!p.empty()) {
@@ -1579,14 +1160,18 @@ void AudioGraphManager::ensureModeLinksCached(PerformanceMode mode)
         case LinkRole::MicHp:
             for (const auto& p : c.mic_capture) {
                 if (!p.empty()) {
-                    want.emplace_back(p, c.play_l);
-                    want.emplace_back(p, c.play_r);
+                    want.emplace_back(p, c.final_l);
+                    want.emplace_back(p, c.final_r);
                     break;
                 }
             }
             break;
         case LinkRole::SlHp:
-            add2(c.sl_out_l, c.sl_out_r, c.play_l, c.play_r);
+            add2(c.sl_out_l, c.sl_out_r, c.final_l, c.final_r);
+            break;
+        case LinkRole::BusSink:
+            if (c.bus_ready)
+                add2(c.bus_out_l, c.bus_out_r, c.play_l, c.play_r);
             break;
         case LinkRole::MidiMel: {
             std::string dst = resolveClientPort(cfg_.zyn_client_name, "midi_input", true);
@@ -1606,7 +1191,7 @@ void AudioGraphManager::ensureModeLinksCached(PerformanceMode mode)
     if (mode == PerformanceMode::SynthOnly && !vol_ok) {
         Logger::warning("zyn-volume-node ports not found -- Mode 1 routing Zyn directly (no breath volume)");
         add2(c.mel_l, c.mel_r, c.sl_in_l, c.sl_in_r);
-        add2(c.mel_l, c.mel_r, c.play_l, c.play_r);
+        add2(c.mel_l, c.mel_r, c.final_l, c.final_r);
     }
     mode_link_cache_[idx] = std::move(want);
     mode_link_cache_valid_[idx] = true;
@@ -1614,61 +1199,6 @@ void AudioGraphManager::ensureModeLinksCached(PerformanceMode mode)
     //              + " links for mode " + std::to_string(idx));
 }
 
-// Fast path used by applyModeTransition: only the delta.
-bool AudioGraphManager::ensureModeLinks(PerformanceMode mode)
-{
-    ensureModeLinksCached(mode);                 // no-op if already cached
-    const auto& want = mode_link_cache_[static_cast<int>(mode)];
-
-    // Build the universe once from the cache of *all* roles so we can
-    // sever anything that should not be present.
-    static const LinkRole kAll[] = {
-        LinkRole::MelSl, LinkRole::MelHp, LinkRole::MelVoc, LinkRole::MelMvx,
-        LinkRole::DrumSl, LinkRole::DrumHp,
-        LinkRole::VocSl, LinkRole::VocHp,
-        LinkRole::MicSide, LinkRole::MicSl, LinkRole::MicHp,
-        LinkRole::SlHp, LinkRole::MidiMel, LinkRole::MidiDru
-    };
-    // We still need a universe, but we can build it cheaply from the
-    // six cached mode sets (union).  First time we ever run we may have
-    // only one mode cached; fall back to a full resolveRole pass only then.
-    std::vector<std::pair<std::string,std::string>> universe;
-    bool any = false;
-    for (int i = 0; i < 6; ++i) {
-        if (mode_link_cache_valid_[i]) {
-            any = true;
-            universe.insert(universe.end(),
-                            mode_link_cache_[i].begin(),
-                            mode_link_cache_[i].end());
-        }
-    }
-    if (!any) {
-        // cold start – resolve the hard way once
-        for (auto r : kAll) {
-            auto pairs = resolveRole(r);
-            universe.insert(universe.end(), pairs.begin(), pairs.end());
-        }
-    }
-
-    auto is_wanted = [&](const std::string& s, const std::string& d) {
-        for (const auto& w : want)
-            if (w.first == s && w.second == d) return true;
-        return false;
-    };
-
-    // Sever only what is not wanted (quiet – no spam on "not linked")
-    for (const auto& u : universe) {
-        if (!is_wanted(u.first, u.second))
-            pwUnlink(u.first, u.second);
-    }
-    // Create only what is missing (pw-link "File exists" is now silent)
-    for (const auto& w : want)
-        pwLink(w.first, w.second);
-
-    // Logger::info("ensureModeLinks: mode graph applied (" +
-    //              std::to_string(want.size()) + " target pairs) [cached]");
-    return true;
-}
 
 bool AudioGraphManager::applyModeTransition(PerformanceMode from,
                                             PerformanceMode to)
@@ -1718,6 +1248,12 @@ bool AudioGraphManager::setMode(PerformanceMode mode) {
     const PerformanceMode from = mode_;
     const bool ok = applyModeTransition(from, mode);
     mode_ = mode;                       // already set inside apply, but keep consistent
+    // [instrument-bus] AFTER the new links exist (no silent gap): drop stale direct source -> sink links.
+    if (sweep_pending_) {
+        sweep_pending_ = false;
+        if (port_cache_.valid && port_cache_.bus_ready)
+            sweepDirectSinkLinks();
+    }
     if (mode != PerformanceMode::SynthOnly)
         setBreathVolume(1.0f);  // [breath_vol_node] node fixed at 100% outside Mode 1
     switch (mode) {
@@ -1755,6 +1291,7 @@ std::string AudioGraphManager::statusSummary() const
        << " drums=" << (processAlive(zyn_drums_pid_) ? "up" : "down")
        << " sl=" << (sooperlooperRunning() ? "up" : "down")
        << " voc=" << (vocoderRunning() ? "up" : "down")
+       << " bus=" << (processAlive(bus_pid_) ? "up" : "down")
        << " mic=" << (micPresent() ? "yes" : "no")
        << " links=" << owned_links_.size();
     return ss.str();
@@ -2434,26 +1971,10 @@ bool AudioGraphManager::sendLooperOsc(const std::string& path,
 
 void AudioGraphManager::connectLooperGraph()
 {
-    if (!processAlive(sl_pid_))
-        return;
-    std::string in_l, in_r, out_l, out_r;
-    if (!resolveLooperPorts(in_l, in_r, out_l, out_r))
-        return;
-    std::string play_l = defaultPlaybackPort(true);
-    std::string play_r = defaultPlaybackPort(false);
-    if (play_l.empty()) {
-        play_l = PI_AUDIO_LEFT_SINK;
-        Logger::warning("defaultPlaybackPort(L) empty; using Headphones fallback");
-    }
-    if (play_r.empty()) {
-        play_r = PI_AUDIO_RIGHT_SINK;
-        Logger::warning("defaultPlaybackPort(R) empty; using Headphones fallback");
-    }
-    Logger::info("Playback targets: " + play_l + " / " + play_r);
-    if (!play_l.empty())
-        pwLink(out_l, play_l);
-    if (!play_r.empty())
-        pwLink(out_r.empty() ? out_l : out_r, play_r);
+    // [instrument-bus] Deliberately a no-op. SooperLooper's output reaches the sink ONLY through
+    // the SlHp role (SL out -> instrument-bus in -> bus out -> configured sink), which the mode
+    // graph owns. Linking SL straight to the sink here (this used to run on every Record /
+    // Overdub press) would add a second, un-attenuated path into the sink.
 }
 
 
@@ -2523,40 +2044,6 @@ void AudioGraphManager::linkStereoToLooper(const std::string& src_l,
 
 
 
-bool AudioGraphManager::setNodeVolume(const std::string& node_name_substring,
-                                      float linear)
-{
-    if (linear < 0.f) linear = 0.f;
-    if (linear > 1.f) linear = 1.f;
-
-    std::string pactl = which("pactl");
-    if (!pactl.empty())
-    {
-        std::string sinks = shellCapture(pactl + " list short sinks 2>/dev/null");
-        std::istringstream ss(sinks);
-        std::string line;
-        while (std::getline(ss, line))
-        {
-            if (line.find(node_name_substring) == std::string::npos)
-                continue;
-            std::istringstream ls(line);
-            std::string id, name;
-            ls >> id >> name;
-            int percent = static_cast<int>(linear * 100.0f + 0.5f);
-            std::string setcmd = pactl + " set-sink-volume " + id + " " +
-                                 std::to_string(percent) + "% 2>/dev/null";
-            if (std::system(setcmd.c_str()) == 0)
-            {
-                Logger::info("Volume " + name + " -> " + std::to_string(percent) + "%");
-                return true;
-            }
-        }
-    }
-
-    Logger::debug("setNodeVolume '" + node_name_substring + "' linear=" +
-                  std::to_string(linear) + " (no matching sink; recorded only)");
-    return false;
-}
 
 bool AudioGraphManager::setSourceVolume(const std::string& node_name_substring,
                                          float linear)
@@ -2603,56 +2090,32 @@ bool AudioGraphManager::setSourceVolume(const std::string& node_name_substring,
 
 
 void AudioGraphManager::applyMixerLevels(int master, int dry, int vocoder, int drums,
- int synth, int mic)
+                                        int synth, int mic)
 {
-    last_master_  = master;
-    last_dry_     = dry;
+    last_master_ = master;
+    last_dry_ = dry;
     last_vocoder_ = vocoder;
-    last_drums_   = drums;
- last_synth_ = synth;
- last_mic_ = mic;
-
-    float m = master / 127.0f;
-    float d = dry / 127.0f;
-    float v = vocoder / 127.0f;
-    // Dry/voice node gain is a fraction of the master ceiling.
-    float dry_final = d * m;
-    // Vocoder gain is a fraction of the dry/voice level (relative to
-    // voice), not an independent absolute -- it rides on dry_final.
-    float vocoder_final = v * dry_final;
-
+    last_drums_ = drums;
+    last_synth_ = synth;
+    last_mic_ = mic;
+    const float d = dry / 127.0f;
+    const float v = vocoder / 127.0f;
+    // [instrument-bus] Master is NOT folded into the dry / vocoder levels any more. It is the gain
+    // of instrument-bus only (applyMasterBus below). Nothing in this function ever changes a
+    // device or sink volume.
+    const float dry_final = d;
+    // Vocoder gain is a fraction of the dry/voice level (relative to voice),
+    // not an independent absolute -- it rides on dry_final.
+    const float vocoder_final = v * dry_final;
     Logger::info(
- "Mixer master=" + std::to_string(master) +
- " dry=" + std::to_string(dry) + " (" + std::to_string((dry * 100) / 127) + "%)" +
- " vocoder=" + std::to_string(vocoder) + " (" + std::to_string((vocoder * 100) / 127) + "%)" +
- " drums=" + std::to_string(drums) + " (" + std::to_string((drums * 100) / 127) + "%)");
-
-    // [fix_all] master-on-configured-sink: master volume goes to the output sink chosen
-    // at build time (laptop headphones / Pi Shure), not to "whatever the default sink is".
-    bool master_on_configured_sink = false;
-    {
-        std::string master_sink = PI_AUDIO_LEFT_SINK;
-        const auto master_colon = master_sink.rfind(':');
-        if (master_colon != std::string::npos)
-            master_sink.erase(master_colon);
-        master_on_configured_sink = setNodeVolume(master_sink, m);
-    }
-    std::string wpctl = master_on_configured_sink ? std::string() : which("wpctl");
-    if (!wpctl.empty())
-    {
-        std::ostringstream cmd;
-        cmd << wpctl << " set-volume @DEFAULT_AUDIO_SINK@ " << m << " 2>/dev/null";
-        if (std::system(cmd.str().c_str()) == 0)
-            Logger::info("Master -> DEFAULT_AUDIO_SINK " + std::to_string(m));
-    }
-    else
-    {
-        setNodeVolume("analog-stereo", m);
-    }
-
-    setNodeVolume("InstrumentVocoder", vocoder_final);
-    if (!cfg_.mic_name_hint.empty())
-    {
+        "Mixer master=" + std::to_string(master) + " (bus " + std::to_string((master * 100) / 127) + "%)" +
+        " dry=" + std::to_string(dry) + " (" + std::to_string((dry * 100) / 127) + "%)" +
+        " vocoder=" + std::to_string(vocoder) + " (" + std::to_string((vocoder * 100) / 127) + "%)" +
+        " drums=" + std::to_string(drums) + " (" + std::to_string((drums * 100) / 127) + "%)");
+    Logger::debug("Mixer dry_final=" + std::to_string(dry_final) +
+                  " vocoder_final=" + std::to_string(vocoder_final));
+    applyMasterBus(master);
+    if (!cfg_.mic_name_hint.empty()) {
         // The dry-mix buttons ARE the mic's input-gain buttons: apply the
         // level directly at the USB interface's capture source, as a flat
         // fraction of whatever the mic picks up. Deliberately NOT
@@ -2660,15 +2123,13 @@ void AudioGraphManager::applyMixerLevels(int master, int dry, int vocoder, int d
         // decisions; this is the input stage, before anything else
         // touches the signal. dry=64 (50%) means capture gain = 50%,
         // full stop.
-        float mic_capture_gain = static_cast<float>(dry) / 127.0f;
+        const float mic_capture_gain = static_cast<float>(dry) / 127.0f;
         setSourceVolume(cfg_.mic_name_hint, mic_capture_gain);
     }
-
-    // NOTE: 'drums' is intentionally not applied to any PipeWire node
-    // here -- drum loudness is a MIDI-velocity path, not an audio-graph
-    // gain: Engine::handleAction's ActionType::Drum case scales note-on
-    // velocity by (drumMix/127) * (masterVolume/127) directly. Breath
-    // and vocoder gain never touch that path.
+    // NOTE: 'drums' is intentionally not applied to any PipeWire node here -- drum loudness is a
+    // MIDI-velocity path (Engine::handleAction, ActionType::Drum: 100 * drumMix / 127). Master is
+    // NOT part of that velocity any more; the drums reach the sink through the bus like everything
+    // else, so master attenuates them exactly once.
 }
 
 
@@ -2720,29 +2181,6 @@ bool AudioGraphManager::forceMvx2uPurePlayback()
  return true;
 }
 
-bool AudioGraphManager::resolveMvx2uPlaybackPorts(std::string& out_l,
- std::string& out_r)
-{
- out_l.clear();
- out_r.clear();
- auto ports = findPortsMatching({"MVX2U", "Shure"}, /*inputs=*/false);
- for (const auto& p : ports) {
- if (p.find("playback_FL") != std::string::npos ||
- p.find("playback_0") != std::string::npos)
- out_l = p;
- if (p.find("playback_FR") != std::string::npos ||
- p.find("playback_1") != std::string::npos)
- out_r = p;
- }
- if (out_l.empty() || out_r.empty()) {
- out_l = "alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FL";
- out_r = "alsa_output.usb-Shure_Inc_Shure_MVX2U_MVX2U_3-0b87ca28e1edb55fb98979f9c199844e-01.analog-stereo:playback_FR";
- static bool once = false;
-    if (!once) { once = true; Logger::warning("resolveMvx2uPlaybackPorts: using hardcoded MVX2U port names (further silenced)"); }
- }
- Logger::info("MVX2U playback ports: " + out_l + " / " + out_r);
- return !out_l.empty() && !out_r.empty();
-}
 
 bool AudioGraphManager::ensureMvx2uMicCaptureLive()
 {
@@ -2857,9 +2295,11 @@ void AudioGraphManager::setBreathVolume(float linear)
     vol_target_pct_.store(static_cast<int>(linear * 100.0f + 0.5f));
 }
 
-void AudioGraphManager::resolveVolumeNodePorts(std::string& in_l, std::string& in_r,
+void AudioGraphManager::resolveVolumeNodePorts(const std::string& client_prefix,
+                                               std::string& in_l, std::string& in_r,
                                                std::string& out_l, std::string& out_r) const
 {
+    // client_prefix is e.g. "zyn-volume-node:" or "instrument-bus:".
     in_l.clear(); in_r.clear(); out_l.clear(); out_r.clear();
     auto lower = [](std::string s) {
         for (char& ch : s)
@@ -2881,6 +2321,238 @@ void AudioGraphManager::resolveVolumeNodePorts(std::string& in_l, std::string& i
                 r = p;
         }
     };
-    pick(findPortsMatching({"zyn-volume-node:"}, true), in_l, in_r);
-    pick(findPortsMatching({"zyn-volume-node:"}, false), out_l, out_r);
+    pick(findPortsMatching({client_prefix}, true), in_l, in_r);
+    pick(findPortsMatching({client_prefix}, false), out_l, out_r);
+}
+
+// ===== [instrument-bus] master bus ==========================================
+// "instrument-bus" is a second instance of the zynvol tool (tools/zynvol), driven by
+// MidiEngine's "MIDI Bus Volume" port. Every audible source of the instrument links ONLY to
+// instrument-bus:in_1/in_2. The single path from the instrument into the physical sink is
+// instrument-bus:out_1/out_2 -> the configured sink (PI_AUDIO_LEFT_SINK / PI_AUDIO_RIGHT_SINK).
+// Master volume is the gain of this node; no sink or device volume is ever touched.
+void AudioGraphManager::setBusVolumeSender(std::function<void(float)> fn)
+{
+    bus_volume_sender_ = std::move(fn);
+}
+
+bool AudioGraphManager::busRunning() const
+{
+    return processAlive(bus_pid_);
+}
+
+void AudioGraphManager::applyMasterBus(int master)
+{
+    if (master < 0) master = 0;
+    if (master > 127) master = 127;
+    last_master_ = master;
+    if (bus_volume_sender_)
+        bus_volume_sender_(static_cast<float>(master) / 127.0f);
+}
+
+bool AudioGraphManager::launchBusNode()
+{
+    if (processAlive(bus_pid_))
+        return true;
+    if (bus_unavailable_)
+        return false;
+    std::string bin;
+    char self[4096];
+    const ssize_t n = readlink("/proc/self/exe", self, sizeof(self) - 1);
+    if (n > 0) {
+        self[n] = '\0';
+        const std::string exe(self);
+        const size_t slash = exe.rfind('/');
+        if (slash != std::string::npos) {
+            const std::string cand = exe.substr(0, slash + 1) + "zynvol";
+            if (access(cand.c_str(), X_OK) == 0)
+                bin = cand;
+        }
+    }
+    if (bin.empty() && access("build/zynvol", X_OK) == 0)
+        bin = "build/zynvol";
+    if (bin.empty())
+        bin = which("zynvol");
+    if (bin.empty()) {
+        bus_unavailable_ = true;
+        Logger::warning("zynvol not found (was it built? needs libjack-jackd2-dev) -- "
+                        "instrument-bus unavailable: sources link straight to the configured "
+                        "sink (no master volume)");
+        return false;
+    }
+    const std::string pwjack = which("pw-jack");
+    pid_t pid = fork();
+    if (pid < 0)
+        return false;
+    if (pid == 0) {
+        int fd = open("/dev/null", O_WRONLY);
+        if (fd >= 0) {
+            dup2(fd, STDOUT_FILENO);
+            dup2(fd, STDERR_FILENO);
+            close(fd);
+        }
+        setenv("PIPEWIRE_PROPS", "{ node.autoconnect=false }", 1);
+        if (!pwjack.empty())
+            execlp("pw-jack", "pw-jack", bin.c_str(), "--name", "instrument-bus",
+                   "--midi-port", "MIDI Bus Volume", "--exponent", "3.0",
+                   static_cast<char*>(nullptr));
+        execlp(bin.c_str(), bin.c_str(), "--name", "instrument-bus",
+               "--midi-port", "MIDI Bus Volume", "--exponent", "3.0",
+               static_cast<char*>(nullptr));
+        _exit(127);
+    }
+    bus_pid_ = pid;
+    Logger::info("Launched instrument-bus (zynvol) pid=" + std::to_string(pid));
+    bool ready = false;
+    for (int i = 0; i < 25 && !ready; ++i) { // up to ~5 s for the in/out ports
+        std::this_thread::sleep_for(std::chrono::milliseconds(200));
+        if (!processAlive(bus_pid_))
+            break;
+        ready = !findPortsMatching({"instrument-bus:"}, true).empty() &&
+                !findPortsMatching({"instrument-bus:"}, false).empty();
+    }
+    if (!processAlive(bus_pid_)) {
+        Logger::error("instrument-bus exited right after launch -- sources will link straight "
+                      "to the configured sink until it is back");
+        bus_pid_ = -1;
+        last_bus_ready_ = false;
+        return false;
+    }
+    last_bus_ready_ = ready;
+    if (ready) {
+        Logger::info("instrument-bus ports visible");
+        // zynvol subscribes to the "MIDI Bus Volume" port within ~0.5 s of starting, and
+        // Engine re-sends the level on every 2 s health tick, so a missed first message heals.
+        std::this_thread::sleep_for(std::chrono::milliseconds(300));
+        applyMasterBus(last_master_);
+    } else {
+        Logger::warning("instrument-bus ports not visible yet");
+    }
+    return true;
+}
+
+// Every link PipeWire currently has, as (output port, input port). pw-link -l prints each
+// port with its peers ("  |-> peer" under an output port, "  |<- peer" under an input port);
+// both forms are read and de-duplicated so either direction alone is enough.
+std::vector<std::pair<std::string, std::string>> AudioGraphManager::listLinks() const
+{
+    std::vector<std::pair<std::string, std::string>> links;
+    const std::string out = shellCapture("pw-link -l 2>/dev/null");
+    std::istringstream ss(out);
+    std::string line, cur;
+    auto add = [&links](const std::string& a, const std::string& b) {
+        const std::pair<std::string, std::string> p(a, b);
+        for (const auto& q : links)
+            if (q == p)
+                return;
+        links.push_back(p);
+    };
+    while (std::getline(ss, line)) {
+        while (!line.empty() && (line.back() == '\r' || line.back() == ' '))
+            line.pop_back();
+        if (line.empty())
+            continue;
+        const size_t first = line.find_first_not_of(" \t");
+        if (first == 0) { // port header
+            cur = line;
+            continue;
+        }
+        const std::string body = line.substr(first);
+        const bool out_link = body.compare(0, 3, "|->") == 0;
+        const bool in_link = body.compare(0, 3, "|<-") == 0;
+        if ((!out_link && !in_link) || cur.empty())
+            continue;
+        const size_t b = body.find_first_not_of(" \t", 3);
+        if (b == std::string::npos)
+            continue;
+        const std::string peer = body.substr(b);
+        if (out_link)
+            add(cur, peer);
+        else
+            add(peer, cur);
+    }
+    return links;
+}
+
+// Unlink OUR sources from the configured sink ports (and nothing else). Once the bus exists the
+// only path into the sink is bus out -> sink, so any direct melody / drums / vocoder / mic / SL /
+// volume-node link to the sink is stale: PipeWire auto-links, or links created before the bus
+// came up (the mode-transition diff cannot see those after a cache invalidation).
+void AudioGraphManager::sweepDirectSinkLinks()
+{
+    const PortCache& c = portCache();
+    if (!c.bus_ready)
+        return; // bus down: direct source -> sink links ARE the (fallback) routing
+    auto low = [](std::string s) {
+        for (char& ch : s)
+            ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
+        return s;
+    };
+    std::vector<std::string> exact = {c.mel_l, c.mel_r, c.dr_l, c.dr_r, c.vout_l, c.vout_r,
+                                      c.sl_out_l, c.sl_out_r, c.vol_out_l, c.vol_out_r};
+    exact.insert(exact.end(), c.mic_capture.begin(), c.mic_capture.end());
+    const std::string mel_pref = low("zynaddsubfx_" + cfg_.zyn_client_name + ":");
+    const std::string dru_pref = low("zynaddsubfx_" + cfg_.zyn_drums_client_name + ":");
+    auto ours = [&](const std::string& src) {
+        const std::string s = low(src);
+        if (s.compare(0, 15, "instrument-bus:") == 0)
+            return false;
+        for (const auto& e : exact)
+            if (!e.empty() && e == src)
+                return true;
+        return s.compare(0, mel_pref.size(), mel_pref) == 0 ||
+               s.compare(0, dru_pref.size(), dru_pref) == 0 ||
+               s.compare(0, 12, "sooperlooper") == 0 ||
+               s.compare(0, 18, "instrumentvocoder:") == 0 ||
+               s.compare(0, 16, "zyn-volume-node:") == 0;
+    };
+    int removed = 0;
+    for (const auto& l : listLinks()) {
+        if (l.second != c.play_l && l.second != c.play_r)
+            continue;
+        if (!ours(l.first))
+            continue;
+        if (pwUnlink(l.first, l.second))
+            ++removed;
+    }
+    if (removed > 0)
+        Logger::info("instrument-bus: removed " + std::to_string(removed) +
+                     " direct source -> sink link(s); the bus is the only path");
+}
+
+// Verify (and repair) the one path into the sink: bus out -> configured sink. A different
+// *playback* target of the bus (stale sink after a replug, or a fallback sink used while the
+// configured one was away) is dropped so there is never a duplicate path; non-playback targets
+// (e.g. a recorder the user attached to the bus output) are left alone.
+bool AudioGraphManager::ensureBusSinkLinks(const std::string& bus_out_l, const std::string& bus_out_r,
+                                           const std::string& sink_l, const std::string& sink_r)
+{
+    if (bus_out_l.empty() || bus_out_r.empty() || sink_l.empty() || sink_r.empty())
+        return false;
+    bool have_l = false, have_r = false;
+    for (const auto& l : listLinks()) {
+        const bool is_l = (l.first == bus_out_l);
+        const bool is_r = (l.first == bus_out_r);
+        if (!is_l && !is_r)
+            continue;
+        const std::string& want = is_l ? sink_l : sink_r;
+        if (l.second == want) {
+            if (is_l)
+                have_l = true;
+            else
+                have_r = true;
+            continue;
+        }
+        std::string low = l.second;
+        for (char& ch : low)
+            ch = static_cast<char>(std::tolower(static_cast<unsigned char>(ch)));
+        if (low.find("playback_") != std::string::npos)
+            pwUnlink(l.first, l.second);
+    }
+    // Only try when the sink port really exists (it is absent while a USB sink is unplugged).
+    if (!have_l && !findPortsMatching({sink_l}, true).empty())
+        pwLink(bus_out_l, sink_l);
+    if (!have_r && !findPortsMatching({sink_r}, true).empty())
+        pwLink(bus_out_r, sink_r);
+    return true;
 }
